@@ -54,8 +54,22 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         // Maybe use a switch statement to cycle through each of the piece types?
-
-        return new ArrayList<>();
+        switch (this.type){
+            case BISHOP:
+                return bishopMoves(board, myPosition);
+            case KING:
+                return kingMoves(board, myPosition);
+            case KNIGHT:
+                return knightMoves(board, myPosition);
+            case PAWN:
+                return pawnMoves(board, myPosition);
+            case QUEEN:
+                return queenMoves(board, myPosition);
+            case ROOK:
+                return rookMoves(board, myPosition);
+            default:
+                return new ArrayList<>();
+        }
     }
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
@@ -66,7 +80,7 @@ public class ChessPiece {
         return availableMoves;
     }
 
-    private Collection<ChessMove> KingMoves(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> availableMoves = new ArrayList<>();
 
 
@@ -74,5 +88,35 @@ public class ChessPiece {
         return availableMoves;
     }
 
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> availableMoves = new ArrayList<>();
 
+
+
+        return availableMoves;
+    }
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+
+
+
+        return availableMoves;
+    }
+
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+
+
+
+        return availableMoves;
+    }
+
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+
+
+
+        return availableMoves;
+    }
 }
