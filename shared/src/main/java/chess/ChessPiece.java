@@ -53,6 +53,26 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        // Maybe use a switch statement to cycle through each of the piece types?
+
         return new ArrayList<>();
     }
+
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+
+        // Add Logic to figure out which moves the Bishop can make on the board.
+
+        return availableMoves;
+    }
+
+    private Collection<ChessMove> KingMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> availableMoves = new ArrayList<>();
+
+
+
+        return availableMoves;
+    }
+
+
 }
