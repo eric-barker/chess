@@ -80,15 +80,58 @@ public class ChessPiece {
         // Add Logic to figure out which moves the Bishop can make on the board.
         // Move upper left and check for boundary or Collision
         // Check for Boundary
-        if(columnNum < 1 || rowNum > 8){
-
+        int newRow = rowNum + 1;
+        int newColumn = columnNum -1;
+        // Check if outside of Boundary
+        while(columnNum >= 1 && rowNum <= 8){
+            // Check for Collision
+            ChessPosition newPosition = new ChessPosition(newRow, newColumn);
+            ChessPiece pieceInSquare = board.getPiece(newPosition);
+            // Is there a piece in the square?
+            if(pieceInSquare != null){
+                // Is it my teams piece?
+                if(pieceInSquare.getTeamColor() == this.pieceColor){
+                    break;
+                }
+                else{
+                    // Placeholder: Add logic to capture the enemy piece?
+                    availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                    break; // Stop after capturing their piece?
+                }
+            }
+            // No piece?
+            availableMoves.add(new ChessMove(myPosition,newPosition, null));
+            newRow++;
+            newColumn--;
         }
-        // Check for Collision
-        ChessPosition newPosition = new ChessPosition(rowNum, columnNum);
-        ChessPiece pieceInSquare = board.getPiece();
-        if(ChessBoard.getPiece())
+
 
         // Move upper right and check for boundary or Collision
+        // Check for Boundary
+        newRow = rowNum + 1;
+        newColumn = columnNum + 1;
+        // Check if outside of Boundary
+        while(columnNum >= 1 && rowNum <= 8){
+            // Check for Collision
+            ChessPosition newPosition = new ChessPosition(newRow, newColumn);
+            ChessPiece pieceInSquare = board.getPiece(newPosition);
+            // Is there a piece in the square?
+            if(pieceInSquare != null){
+                // Is it my teams piece?
+                if(pieceInSquare.getTeamColor() == this.pieceColor){
+                    break;
+                }
+                else{
+                    // Placeholder: Add logic to capture the enemy piece?
+                    availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                    break; // Stop after capturing their piece?
+                }
+            }
+            // No piece?
+            availableMoves.add(new ChessMove(myPosition,newPosition, null));
+            newRow++;
+            newColumn++;
+        }
         // Move lower left and check for boundary or Collision
         // Move lower right and check for boundary or Collision
         
