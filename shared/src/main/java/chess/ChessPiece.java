@@ -74,8 +74,24 @@ public class ChessPiece {
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> availableMoves = new ArrayList<>();
+        int rowNum = myPosition.getRow();
+        int columnNum = myPosition.getColumn();
 
         // Add Logic to figure out which moves the Bishop can make on the board.
+        // Move upper left and check for boundary or Collision
+        // Check for Boundary
+        if(columnNum < 1 || rowNum > 8){
+
+        }
+        // Check for Collision
+        ChessPosition newPosition = new ChessPosition(rowNum, columnNum);
+        ChessPiece pieceInSquare = board.getPiece();
+        if(ChessBoard.getPiece())
+
+        // Move upper right and check for boundary or Collision
+        // Move lower left and check for boundary or Collision
+        // Move lower right and check for boundary or Collision
+        
 
         return availableMoves;
     }
@@ -119,4 +135,6 @@ public class ChessPiece {
 
         return availableMoves;
     }
+
+
 }
