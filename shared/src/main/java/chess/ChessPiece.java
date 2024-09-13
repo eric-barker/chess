@@ -111,7 +111,7 @@ public class ChessPiece {
         newRow = rowNum + 1;
         newColumn = columnNum + 1;
         // Check if outside of Boundary
-        while(columnNum >= 1 && rowNum <= 8){
+        while(columnNum <= 8 && rowNum <= 8){
             // Check for Collision
             ChessPosition newPosition = new ChessPosition(newRow, newColumn);
             ChessPiece pieceInSquare = board.getPiece(newPosition);
@@ -132,9 +132,60 @@ public class ChessPiece {
             newRow++;
             newColumn++;
         }
+
         // Move lower left and check for boundary or Collision
+        // Check for Boundary
+        newRow = rowNum - 1;
+        newColumn = columnNum - 1;
+        // Check if outside of Boundary
+        while(columnNum >= 1 && rowNum >= 1){
+            // Check for Collision
+            ChessPosition newPosition = new ChessPosition(newRow, newColumn);
+            ChessPiece pieceInSquare = board.getPiece(newPosition);
+            // Is there a piece in the square?
+            if(pieceInSquare != null){
+                // Is it my teams piece?
+                if(pieceInSquare.getTeamColor() == this.pieceColor){
+                    break;
+                }
+                else{
+                    // Placeholder: Add logic to capture the enemy piece?
+                    availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                    break; // Stop after capturing their piece?
+                }
+            }
+            // No piece?
+            availableMoves.add(new ChessMove(myPosition,newPosition, null));
+            newRow--;
+            newColumn--;
+        }
+
         // Move lower right and check for boundary or Collision
-        
+        // Check for Boundary
+        newRow = rowNum - 1;
+        newColumn = columnNum + 1;
+        // Check if outside of Boundary
+        while(columnNum <= 8 && rowNum >= 1){
+            // Check for Collision
+            ChessPosition newPosition = new ChessPosition(newRow, newColumn);
+            ChessPiece pieceInSquare = board.getPiece(newPosition);
+            // Is there a piece in the square?
+            if(pieceInSquare != null){
+                // Is it my teams piece?
+                if(pieceInSquare.getTeamColor() == this.pieceColor){
+                    break;
+                }
+                else{
+                    // Placeholder: Add logic to capture the enemy piece?
+                    availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                    break; // Stop after capturing their piece?
+                }
+            }
+            // No piece?
+            availableMoves.add(new ChessMove(myPosition,newPosition, null));
+            newRow++;
+            newColumn--;
+        }
 
         return availableMoves;
     }
