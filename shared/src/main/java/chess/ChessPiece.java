@@ -75,6 +75,7 @@ public class ChessPiece {
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> availableMoves = new ArrayList<>();
 
+
         int[][] bishopMoveDirections = {
                 {1,1}, // Upper Right
                 {1,-1}, // Upper Left
@@ -89,15 +90,30 @@ public class ChessPiece {
 
             // Keep iterating and adding moves until out of bounds
             while(rowNum >= 1 && rowNum <= 8 && columnNum >= 1 && columnNum <= 8){
+                ChessPosition newPosition = new ChessPosition(rowNum, columnNum);
+                ChessPiece pieceInSquare = board.getPiece(newPosition);
 
                 // Check if there is a piece in the square
-                    // Is the piece on my team?
+                if(pieceInSquare != null){
 
+                    // Is the piece on my team?
+                    if(pieceInSquare.getTeamColor() == this.pieceColor){
+                        // We have reached the end of options in this direction.
+                        break;
+                    }
                     // Add move to available moves
+                    else{
+                        availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                        break;
+                    }
+                }
 
                 // If no piece add square to available moves
+                availableMoves.add(new ChessMove(myPosition, newPosition, null));
 
                 // Increment the row and column in the given direction
+                rowNum += direction[0];
+                columnNum += direction[1];
 
             }
         }
