@@ -168,5 +168,10 @@ public class ChessPiece {
         return availableMoves;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s %s", pieceColor, type);
+    }
+
 
 }
