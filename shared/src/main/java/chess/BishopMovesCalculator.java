@@ -35,7 +35,7 @@ public class BishopMovesCalculator extends PieceMovesCalculator{
             int col = position.getColumn();
 
             // Move in direction within the board boundaries
-            While (true){
+            while (true){
                 // Update position in the current diagonal direction
                 row += direction[0];
                 col += direction[1];
@@ -65,7 +65,6 @@ public class BishopMovesCalculator extends PieceMovesCalculator{
                 }
             }
         }
-
 
         return moves;
     }
