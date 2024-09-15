@@ -31,16 +31,39 @@ public class BishopMovesCalculator extends PieceMovesCalculator{
         // Iterate over each diagonal direction
         for(int[] direction: directions){
             // Start from the current position
+            int row = position.getRow();
+            int col = position.getColumn();
 
             // Move in direction within the board boundaries
+            While (true){
                 // Update position in the current diagonal direction
+                row += direction[0];
+                col += direction[1];
+
                 // Is the new position out of bound?
+                if(row < 0 || row >= 8 || col < 0 || col >= 8){
+                    break;
+                }
+                // Create new ChessPosition and ChessPiece objects
+                ChessPosition newPos = new ChessPosition(row,col);
+                ChessPiece piece = board.getPiece(newPos);
+
                 // Is the square empty?
+                if(piece == null){
                     // Add the position to the moves Collection
+                    moves.add(new ChessMove(position, newPos, null));
+                }
                 // There is a piece
-                // Is it an enemy piece?
-                    // Add ChessMove
-                // Stop moving further in this direction
+                else{
+                    // Is it an enemy piece?
+                    if(piece.getTeamColor() != board.getPiece(position).getTeamColor()){
+                        // Add ChessMove
+                        moves.add(new ChessMove(position, newPos, null));
+                    }
+                    // Stop moving further in this direction
+                    break;
+                }
+            }
         }
 
 
