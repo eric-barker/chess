@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -11,12 +10,7 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
-    private final ChessGame.TeamColor pieceColor;
-    private final PieceType type;
-
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.pieceColor = pieceColor;
-        this.type = type;
     }
 
     /**
@@ -35,14 +29,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return pieceColor;
+        throw new RuntimeException("Not implemented");
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return type;
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -53,125 +47,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        // Maybe use a switch statement to cycle through each of the piece types?
-        switch (this.type){
-            case BISHOP:
-                return bishopMoves(board, myPosition);
-            case KING:
-                return kingMoves(board, myPosition);
-            case KNIGHT:
-                return knightMoves(board, myPosition);
-            case PAWN:
-                return pawnMoves(board, myPosition);
-            case QUEEN:
-                return queenMoves(board, myPosition);
-            case ROOK:
-                return rookMoves(board, myPosition);
-            default:
-                return new ArrayList<>();
-        }
+        throw new RuntimeException("Not implemented");
     }
-
-    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
-
-
-        int[][] bishopMoveDirections = {
-                {1,1}, // Upper Right
-                {1,-1}, // Upper Left
-                {-1,1}, // Lower Right
-                {-1,-1}}; // Lower Left
-
-        // check each of the diagonal directions
-        for(int[] direction: bishopMoveDirections){
-            // Set row and column to first square in the direction
-            int rowNum = myPosition.getRow() + direction[0]; // Subtract 1 to convert to base 0 indexing
-            int columnNum = myPosition.getColumn() + direction[1]; // Subtract 1 to convert to base 0 indexing
-
-            // Keep iterating and adding moves until out of bounds
-            while(rowNum > 0 && rowNum < 8 && columnNum > 0 && columnNum < 8){
-                ChessPosition newPosition = new ChessPosition(rowNum , columnNum); // Convert back to 1-based index for ChessPosition
-                ChessPiece pieceInSquare = board.getPiece(newPosition);
-
-                // Check if there is a piece in the square
-                if(pieceInSquare != null){
-
-                    // Is the piece on my team?
-                    if(pieceInSquare.getTeamColor() == this.pieceColor){
-                        // We have reached the end of options in this direction.
-                        break;
-                    }
-                    // Add move to available moves
-                    else{
-                        availableMoves.add(new ChessMove(myPosition, newPosition, null));
-                        System.out.println("Added move: " + new ChessMove(myPosition, newPosition, null).toString());
-
-                        break;
-                    }
-                }
-
-                // If no piece add square to available moves
-                availableMoves.add(new ChessMove(myPosition, newPosition, null));
-                System.out.println("Added move: " + new ChessMove(myPosition, newPosition, null).toString());
-
-                // Increment the row and column in the given direction
-                rowNum += direction[0];
-                columnNum += direction[1];
-
-            }
-        }
-
-
-
-
-
-        return availableMoves;
-    }
-
-    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
-
-
-
-        return availableMoves;
-    }
-
-    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
-
-
-
-        return availableMoves;
-    }
-
-    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
-
-
-
-        return availableMoves;
-    }
-
-    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
-
-
-
-        return availableMoves;
-    }
-
-    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> availableMoves = new ArrayList<>();
-
-
-
-        return availableMoves;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s %s", pieceColor, type);
-    }
-
-
 }
