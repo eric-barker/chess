@@ -104,12 +104,15 @@ public class ChessPiece {
                     // Add move to available moves
                     else{
                         availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                        System.out.println("Added move: " + new ChessMove(myPosition, newPosition, null).toString());
+
                         break;
                     }
                 }
 
                 // If no piece add square to available moves
                 availableMoves.add(new ChessMove(myPosition, newPosition, null));
+                System.out.println("Added move: " + new ChessMove(myPosition, newPosition, null).toString());
 
                 // Increment the row and column in the given direction
                 rowNum += direction[0];
