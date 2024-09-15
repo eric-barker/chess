@@ -75,11 +75,13 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        PieceMovesCalculator myMovesCalculator;
+
         switch(type){
             case KING:
             case QUEEN:
             case BISHOP:
-                BishopMovesCalculator myMovesCalculator = new BishopMovesCalculator(board, myPosition);
+                myMovesCalculator = new BishopMovesCalculator(board, myPosition);
                 break;
             case KNIGHT:
             case ROOK:
@@ -88,6 +90,6 @@ public class ChessPiece {
                 throw new IllegalArgumentException("Unknown Piece Type: " + type);
         }
 
-        return myMovesCalculator.calculateMoves();
+        return myMovesCalculator.calculateMoves(board, myPosition);
     }
 }
