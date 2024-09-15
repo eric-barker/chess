@@ -57,14 +57,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return pieceColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+        return type;
     }
 
     /**
@@ -75,6 +75,18 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        switch(type){
+            case KING:
+            case QUEEN:
+            case BISHOP:
+                BishopMovesCalculator myMovesCalculator = new BishopMovesCalculator(board, myPosition);
+            case KNIGHT:
+            case ROOK:
+            case PAWN:
+            default:
+                throw new IllegalArgumentException("Unknown Piece Type: " + type);
+        }
+
+        return myMovesCalculator.calculateMoves();
     }
 }

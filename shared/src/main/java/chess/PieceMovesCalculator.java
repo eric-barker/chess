@@ -17,5 +17,6 @@ public abstract class PieceMovesCalculator {
     public abstract Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position);
 
     // Default Constructor
-    public PieceMovesCalculator(){}
+    public PieceMovesCalculator(ChessBoard board, ChessPosition position){
+    }
 }
