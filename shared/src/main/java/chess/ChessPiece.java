@@ -85,12 +85,12 @@ public class ChessPiece {
         // check each of the diagonal directions
         for(int[] direction: bishopMoveDirections){
             // Set row and column to first square in the direction
-            int rowNum = myPosition.getRow() + direction[0];
-            int columnNum = myPosition.getColumn() + direction[1];
+            int rowNum = myPosition.getRow() + direction[0]; // Subtract 1 to convert to base 0 indexing
+            int columnNum = myPosition.getColumn() + direction[1]; // Subtract 1 to convert to base 0 indexing
 
             // Keep iterating and adding moves until out of bounds
-            while(rowNum >= 1 && rowNum <= 8 && columnNum >= 1 && columnNum <= 8){
-                ChessPosition newPosition = new ChessPosition(rowNum, columnNum);
+            while(rowNum > 0 && rowNum < 8 && columnNum > 0 && columnNum < 8){
+                ChessPosition newPosition = new ChessPosition(rowNum , columnNum); // Convert back to 1-based index for ChessPosition
                 ChessPiece pieceInSquare = board.getPiece(newPosition);
 
                 // Check if there is a piece in the square
