@@ -24,7 +24,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
                 {1,-1}, // Upper-left
                 {0,1}, // Up
                 {1,1}, // Upper-right
-                {0,1}, // Right
+                {1,0}, // Right
                 {-1,1}, // Bottom-right
                 {0,-1}, // Bottom
                 {-1,-1}, // Bottom-left
@@ -62,8 +62,6 @@ public class KingMovesCalculator extends PieceMovesCalculator {
                     // Add ChessMove
                     moves.add(new ChessMove(position, newPos, null));
                 }
-                // Stop moving further in this direction
-                break;
             }
         }
 
