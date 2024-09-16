@@ -22,10 +22,10 @@ public class BishopMovesCalculator extends PieceMovesCalculator{
 
         // Define diagonal movement directions
         int[][] directions = {
-                {1,1}, // Upper-right
                 {1,-1}, // Upper-left
-                {-1,1}, // Bottom-right
-                {-1,-1} // Bottom-left
+                {1,1}, // Upper-right
+                {-1,-1}, // Bottom-left
+                {-1,1} // Bottom-right
         };
 
         // Iterate over each diagonal direction
@@ -41,11 +41,12 @@ public class BishopMovesCalculator extends PieceMovesCalculator{
                 col += direction[1];
 
                 // Is the new position out of bound?
-                if(row < 0 || row >= 8 || col < 0 || col >= 8){
+                if(row < 1 || row > 8 || col < 1 || col > 8){
                     break;
                 }
                 // Create new ChessPosition and ChessPiece objects
                 ChessPosition newPos = new ChessPosition(row,col);
+                ChessPosition offByOnePos = new ChessPosition(row -1, col -1);
                 ChessPiece piece = board.getPiece(newPos);
 
                 // Is the square empty?
