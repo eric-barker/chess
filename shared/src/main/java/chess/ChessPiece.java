@@ -79,6 +79,7 @@ public class ChessPiece {
 
         switch(type){
             case KING:
+                myMovesCalculator = new KingMOvesCalculator(board, myPosition);
             case QUEEN:
             case BISHOP:
                 myMovesCalculator = new BishopMovesCalculator(board, myPosition);
