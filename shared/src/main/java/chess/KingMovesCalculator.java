@@ -43,7 +43,7 @@ public class KingMovesCalculator extends PieceMovesCalculator {
 
             // Is the new position out of bound?
             if(row < 1 || row > 8 || col < 1 || col > 8){
-                break;
+                continue;
             }
             // Create new ChessPosition and ChessPiece objects
             ChessPosition newPos = new ChessPosition(row,col);
