@@ -88,6 +88,8 @@ public class ChessPiece {
                 myMovesCalculator = new BishopMovesCalculator(board, myPosition);
                 break;
             case KNIGHT:
+                myMovesCalculator = new KnightMovesCalculator(board, myPosition);
+                break;
             case ROOK:
                 myMovesCalculator = new RookMovesCalculator(board, myPosition);
                 break;

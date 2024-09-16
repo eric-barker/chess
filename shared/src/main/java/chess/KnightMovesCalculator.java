@@ -17,14 +17,14 @@ public class KnightMovesCalculator extends PieceMovesCalculator{
 
         // Define diagonal movement directions
         int[][] directions = {
-                {3,-1}, // Upper-left
-                {3,1}, // Upper-right
-                {1,3}, // Right-up
-                {-1,3}, // Right-down
-                {-3,1}, // Bottom-right
-                {-3,-1}, // Bottom-left
-                {-3,1}, // Left-up
-                {-3,-1} // Left-down
+                {-1,2}, // Upper-left
+                {1,2}, // Upper-right
+                {-1,-2}, // Lower-left
+                {1,-2}, // Lower-right
+                {-2,1}, // Left-Up
+                {-2,-1}, // Left-Down
+                {2,1}, // Right-up
+                {2,-1} // Right-down
         };
 
         // Iterate over each diagonal direction
