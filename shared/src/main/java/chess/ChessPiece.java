@@ -82,11 +82,15 @@ public class ChessPiece {
                 myMovesCalculator = new KingMovesCalculator(board, myPosition);
                 break;
             case QUEEN:
+                myMovesCalculator = new QueenMovesCalculator(board, myPosition);
+                break;
             case BISHOP:
                 myMovesCalculator = new BishopMovesCalculator(board, myPosition);
                 break;
             case KNIGHT:
             case ROOK:
+                myMovesCalculator = new RookMovesCalculator(board, myPosition);
+                break;
             case PAWN:
             default:
                 throw new IllegalArgumentException("Unknown Piece Type: " + type);
