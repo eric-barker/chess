@@ -95,6 +95,8 @@ public class ChessPiece {
                 myMovesCalculator = new RookMovesCalculator(board, myPosition);
                 break;
             case PAWN:
+                myMovesCalculator = new PawnMovesCalculator(board, myPosition);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Piece Type: " + type);
         }
