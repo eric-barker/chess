@@ -1,17 +1,21 @@
-package chess;
+package chess.movecalculators;
+
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class QueenMovesCalculator extends PieceMovesCalculator {
-
+public class RookMovesCalculator extends PieceMovesCalculator {
     // Constructor
-    public QueenMovesCalculator(ChessBoard board, ChessPosition position){
+    public RookMovesCalculator(ChessBoard board, ChessPosition position){
         super(board, position);
     }
 
     /**
-     * Calculates all valid moves for a Queen at the given position on the board.
+     * Calculates all valid moves for a ROOK at the given position on the board.
      *
      * @param board The chessboard on which to calculate moves.
      * @param position The current position of the piece.
@@ -25,13 +29,9 @@ public class QueenMovesCalculator extends PieceMovesCalculator {
 
         // Define diagonal movement directions
         int[][] directions = {
-                {1,-1}, // Upper-left
                 {0,1}, // Up
-                {1,1}, // Upper-right
                 {1,0}, // Right
-                {-1,1}, // Bottom-right
                 {0,-1}, // Bottom
-                {-1,-1}, // Bottom-left
                 {-1,0} // Left
         };
 

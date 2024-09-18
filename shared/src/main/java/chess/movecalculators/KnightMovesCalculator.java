@@ -1,15 +1,16 @@
-package chess;
+package chess.movecalculators;
+
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-/**
- * Concrete class for calculating moves of a King.
- */
-public class KingMovesCalculator extends PieceMovesCalculator {
-
-    // Parameterized constructor
-    public KingMovesCalculator(ChessBoard board, ChessPosition position) {
+public class KnightMovesCalculator extends PieceMovesCalculator {
+    // Constructor
+    public KnightMovesCalculator(ChessBoard board, ChessPosition position){
         super(board, position);
     }
 
@@ -21,14 +22,14 @@ public class KingMovesCalculator extends PieceMovesCalculator {
 
         // Define diagonal movement directions
         int[][] directions = {
-                {1,-1}, // Upper-left
-                {0,1}, // Up
-                {1,1}, // Upper-right
-                {1,0}, // Right
-                {-1,1}, // Bottom-right
-                {0,-1}, // Bottom
-                {-1,-1}, // Bottom-left
-                {-1,0} // Left
+                {-1,2}, // Upper-left
+                {1,2}, // Upper-right
+                {-1,-2}, // Lower-left
+                {1,-2}, // Lower-right
+                {-2,1}, // Left-Up
+                {-2,-1}, // Left-Down
+                {2,1}, // Right-up
+                {2,-1} // Right-down
         };
 
         // Iterate over each diagonal direction
