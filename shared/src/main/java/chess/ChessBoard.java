@@ -10,10 +10,59 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-     private ChessPiece[][] squares = new ChessPiece[9][9];
+    private ChessPiece[][] squares = new ChessPiece[9][9];
 
     public ChessBoard() {
-        
+//        // Empty board
+//        emptyBoard();
+//        setTeamPieces(ChessGame.TeamColor.WHITE);
+//        setTeamPieces(ChessGame.TeamColor.BLACK);
+    }
+
+    private void emptyBoard(){
+        for(int col = 1; col <= 8; col++){
+            for(int row = 1; row <= 8; row++){
+                squares[row][col] = null;
+            }
+        }
+    }
+
+    private void setTeamPieces(ChessGame.TeamColor color) {
+        int backRow;
+        int frontRow;
+
+        if(color == ChessGame.TeamColor.WHITE){
+            backRow = 1;
+            frontRow = 2;
+        }
+        else{
+            backRow = 8;
+            frontRow = 7;
+        }
+
+        // Place pieces
+        // Pawns
+        for(int col = 1; col <= 8; col++){
+            squares[frontRow][col] = new ChessPiece(color, ChessPiece.PieceType.PAWN);
+        }
+
+        // Rooks
+        squares[backRow][1] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        squares[backRow][8] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+
+        // Knights
+        squares[backRow][2] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        squares[backRow][7] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+
+        // Bishops
+        squares[backRow][3] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        squares[backRow][6] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+
+        // Queen
+        squares[backRow][4] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+
+        // King
+        squares[backRow][5] = new ChessPiece(color, ChessPiece.PieceType.KING);
     }
 
     /**
@@ -44,7 +93,9 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        emptyBoard();
+        setTeamPieces(ChessGame.TeamColor.WHITE);
+        setTeamPieces(ChessGame.TeamColor.BLACK);
     }
 
     @Override
