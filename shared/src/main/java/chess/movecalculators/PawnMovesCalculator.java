@@ -1,9 +1,6 @@
 package chess.movecalculators;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,8 +52,21 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
 
         // Any Pieces to Capture?
         row = position.getRow() + direction;
-        for(columnOffset: new int[]{-1,1}){
-            col = position.getColumn() + columnOffset;
+        int[] columnOffset = {-1,1};
+        for(columnNum: columnOffset){
+            col = position.getColumn() + columnNum;
+
+            // Is it in the board boundaries?
+            if(row >= 1 && row <=8 && col >=1 && col <=8){
+                ChessPosition pos = new ChessPosition(row, col);
+
+                // Is there an enemy piece?
+                if(board.getPiece(pos) != null){
+                    if(board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()){
+                        moves.add(new ChessMove(position, pos, null));
+                    }
+                }
+            }
         }
             // Add the move to moves
 
