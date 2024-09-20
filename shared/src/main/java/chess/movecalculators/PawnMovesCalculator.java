@@ -14,13 +14,16 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
     }
 
     private void addMoves(Collection<ChessMove> moves, ChessPosition position, ChessPosition pos, int endRow){
-        moves.add(new ChessMove(position, pos, null));
         // Can the pawn promote?
-        if(position.getRow() == endRow){
+        if(pos.getRow() == endRow){
             moves.add(new ChessMove(position, pos, QUEEN));
             moves.add(new ChessMove(position, pos, BISHOP));
             moves.add(new ChessMove(position, pos, KNIGHT));
             moves.add(new ChessMove(position, pos, ROOK));
+        }
+        // Add a move like normal
+        else{
+            moves.add(new ChessMove(position, pos, null));
         }
     }
 
@@ -102,7 +105,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 // Is there an enemy piece?
                 if (board.getPiece(pos) != null) {
                     if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                       addMoves(moves, position, pos, );
+                       addMoves(moves, position, pos, endRow);
                     }
                 }
             }
