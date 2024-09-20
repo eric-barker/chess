@@ -1,6 +1,7 @@
 package chess.movecalculators;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 
@@ -17,9 +18,24 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        // Which Direction are the pawns moving? Based on color?
+        int direction;
+        int startRow;
 
-        // Where do they start?
+        if(getTeamColor() == ChessGame.TeamColor.WHITE){
+            // Which Direction are the pawns moving? Based on color?
+            direction = 1;
+            // Where do they start?
+            startRow = 2;
+        }
+        else{
+            // Which Direction are the pawns moving? Based on color?
+            direction = -1;
+            // Where do they start?
+            startRow = 7;
+        }
+
+
+
 
         // Move forward
 
