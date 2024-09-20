@@ -68,13 +68,26 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 }
             }
         }
-            // Add the move to moves
 
 
         // Double move at beginning?
+        if(position.getRow() == startRow){
+            row = position.getRow() + 2;
+            ChessPosition pos = new ChessPosition(row,col);
+            ChessPosition posOneLess = new ChessPosition(row-1, col);
+
+            // is the space empty and the space before it empty?
+            if(board.getPiece(pos) == null && board.getPiece(posOneLess) == null){
+                // Add move to moves
+                moves.add(new ChessMove(position, pos, null));
+            }
+        }
 
 
         // Promote the piece
+//        if(position.getRow() == endRow){
+//
+//        }
 
 
         return moves;
