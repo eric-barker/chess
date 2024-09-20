@@ -43,10 +43,10 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
 
         // Any Pieces to Capture?
         int[] columnOffset = {-1,0,1};
-        row = position.getRow() + direction;
+        int row = position.getRow() + direction;
 
         for(int column : columnOffset){
-            col = position.getColumn() + column;
+            int col = position.getColumn() + column;
             ChessPosition pos = new ChessPosition(row, col);
 
             // Is it out of board boundaries?
@@ -56,55 +56,45 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
 
             // Moving straight?
             if(column == 0){
+
                 // Is the next board space empty?
                 if(board.getPiece(pos) == null){
                     // Add move to moves
                     moves.add(new ChessMove(position, pos, null));
-                }
-                // Am I at the start row?
-                if(position.getRow() == startRow){
-                    // look at space 2 in front of myPawn
-                    row += 1;
 
-                    // Is it out of board boundaries?
-                    if(row < 1 || row > 8 || col < 1 || col > 8) {
-                        continue; // Move on to next for loop iteration
-                    }
+                    // Am I at the start row?
+                    if(position.getRow() == startRow){
+                        // look at space 2 in front of myPawn
+                        row += direction;
 
-                    pos = new ChessPosition(row, col);
+                        // Is it out of board boundaries?
+                        if(row < 1 || row > 8 || col < 1 || col > 8) {
+                            continue; // Move on to next for loop iteration
+                        }
 
-                    // Is the space empty?
-                    if(board.getPiece(pos) == null){
-                        // add move to moves.
-                        moves.add(new ChessMove(position,pos,null));
+                        pos = new ChessPosition(row, col);
+
+                        // Is the space empty?
+                        if(board.getPiece(pos) == null){
+                            // add move to moves.
+                            moves.add(new ChessMove(position,pos,null));
+                        }
                     }
                 }
             }
 
 
-
-            // Is there an enemy piece?
-            if(board.getPiece(pos) != null){
-                if(board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()){
-                    moves.add(new ChessMove(position, pos, null));
+            // Check Diagonals for enemies
+            if(column == -1 || column == 1) {
+                // Is there an enemy piece?
+                if (board.getPiece(pos) != null) {
+                    if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
+                        moves.add(new ChessMove(position, pos, null));
+                    }
                 }
             }
         }
 
-
-
-        // Double move at beginning?
-        if(position.getRow() == startRow){
-            row = position.getRow() + 2;
-            ChessPosition pos = new ChessPosition(row,col);
-            ChessPosition posOneLess = new ChessPosition(row-1, col);
-
-            // is the space empty and the space before it empty?
-            if(board.getPiece(pos) == null && board.getPiece(posOneLess) == null){
-                // Add move to moves
-                moves.add(new ChessMove(position, pos, null));
-            }
-        }
 
 
         // Promote the piece
