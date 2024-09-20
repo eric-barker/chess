@@ -20,18 +20,23 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
 
         int direction;
         int startRow;
+        int endRow;
 
         if(getTeamColor() == ChessGame.TeamColor.WHITE){
             // Which Direction are the pawns moving? Based on color?
             direction = 1;
             // Where do they start?
             startRow = 2;
+            // Where do they end?
+            endRow = 8;
         }
         else{
             // Which Direction are the pawns moving? Based on color?
             direction = -1;
             // Where do they start?
             startRow = 7;
+            // Where do they end?
+            endRow = 1;
         }
 
         // Move forward
@@ -47,10 +52,12 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 moves.add(new ChessMove(position,pos,null));
             }
         }
-            // Is it an empty space?
-                // Add the move to the moves
 
         // Any Pieces to Capture?
+        row = position.getRow() + direction;
+        for(columnOffset: new int[]{-1,1}){
+            col = position.getColumn() + columnOffset;
+        }
             // Add the move to moves
 
 
