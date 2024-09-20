@@ -14,12 +14,13 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
     @Override
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
         Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece myPawn = board.getPiece(position);
 
         int direction;
         int startRow;
         int endRow;
 
-        if(getTeamColor() == ChessGame.TeamColor.WHITE){
+        if(myPawn.getTeamColor() == ChessGame.TeamColor.WHITE){
             // Which Direction are the pawns moving? Based on color?
             direction = 1;
             // Where do they start?
@@ -36,38 +37,60 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
             endRow = 1;
         }
 
-        // Move forward
-        int row = position.getRow() + direction;
-        int col = position.getColumn();
 
-        // Is it in bounds of the Board?
-        if(row >= 1 && row <= 8){
-            ChessPosition pos = new ChessPosition(row,col);
-            // Is it an empty space?
-            if(board.getPiece(pos) == null){
-                // Add the move to the moves
-                moves.add(new ChessMove(position,pos,null));
-            }
-        }
+
+
 
         // Any Pieces to Capture?
+        int[] columnOffset = {-1,0,1};
         row = position.getRow() + direction;
-        int[] columnOffset = {-1,1};
-        for(columnNum: columnOffset){
-            col = position.getColumn() + columnNum;
 
-            // Is it in the board boundaries?
-            if(row >= 1 && row <=8 && col >=1 && col <=8){
-                ChessPosition pos = new ChessPosition(row, col);
+        for(int column : columnOffset){
+            col = position.getColumn() + column;
+            ChessPosition pos = new ChessPosition(row, col);
 
-                // Is there an enemy piece?
-                if(board.getPiece(pos) != null){
-                    if(board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()){
-                        moves.add(new ChessMove(position, pos, null));
+            // Is it out of board boundaries?
+            if(row < 1 || row > 8 || col < 1 || col > 8) {
+                continue; // Move on to next for loop iteration
+            }
+
+            // Moving straight?
+            if(column == 0){
+                // Is the next board space empty?
+                if(board.getPiece(pos) == null){
+                    // Add move to moves
+                    moves.add(new ChessMove(position, pos, null));
+                }
+                // Am I at the start row?
+                if(position.getRow() == startRow){
+                    // look at space 2 in front of myPawn
+                    row += 1;
+
+                    // Is it out of board boundaries?
+                    if(row < 1 || row > 8 || col < 1 || col > 8) {
+                        continue; // Move on to next for loop iteration
+                    }
+
+                    pos = new ChessPosition(row, col);
+
+                    // Is the space empty?
+                    if(board.getPiece(pos) == null){
+                        // add move to moves.
+                        moves.add(new ChessMove(position,pos,null));
                     }
                 }
             }
+
+
+
+            // Is there an enemy piece?
+            if(board.getPiece(pos) != null){
+                if(board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()){
+                    moves.add(new ChessMove(position, pos, null));
+                }
+            }
         }
+
 
 
         // Double move at beginning?
