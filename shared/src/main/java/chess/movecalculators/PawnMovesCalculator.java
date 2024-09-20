@@ -6,9 +6,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static chess.ChessPiece.PieceType.*;
+
 public class PawnMovesCalculator extends PieceMovesCalculator{
     public PawnMovesCalculator(ChessBoard board, ChessPosition position){
         super(board, position);
+    }
+
+    private void addMoves(Collection<ChessMove> moves, ChessPosition position, ChessPosition pos, int endRow){
+        moves.add(new ChessMove(position, pos, null));
+        // Can the pawn promote?
+        if(position.getRow() == endRow){
+            moves.add(new ChessMove(position, pos, QUEEN));
+            moves.add(new ChessMove(position, pos, BISHOP));
+            moves.add(new ChessMove(position, pos, KNIGHT));
+            moves.add(new ChessMove(position, pos, ROOK));
+        }
     }
 
     @Override
@@ -60,7 +73,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 // Is the next board space empty?
                 if(board.getPiece(pos) == null){
                     // Add move to moves
-                    moves.add(new ChessMove(position, pos, null));
+                   addMoves(moves, position, pos, endRow);
 
                     // Am I at the start row?
                     if(position.getRow() == startRow){
@@ -77,7 +90,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                         // Is the space empty?
                         if(board.getPiece(pos) == null){
                             // add move to moves.
-                            moves.add(new ChessMove(position,pos,null));
+                            addMoves(moves, position, pos, endRow);
                         }
                     }
                 }
@@ -89,18 +102,11 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 // Is there an enemy piece?
                 if (board.getPiece(pos) != null) {
                     if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                        moves.add(new ChessMove(position, pos, null));
+                       addMoves(moves, position, pos, );
                     }
                 }
             }
         }
-
-
-
-        // Promote the piece
-//        if(position.getRow() == endRow){
-//
-//        }
 
 
         return moves;
