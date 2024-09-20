@@ -34,12 +34,19 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
             startRow = 7;
         }
 
-
-
-
         // Move forward
+        int row = position.getRow() + direction;
+        int col = position.getColumn();
 
         // Is it in bounds of the Board?
+        if(row >= 1 && row <= 8){
+            ChessPosition pos = new ChessPosition(row,col);
+            // Is it an empty space?
+            if(board.getPiece(pos) == null){
+                // Add the move to the moves
+                moves.add(new ChessMove(position,pos,null));
+            }
+        }
             // Is it an empty space?
                 // Add the move to the moves
 
