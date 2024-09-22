@@ -76,30 +76,15 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculator myMovesCalculator;
-
-        switch(type){
-            case KING:
-                myMovesCalculator = new KingMovesCalculator(board, myPosition);
-                break;
-            case QUEEN:
-                myMovesCalculator = new QueenMovesCalculator(board, myPosition);
-                break;
-            case BISHOP:
-                myMovesCalculator = new BishopMovesCalculator(board, myPosition);
-                break;
-            case KNIGHT:
-                myMovesCalculator = new KnightMovesCalculator(board, myPosition);
-                break;
-            case ROOK:
-                myMovesCalculator = new RookMovesCalculator(board, myPosition);
-                break;
-            case PAWN:
-                myMovesCalculator = new PawnMovesCalculator(board, myPosition);
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown Piece Type: " + type);
-        }
+        PieceMovesCalculator myMovesCalculator = switch (type) {
+            case KING -> new KingMovesCalculator(board, myPosition);
+            case QUEEN -> new QueenMovesCalculator(board, myPosition);
+            case BISHOP -> new BishopMovesCalculator(board, myPosition);
+            case KNIGHT -> new KnightMovesCalculator(board, myPosition);
+            case ROOK -> new RookMovesCalculator(board, myPosition);
+            case PAWN -> new PawnMovesCalculator(board, myPosition);
+            default -> throw new IllegalArgumentException("Unknown Piece Type: " + type);
+        };
 
         return myMovesCalculator.calculateMoves(board, myPosition);
     }

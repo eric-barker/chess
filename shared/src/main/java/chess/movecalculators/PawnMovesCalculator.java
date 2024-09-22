@@ -13,19 +13,6 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
         super(board, position);
     }
 
-    private void addMoves(Collection<ChessMove> moves, ChessPosition position, ChessPosition pos, int endRow){
-        // Can the pawn promote?
-        if(pos.getRow() == endRow){
-            moves.add(new ChessMove(position, pos, QUEEN));
-            moves.add(new ChessMove(position, pos, BISHOP));
-            moves.add(new ChessMove(position, pos, KNIGHT));
-            moves.add(new ChessMove(position, pos, ROOK));
-        }
-        // Add a move like normal
-        else{
-            moves.add(new ChessMove(position, pos, null));
-        }
-    }
 
     @Override
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
@@ -76,7 +63,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 // Is the next board space empty?
                 if(board.getPiece(pos) == null){
                     // Add move to moves
-                   addMoves(moves, position, pos, endRow);
+                   super.addMoves(moves, position, pos, endRow);
 
                     // Am I at the start row?
                     if(position.getRow() == startRow){
@@ -93,7 +80,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                         // Is the space empty?
                         if(board.getPiece(pos) == null){
                             // add move to moves.
-                            addMoves(moves, position, pos, endRow);
+                            super.addMoves(moves, position, pos, endRow);
                         }
                     }
                 }
@@ -105,7 +92,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 // Is there an enemy piece?
                 if (board.getPiece(pos) != null) {
                     if (board.getPiece(pos).getTeamColor() != board.getPiece(position).getTeamColor()) {
-                       addMoves(moves, position, pos, endRow);
+                       super.addMoves(moves, position, pos, endRow);
                     }
                 }
             }

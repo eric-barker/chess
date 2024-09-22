@@ -6,6 +6,9 @@ import chess.ChessPosition;
 
 import java.util.Collection;
 
+import static chess.ChessPiece.PieceType.*;
+import static chess.ChessPiece.PieceType.ROOK;
+
 
 /**
  * Abstract base class for calculating moves of different chess pieces.
@@ -22,5 +25,19 @@ public abstract class PieceMovesCalculator {
 
     // Default Constructor
     public PieceMovesCalculator(ChessBoard board, ChessPosition position){
+    }
+
+    public void addMoves(Collection<ChessMove> moves, ChessPosition position, ChessPosition pos, int endRow){
+        // Can the pawn promote?
+        if(pos.getRow() == endRow){
+            moves.add(new ChessMove(position, pos, QUEEN));
+            moves.add(new ChessMove(position, pos, BISHOP));
+            moves.add(new ChessMove(position, pos, KNIGHT));
+            moves.add(new ChessMove(position, pos, ROOK));
+        }
+        // Add a move like normal
+        else{
+            moves.add(new ChessMove(position, pos, null));
+        }
     }
 }
