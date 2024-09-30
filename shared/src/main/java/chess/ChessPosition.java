@@ -13,6 +13,14 @@ public class ChessPosition {
     private final int row;
     private final int col;
 
+    @Override
+    public String toString() {
+        return "ChessPosition{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
+    }
+
     public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
@@ -45,13 +53,5 @@ public class ChessPosition {
     @Override
     public int hashCode() {
         return Objects.hash(getRow(), col);
-    }
-
-    @Override
-    public String toString() {
-        return "ChessPosition{" +
-                "row=" + row +
-                ", col=" + col +
-                '}';
     }
 }

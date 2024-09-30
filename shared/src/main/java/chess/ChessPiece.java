@@ -1,7 +1,8 @@
 package chess;
 
-import chess.movecalculators.*;
+import chess.moves.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -25,8 +26,8 @@ public class ChessPiece {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ChessPiece that = (ChessPiece) o;
-        return pieceColor == that.pieceColor && type == that.type;
+        ChessPiece piece = (ChessPiece) o;
+        return pieceColor == piece.pieceColor && type == piece.type;
     }
 
     @Override
@@ -76,16 +77,17 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculator myMovesCalculator = switch (type) {
-            case KING -> new KingMovesCalculator(board, myPosition);
-            case QUEEN -> new QueenMovesCalculator(board, myPosition);
-            case BISHOP -> new BishopMovesCalculator(board, myPosition);
-            case KNIGHT -> new KnightMovesCalculator(board, myPosition);
-            case ROOK -> new RookMovesCalculator(board, myPosition);
-            case PAWN -> new PawnMovesCalculator(board, myPosition);
-            default -> throw new IllegalArgumentException("Unknown Piece Type: " + type);
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        moves = switch (type){
+            case KING -> new KingMoves().calculateMoves(board, myPosition);
+            case QUEEN -> new QueenMoves().calculateMoves(board, myPosition);
+            case BISHOP -> new BishopMoves().calculateMoves(board, myPosition);
+            case KNIGHT -> new KnightMoves().calculateMoves(board, myPosition);
+            case ROOK -> new RookMoves().calculateMoves(board, myPosition);
+            case PAWN -> new PawnMoves().calculateMoves(board, myPosition);
         };
 
-        return myMovesCalculator.calculateMoves(board, myPosition);
+        return moves;
     }
 }
