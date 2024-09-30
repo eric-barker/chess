@@ -23,7 +23,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -34,7 +34,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+        return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -48,8 +48,8 @@ public class ChessBoard {
     }
 
     private void clearBoard() {
-        for(int i = 1; i <=8; i++){
-            for(int j = 1; j <=8; j++){
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
                 squares[i][j] = null;
             }
         }
@@ -60,31 +60,31 @@ public class ChessBoard {
         int backRow;
 
         if(color == ChessGame.TeamColor.WHITE){
-            frontRow = 2;
-            backRow = 1;
+            frontRow = 1;
+            backRow = 0;
         }
         else{
-            frontRow = 7;
-            backRow = 8;
+            frontRow = 6;
+            backRow = 7;
         }
 
         // Populate the pawns
-        for(int i = 1; i <= 8; i++){
+        for(int i = 0; i < 8; i++){
             squares[frontRow][i]= new ChessPiece(color, ChessPiece.PieceType.PAWN);
         }
 
         // Populate the backRow
-        squares[backRow][5] = new ChessPiece(color, ChessPiece.PieceType.KING);
-        squares[backRow][4] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+        squares[backRow][4] = new ChessPiece(color, ChessPiece.PieceType.KING);
+        squares[backRow][3] = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
 
-        squares[backRow][1] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-        squares[backRow][8] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        squares[backRow][0] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+        squares[backRow][7] = new ChessPiece(color, ChessPiece.PieceType.ROOK);
 
-        squares[backRow][2] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-        squares[backRow][7] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        squares[backRow][1] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+        squares[backRow][6] = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
 
-        squares[backRow][3] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-        squares[backRow][6] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        squares[backRow][2] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+        squares[backRow][5] = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
     }
 
     @Override
