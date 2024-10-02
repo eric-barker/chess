@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -11,6 +12,7 @@ import java.util.Collection;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor whoseTurn;
+    private String invalidMoveException;
 
     public ChessGame() {
         this.board = new ChessBoard();
@@ -59,7 +61,27 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+        // Is the startSquare empty?
+        if(piece == null){
+           invalidMoveException = "Invalid Move: No piece in starting square";
+        }
+
+        // Check if it is this piece's turn
+        if(piece.getTeamColor() != whoseTurn){
+            invalidMoveException = "Invalid Move: Not the piece in starting square's turn";
+        }
+
+        // Am I moving into check?
+
+        // Does my move cause my king to be in check?
+
+
+
+        return validMoves;
     }
 
     /**
@@ -73,18 +95,37 @@ public class ChessGame {
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece myPiece = board.getPiece(startPosition);
 
-        // Check if the piece exists
 
-        // Check if it is this piece's turn
+        // Collection of valid moves
+        Collection<ChessMove> validMoves = this.validMoves(startPosition);
 
-        // Validation placeholder
+        // Check if move is valid
+        boolean isMoveValid = false;
+        for(ChessMove aMove: validMoves){
+            if(aMove == move){
+                isMoveValid = true;
+                break; // Condition is met, terminate for loop.
+            }
+        }
+
+        // If move is invalid, throw a relevant exception
+        if(!isMoveValid){
+            throw new InvalidMoveException("Invalid Move: " + invalidMoveException);
+        }
 
         // move the piece to the endPosition
+        board.addPiece(endPosition, myPiece);
         // Erase piece from the startPosition
+        board.addPiece(startPosition, null);
 
-        // ??
 
         // Switch team moves
+        if(whoseTurn == TeamColor.WHITE){
+            whoseTurn = TeamColor.BLACK;
+        }
+        else{
+            whoseTurn = TeamColor.WHITE;
+        }
     }
 
     /**
@@ -124,7 +165,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        board.resetBoard();
     }
 
 
