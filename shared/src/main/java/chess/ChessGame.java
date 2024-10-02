@@ -22,7 +22,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return whoseTurn;
     }
 
     /**
@@ -31,7 +31,16 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        whoseTurn = team;
+    }
+
+    /**
+     * Gets the current chessboard
+     *
+     * @return the chessboard
+     */
+    public ChessBoard getBoard() {
+        return board;
     }
 
     /**
@@ -103,12 +112,5 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
-    /**
-     * Gets the current chessboard
-     *
-     * @return the chessboard
-     */
-    public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
-    }
+
 }
