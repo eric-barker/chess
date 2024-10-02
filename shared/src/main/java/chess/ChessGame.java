@@ -62,17 +62,19 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // Is the startSquare empty?
         if(piece == null){
-           invalidMoveException = "Invalid Move: No piece in starting square";
+           invalidMoveException = "No piece in starting square";
+           return validMoves;
         }
+
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
 
         // Check if it is this piece's turn
         if(piece.getTeamColor() != whoseTurn){
-            invalidMoveException = "Invalid Move: Not the piece in starting square's turn";
+            invalidMoveException = "Not the piece in starting square's turn";
         }
 
         // Am I moving into check?
