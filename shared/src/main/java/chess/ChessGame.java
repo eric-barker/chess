@@ -192,18 +192,26 @@ public class ChessGame {
 
         // Can my King escape Check?
         // Loop through the moves my pieces can make to see if my king can escape check
+        for(ChessMove move: myTeamMoves) {
 
             // Log the board so I can revert after testing
+            ChessPiece capPiece = board.getPiece(move.getEndPosition());
+            ChessPiece testPiece = board.getPiece(move.getStartPosition());
 
             // Test move
+            doMove(move, null, testPiece);
 
             // Does this take King out of check?
+            boolean inCheck = isInCheck(teamColor);
 
             // return the board to its original state
+            doMove(move, testPiece, capPiece);
 
             // Is the King still in check?
-                // return false
-
+            if(!inCheck) {
+                return false;
+            }
+        }
 
         return true;
     }
@@ -266,6 +274,11 @@ public class ChessGame {
 
             }
         }
+    }
+
+    private void doMove(ChessMove move, ChessPiece startSquare, ChessPiece endSquare){
+        board.addPiece(move.getEndPosition(), endSquare);
+        board.addPiece(move.getStartPosition(), startSquare);
     }
 
 }
