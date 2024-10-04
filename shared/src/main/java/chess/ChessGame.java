@@ -119,10 +119,8 @@ public class ChessGame {
             throw new InvalidMoveException("Invalid Move: " + invalidMoveException);
         }
 
-        // move the piece to the endPosition
-        board.addPiece(endPosition, myPiece);
-        // Erase piece from the startPosition
-        board.addPiece(startPosition, null);
+        // Execute my move
+        doMove(move, null, myPiece);
 
         // Update KingPosition
         if(myPiece.getPieceType() == ChessPiece.PieceType.KING){
@@ -224,7 +222,21 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // If the team is in check, it's not a stalemate
+
+        // Retrieve all possible moves for this team
+
+        // Verify if any move can be made without leaving the king in check
+
+        // Execute the move temporarily
+
+        // Determine if the move removes the team from a stalemate condition
+
+        // Revert the move
+
+        // If no valid moves are available and the team is not in check, it's a stalemate
+
+        return true;
     }
 
     /**
