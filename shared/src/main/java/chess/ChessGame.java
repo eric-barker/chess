@@ -187,7 +187,25 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // Get all possible moves from my team
+        Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor);
+
+        // Can my King escape Check?
+        // Loop through the moves my pieces can make to see if my king can escape check
+
+            // Log the board so I can revert after testing
+
+            // Test move
+
+            // Does this take King out of check?
+
+            // return the board to its original state
+
+            // Is the King still in check?
+                // return false
+
+
+        return true;
     }
 
     /**
