@@ -223,19 +223,35 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         // If the team is in check, it's not a stalemate
+        if (isInCheck(teamColor)) {
+            return false;
+        }
 
         // Retrieve all possible moves for this team
+        Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor);
 
-        // Verify if any move can be made without leaving the king in check
+        // Loop moves to see if I can get out of stalemate
+        for (ChessMove move : myTeamMoves) {
+            // record current state of the board
+            ChessPiece capturedPiece = board.getPiece(move.getEndPosition());
+            ChessPiece movingPiece = board.getPiece(move.getStartPosition());
 
-        // Execute the move temporarily
+            // test move
+            doMove(move, null, movingPiece);
 
-        // Determine if the move removes the team from a stalemate condition
+            // is the king still in check?
+            boolean inCheck = isInCheck(teamColor);
 
-        // Revert the move
+            // put the move back
+            doMove(move, movingPiece, capturedPiece);
+
+            // If there is a move that doesn't leave the king in check, it's not a stalemate
+            if (!inCheck) {
+                return false;
+            }
+        }
 
         // If no valid moves are available and the team is not in check, it's a stalemate
-
         return true;
     }
 
