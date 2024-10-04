@@ -13,11 +13,15 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor whoseTurn;
     private String invalidMoveException;
+    private ChessPosition whiteKingPosition;
+    private ChessPosition blackKingPosition;
 
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard(); // Reset the board when you make a game.
         this.whoseTurn = TeamColor.WHITE;
+        this.whiteKingPosition = null;
+        this.blackKingPosition = null;
     }
 
     /**
@@ -81,7 +85,7 @@ public class ChessGame {
 
         // Does my move cause my king to be in check?
 
-
+        // Does my move put the enemy king in check?
 
         return validMoves;
     }
@@ -170,5 +174,44 @@ public class ChessGame {
         board.resetBoard();
     }
 
+    private Collection<ChessMove> getTeamMoves(TeamColor color){
+        ChessPosition myPos;
+        ChessPiece myPiece;
+        Collection<ChessMove> teamMoves = new ArrayList<>();
+
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++){
+                myPos = new ChessPosition(i, j);
+                myPiece = board.getPiece(myPos);
+                //Is there a piece && is it my team color?
+                if(myPiece != null && myPiece.getTeamColor() == color){
+                    // add the piece moves to teamMoves
+                    teamMoves.addAll(myPiece.pieceMoves(board, myPos));
+                }
+            }
+        }
+
+        return teamMoves;
+    }
+
+    private void findKings(){
+        ChessPosition myPos;
+        for(int i = 1; i <= 8; i++){
+            for(int j = 1; j <= 8; j++) {
+                myPos = new ChessPosition(i, j);
+                ChessPiece myPiece = board.getPiece(myPos);
+                // If there is a piece and it is a king
+                if(myPiece != null && myPiece.getPieceType() == ChessPiece.PieceType.KING){
+                    if(myPiece.getTeamColor() == TeamColor.WHITE){
+                        whiteKingPosition = myPos;
+                    }
+                    else{
+                        blackKingPosition = myPos;
+                    }
+                }
+
+            }
+        }
+    }
 
 }
