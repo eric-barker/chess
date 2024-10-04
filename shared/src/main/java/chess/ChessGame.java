@@ -20,8 +20,8 @@ public class ChessGame {
         this.board = new ChessBoard();
         this.board.resetBoard(); // Reset the board when you make a game.
         this.whoseTurn = TeamColor.WHITE;
-        this.whiteKingPosition = null;
-        this.blackKingPosition = null;
+        this.whiteKingPosition = new ChessPosition(1,5);
+        this.blackKingPosition = new ChessPosition(8, 5);
     }
 
     /**
@@ -81,11 +81,11 @@ public class ChessGame {
             invalidMoveException = "Not the piece in starting square's turn";
         }
 
-        // Am I moving into check?
+        // TODO: Am I moving into check?
 
-        // Does my move cause my king to be in check?
+        // TODO: Does my move cause my king to be in check?
 
-        // Does my move put the enemy king in check?
+        // TODO: Does my move put the enemy king in check?
 
         return validMoves;
     }
@@ -124,6 +124,16 @@ public class ChessGame {
         // Erase piece from the startPosition
         board.addPiece(startPosition, null);
 
+        // Update KingPosition
+        if(myPiece.getPieceType() == ChessPiece.PieceType.KING){
+            if(myPiece.getTeamColor() == TeamColor.WHITE){
+                whiteKingPosition = endPosition;
+            }
+            else{
+                blackKingPosition = endPosition;
+            }
+        }
+
 
         // Switch team moves
         if(whoseTurn == TeamColor.WHITE){
@@ -141,7 +151,33 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // Get the king's position
+        ChessPosition kingPosition;
+        if(teamColor == TeamColor.WHITE){
+            kingPosition = whiteKingPosition;
+        }
+        else{
+            kingPosition = blackKingPosition;
+        }
+
+        // Get all the moves of the enemy team
+        TeamColor enemyColor;
+        if(teamColor == TeamColor.WHITE){
+            enemyColor = TeamColor.BLACK;
+        }
+        else{
+            enemyColor = TeamColor.WHITE;
+        }
+        Collection<ChessMove> enemyMoves = getTeamMoves(enemyColor);
+
+        // Loop through all of the enemy moves to see if they overlap the kings position.
+        for(ChessMove move: enemyMoves){
+            if(move.getEndPosition().equals(kingPosition)){
+                return true; // The king is in Check
+            }
+        }
+
+        return false; // The king is not in Check
     }
 
     /**
