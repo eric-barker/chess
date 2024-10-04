@@ -81,11 +81,11 @@ public class ChessGame {
             invalidMoveException = "Not the piece in starting square's turn";
         }
 
-        // TODO: Am I moving into check?
+        for(ChessMove move: moves) {
+            // TODO: Am I moving into check?
 
-        // TODO: Does my move cause my king to be in check?
-
-        // TODO: Does my move put the enemy king in check?
+            // TODO: Does my move cause my king to be in check?
+        }
 
         return validMoves;
     }
