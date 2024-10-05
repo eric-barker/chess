@@ -82,9 +82,21 @@ public class ChessGame {
         }
 
         for(ChessMove move: moves) {
-            // TODO: Am I moving into check?
 
-            // TODO: Does my move cause my king to be in check?
+            // Record current state of the board
+            ChessPiece capPiece = board.getPiece(move.getEndPosition());
+            ChessPiece testPiece = board.getPiece(move.getStartPosition());
+
+            // Test the move in its new position
+            doMove(move, null, capPiece);
+
+            // Does this move put my own king in check?
+            if(!isInCheck(whoseTurn)){
+                validMoves.add(move);
+            }
+
+            // move the test piece back
+            doMove(move, testPiece, capPiece);
         }
 
         return validMoves;
