@@ -19,7 +19,6 @@ public class ChessGame {
     public ChessGame() {
         this.gameBoard = new ChessBoard();
         //this.gameBoard.resetBoard(); // Reset the board when you make a game.
-        this.whoseTurn = TeamColor.WHITE;
         this.whiteKingPosition = new ChessPosition(1,5);
         this.blackKingPosition = new ChessPosition(8, 5);
     }
@@ -69,30 +68,48 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // Is the startSquare empty?
-        if(testPiece == null){
+        if (testPiece == null) {
             invalidMoveException = "No piece in starting square";
-//            validMoves = null;
             return validMoves;
         }
+
+//        // Check if it is this piece's turn
+//        if (testPiece.getTeamColor() != whoseTurn) {
+//            invalidMoveException = "Not the piece in starting square's turn";
+//            return validMoves;
+//        }
 
         Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, startPosition);
 
-        // Check if it is this piece's turn
-        if(testPiece.getTeamColor() != whoseTurn){
-            invalidMoveException = "Not the piece in starting square's turn";
-            return validMoves;
-        }
+        // Check if the king is in check
+        boolean isKingInCheck = isInCheck(whoseTurn);
 
-        // Check each move and if they put my King in check
-        for(ChessMove move: possibleMoves) {
+        // Check each possible move
+        for (ChessMove move : possibleMoves) {
             ChessPiece capPiece = gameBoard.getPiece(move.getEndPosition());
 
             // Perform the move temporarily
             doMove(move, null, testPiece);
 
-            // Check if the move places the king in check
-            if (!isInCheck(whoseTurn)) {
-                validMoves.add(move);
+            //////////////////////// Validation Tests //////////////////////
+
+            // Is the king currently in check?
+            if(isKingInCheck){
+                // Only validate moves that remove him from check
+                // Does the current move leave the King in Check?
+                if(!isInCheck(testPiece.getTeamColor())){
+                    validMoves.add(move);
+                }
+
+
+            }
+
+            // Is the king currently out of check?
+            if(!isKingInCheck){
+                // Only validate moves that keep him from being in check
+                if(!isInCheck(whoseTurn)){
+                    validMoves.add(move);
+                }
             }
 
             // Undo the move to restore the gameBoard state
@@ -101,6 +118,7 @@ public class ChessGame {
 
         return validMoves;
     }
+
 
 
     /**
