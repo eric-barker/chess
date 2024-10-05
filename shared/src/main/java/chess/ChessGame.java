@@ -18,7 +18,7 @@ public class ChessGame {
 
     public ChessGame() {
         this.board = new ChessBoard();
-        this.board.resetBoard(); // Reset the board when you make a game.
+        //this.board.resetBoard(); // Reset the board when you make a game.
         this.whoseTurn = TeamColor.WHITE;
         this.whiteKingPosition = new ChessPosition(1,5);
         this.blackKingPosition = new ChessPosition(8, 5);
@@ -65,42 +65,43 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ChessPiece piece = board.getPiece(startPosition);
+        ChessPiece testPiece = board.getPiece(startPosition);
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         // Is the startSquare empty?
-        if(piece == null){
-           invalidMoveException = "No piece in starting square";
-           return validMoves;
+        if(testPiece == null){
+            invalidMoveException = "No piece in starting square";
+//            validMoves = null;
+            return validMoves;
         }
 
-        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> possibleMoves = testPiece.pieceMoves(board, startPosition);
 
         // Check if it is this piece's turn
-        if(piece.getTeamColor() != whoseTurn){
+        if(testPiece.getTeamColor() != whoseTurn){
             invalidMoveException = "Not the piece in starting square's turn";
+            return validMoves;
         }
 
-        for(ChessMove move: moves) {
-
-            // Record current state of the board
+        // Simulate each move and validate it doesn't result in king being in check
+        for(ChessMove move: possibleMoves) {
             ChessPiece capPiece = board.getPiece(move.getEndPosition());
-            ChessPiece testPiece = board.getPiece(move.getStartPosition());
 
-            // Test the move in its new position
-            doMove(move, null, capPiece);
+            // Perform the move temporarily
+            doMove(move, null, testPiece);
 
-            // Does this move put my own king in check?
-            if(!isInCheck(whoseTurn)){
+            // Check if the move places the king in check
+            if (!isInCheck(whoseTurn)) {
                 validMoves.add(move);
             }
 
-            // move the test piece back
+            // Undo the move to restore the board state
             doMove(move, testPiece, capPiece);
         }
 
         return validMoves;
     }
+
 
     /**
      * Makes a move in a chess game
