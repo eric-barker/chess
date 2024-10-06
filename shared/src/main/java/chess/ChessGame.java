@@ -122,8 +122,6 @@ public class ChessGame {
     }
 
 
-
-
     /**
      * Makes a move in a chess game
      *
@@ -202,6 +200,7 @@ public class ChessGame {
         // Get the king's position
         ChessPosition kingPosition;
         TeamColor enemyColor;
+        this.findKings();
 
         if (teamColor == TeamColor.WHITE) {
             kingPosition = whiteKingPosition;
@@ -237,32 +236,31 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        // Get all possible moves from my team
-        Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor);
+        // Is the team in Check?  Has to be or its Stalemate not Checkmate
+        if(!isInCheck(teamColor)){
+            return false;
+        }
 
-        // Can my King escape Check?
-        // Loop through the moves my pieces can make to see if my king can escape check
-        for(ChessMove move: myTeamMoves) {
+        // Loop through all pieces of the team to see if any piece has valid moves
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition currPosition = new ChessPosition(r, c);
+                ChessPiece currPiece = gameBoard.getPiece(currPosition);
 
-            // Log the gameBoard so I can revert after testing
-            ChessPiece capPiece = gameBoard.getPiece(move.getEndPosition());
-            ChessPiece testPiece = gameBoard.getPiece(move.getStartPosition());
+                // If there is a piece of the current team
+                if (currPiece != null && currPiece.getTeamColor() == teamColor) {
+                    // Get valid moves for this piece
+                    Collection<ChessMove> validMoves = validMoves(currPosition);
 
-            // Test move
-            doMove(move, null, testPiece);
-
-            // Does this take King out of check?
-            boolean inCheck = isInCheck(teamColor);
-
-            // return the gameBoard to its original state
-            doMove(move, testPiece, capPiece);
-
-            // Is the King still in check?
-            if(!inCheck) {
-                return false;
+                    // are there any valid moves? then, it's not checkmate
+                    if (validMoves != null && !validMoves.isEmpty()) {
+                        return false;
+                    }
+                }
             }
         }
 
+        // If no valid moves were found and the king is in check, it's checkmate
         return true;
     }
 
@@ -274,32 +272,27 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        // If the team is in check, it's not a stalemate
+        // If the team is in check, it's checkmate not stalemate.
         if (isInCheck(teamColor)) {
             return false;
         }
 
-        // Retrieve all possible moves for this team
-        Collection<ChessMove> myTeamMoves = getTeamMoves(teamColor);
+        // Loop through all pieces of the team to see if any piece has valid moves
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition currPosition = new ChessPosition(r, c);
+                ChessPiece currPiece = gameBoard.getPiece(currPosition);
 
-        // Loop moves to see if I can get out of stalemate
-        for (ChessMove move : myTeamMoves) {
-            // record current state of the gameBoard
-            ChessPiece capturedPiece = gameBoard.getPiece(move.getEndPosition());
-            ChessPiece movingPiece = gameBoard.getPiece(move.getStartPosition());
+                // If there is a piece of the current team
+                if (currPiece != null && currPiece.getTeamColor() == teamColor) {
+                    // Get valid moves for this piece
+                    Collection<ChessMove> validMoves = validMoves(currPosition);
 
-            // test move
-            doMove(move, null, movingPiece);
-
-            // is the king still in check?
-            boolean inCheck = isInCheck(teamColor);
-
-            // put the move back
-            doMove(move, movingPiece, capturedPiece);
-
-            // If there is a move that doesn't leave the king in check, it's not a stalemate
-            if (!inCheck) {
-                return false;
+                    // are there any valid moves? then, it's not stalemate
+                    if (validMoves != null && !validMoves.isEmpty()) {
+                        return false;
+                    }
+                }
             }
         }
 
