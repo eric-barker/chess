@@ -81,6 +81,21 @@ public class ChessGame {
         for (ChessMove move : possibleMoves) {
             ChessPiece capPiece = gameBoard.getPiece(move.getEndPosition());
 
+            // Temporarily store the current king position
+            ChessPosition originalKingPosition = null;
+            boolean isKingMoving = testPiece.getPieceType() == ChessPiece.PieceType.KING;
+
+            // Update the king's position temporarily if it's the king moving
+            if (isKingMoving) {
+                if (testPiece.getTeamColor() == TeamColor.WHITE) {
+                    originalKingPosition = whiteKingPosition;
+                    whiteKingPosition = move.getEndPosition();
+                } else {
+                    originalKingPosition = blackKingPosition;
+                    blackKingPosition = move.getEndPosition();
+                }
+            }
+
             // Perform the move temporarily
             doMove(move, null, testPiece);
 
@@ -92,6 +107,15 @@ public class ChessGame {
 
             // Undo the move to restore the board state
             doMove(move, testPiece, capPiece);
+
+            // Restore the king's original position if the king moved
+            if (isKingMoving) {
+                if (testPiece.getTeamColor() == TeamColor.WHITE) {
+                    whiteKingPosition = originalKingPosition;
+                } else {
+                    blackKingPosition = originalKingPosition;
+                }
+            }
         }
 
         return validMoves;  // Return empty collection if no valid moves are found
