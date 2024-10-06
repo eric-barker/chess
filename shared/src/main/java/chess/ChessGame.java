@@ -20,8 +20,8 @@ public class ChessGame {
         this.gameBoard = new ChessBoard();
         this.gameBoard.resetBoard(); // Reset the board when you make a game.
         this.whoseTurn = TeamColor.WHITE; // White starts
-        this.whiteKingPosition = new ChessPosition(1,5);
-        this.blackKingPosition = new ChessPosition(8, 5);
+        this.whiteKingPosition = null;
+        this.blackKingPosition = null;
     }
 
     /**
@@ -148,6 +148,11 @@ public class ChessGame {
         // Get valid moves for this piece
         Collection<ChessMove> validMoves = this.validMoves(startPosition);
 
+        boolean validMovesExist;
+        if(validMoves == null){
+            validMovesExist = false;
+        }
+
         // Check if the move is valid
         boolean isMoveValid = false;
         for (ChessMove aMove : validMoves) {
@@ -160,11 +165,18 @@ public class ChessGame {
 
         // If the move is invalid, throw an exception
         if (!isMoveValid) {
-            throw new InvalidMoveException("Invalid Move: The move is not allowed.");
+            throw new InvalidMoveException("Invalid Move: The move is not allowed. ChessMove: " + move.toString());
         }
 
         // Perform the move
         doMove(move, null, myPiece);
+
+        // Handle promotion if a promotion type is specified (aligning with Option 1)
+        if (move.getPromotionPiece() != null) {
+            myPiece = new ChessPiece(myPiece.getTeamColor(), move.getPromotionPiece());
+            gameBoard.addPiece(endPosition, myPiece);  // Update the board with promoted piece
+        }
+
 
         // Update the king's position if the piece is a king
         if (myPiece.getPieceType() == ChessPiece.PieceType.KING) {
@@ -190,27 +202,33 @@ public class ChessGame {
         // Get the king's position
         ChessPosition kingPosition;
         TeamColor enemyColor;
-        if(teamColor == TeamColor.WHITE){
+
+        if (teamColor == TeamColor.WHITE) {
             kingPosition = whiteKingPosition;
             enemyColor = TeamColor.BLACK;
-        }
-        else{
+        } else {
             kingPosition = blackKingPosition;
             enemyColor = TeamColor.WHITE;
+        }
+
+        // If no king is on the board, return false (i.e., not in check)
+        if (kingPosition == null) {
+            return false;
         }
 
         // Get all the moves of the enemy team
         Collection<ChessMove> enemyMoves = getTeamMoves(enemyColor);
 
-        // Loop through all the enemy moves to see if they overlap the kings position.
-        for(ChessMove move: enemyMoves){
-            if(move.getEndPosition().equals(kingPosition)){
-                return true; // The king is in Check
+        // Loop through all the enemy moves to see if they overlap the king's position.
+        for (ChessMove move : enemyMoves) {
+            if (move.getEndPosition().equals(kingPosition)) {
+                return true; // The king is in check
             }
         }
 
-        return false; // The king is not in Check
+        return false; // The king is not in check
     }
+
 
     /**
      * Determines if the given team is in checkmate
@@ -340,8 +358,8 @@ public class ChessGame {
     }
 
     private void doMove(ChessMove move, ChessPiece startSquare, ChessPiece endSquare){
-        gameBoard.addPiece(move.getEndPosition(), endSquare);
-        gameBoard.addPiece(move.getStartPosition(), startSquare);
+            gameBoard.addPiece(move.getEndPosition(), endSquare);
+            gameBoard.addPiece(move.getStartPosition(), startSquare);
     }
 
 }
