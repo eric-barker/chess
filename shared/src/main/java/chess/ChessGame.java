@@ -65,7 +65,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        // Check if there's a piece at startPosition
+        // Check if there's a piece at startPosition, This is stated in the documentation.
         ChessPiece testPiece = gameBoard.getPiece(startPosition);
         if (testPiece == null) {
             return null;  // No piece at this position
@@ -75,8 +75,7 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
         Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, startPosition);
 
-        // Check if the team's king is in check
-        boolean isKingInCheck = isInCheck(whoseTurn);
+
 
         // Filter out invalid moves that leave the king in check
         for (ChessMove move : possibleMoves) {
@@ -85,17 +84,10 @@ public class ChessGame {
             // Perform the move temporarily
             doMove(move, null, testPiece);
 
-            // Is the king in check before the move?
-            if (isKingInCheck) {
-                // Only validate moves that take the king out of check
-                if (!isInCheck(testPiece.getTeamColor())) {
-                    validMoves.add(move);
-                }
-            } else {
-                // Only validate moves that don't put the king in check
-                if (!isInCheck(whoseTurn)) {
-                    validMoves.add(move);
-                }
+
+            // Is the King out of Check after the temporary move
+            if (!isInCheck(testPiece.getTeamColor())) {
+                validMoves.add(move);
             }
 
             // Undo the move to restore the board state
