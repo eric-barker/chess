@@ -18,7 +18,8 @@ public class ChessGame {
 
     public ChessGame() {
         this.gameBoard = new ChessBoard();
-        //this.gameBoard.resetBoard(); // Reset the board when you make a game.
+        this.gameBoard.resetBoard(); // Reset the board when you make a game.
+        this.whoseTurn = TeamColor.WHITE; // White starts
         this.whiteKingPosition = new ChessPosition(1,5);
         this.blackKingPosition = new ChessPosition(8, 5);
     }
@@ -64,60 +65,46 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        // Check if there's a piece at startPosition
         ChessPiece testPiece = gameBoard.getPiece(startPosition);
-        Collection<ChessMove> validMoves = new ArrayList<>();
-
-        // Is the startSquare empty?
         if (testPiece == null) {
-            invalidMoveException = "No piece in starting square";
-            return validMoves;
+            return null;  // No piece at this position
         }
 
-//        // Check if it is this piece's turn
-//        if (testPiece.getTeamColor() != whoseTurn) {
-//            invalidMoveException = "Not the piece in starting square's turn";
-//            return validMoves;
-//        }
-
+        // Get possible moves from the piece
+        Collection<ChessMove> validMoves = new ArrayList<>();
         Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, startPosition);
 
-        // Check if the king is in check
+        // Check if the team's king is in check
         boolean isKingInCheck = isInCheck(whoseTurn);
 
-        // Check each possible move
+        // Filter out invalid moves that leave the king in check
         for (ChessMove move : possibleMoves) {
             ChessPiece capPiece = gameBoard.getPiece(move.getEndPosition());
 
             // Perform the move temporarily
             doMove(move, null, testPiece);
 
-            //////////////////////// Validation Tests //////////////////////
-
-            // Is the king currently in check?
-            if(isKingInCheck){
-                // Only validate moves that remove him from check
-                // Does the current move leave the King in Check?
-                if(!isInCheck(testPiece.getTeamColor())){
+            // Is the king in check before the move?
+            if (isKingInCheck) {
+                // Only validate moves that take the king out of check
+                if (!isInCheck(testPiece.getTeamColor())) {
                     validMoves.add(move);
                 }
-
-
-            }
-
-            // Is the king currently out of check?
-            if(!isKingInCheck){
-                // Only validate moves that keep him from being in check
-                if(!isInCheck(whoseTurn)){
+            } else {
+                // Only validate moves that don't put the king in check
+                if (!isInCheck(whoseTurn)) {
                     validMoves.add(move);
                 }
             }
 
-            // Undo the move to restore the gameBoard state
+            // Undo the move to restore the board state
             doMove(move, testPiece, capPiece);
         }
 
-        return validMoves;
+        return validMoves;  // Return empty collection if no valid moves are found
     }
+
 
 
 
@@ -132,46 +119,50 @@ public class ChessGame {
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece myPiece = gameBoard.getPiece(startPosition);
 
+        // Is the start square empty?
+        if (myPiece == null) {
+            throw new InvalidMoveException("Invalid Move: No piece in starting square.");
+        }
 
-        // Collection of valid moves
+        // Is it the correct team's turn?
+        if (myPiece.getTeamColor() != whoseTurn) {
+            throw new InvalidMoveException("Invalid Move: It's not your turn.");
+        }
+
+        // Get valid moves for this piece
         Collection<ChessMove> validMoves = this.validMoves(startPosition);
 
-        // Check if move is valid
+        // Check if the move is valid
         boolean isMoveValid = false;
-        for(ChessMove aMove: validMoves){
-            if(aMove == move){
+        for (ChessMove aMove : validMoves) {
+            if (aMove.getStartPosition().equals(move.getStartPosition()) &&
+                    aMove.getEndPosition().equals(move.getEndPosition())) {
                 isMoveValid = true;
-                break; // Condition is met, terminate for loop.
+                break;  // Found a valid move
             }
         }
 
-        // If move is invalid, throw a relevant exception
-        if(!isMoveValid){
-            throw new InvalidMoveException("Invalid Move: " + invalidMoveException);
+        // If the move is invalid, throw an exception
+        if (!isMoveValid) {
+            throw new InvalidMoveException("Invalid Move: The move is not allowed.");
         }
 
-        // Execute my move
+        // Perform the move
         doMove(move, null, myPiece);
 
-        // Update KingPosition
-        if(myPiece.getPieceType() == ChessPiece.PieceType.KING){
-            if(myPiece.getTeamColor() == TeamColor.WHITE){
+        // Update the king's position if the piece is a king
+        if (myPiece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (myPiece.getTeamColor() == TeamColor.WHITE) {
                 whiteKingPosition = endPosition;
-            }
-            else{
+            } else {
                 blackKingPosition = endPosition;
             }
         }
 
-
-        // Switch team moves
-        if(whoseTurn == TeamColor.WHITE){
-            whoseTurn = TeamColor.BLACK;
-        }
-        else{
-            whoseTurn = TeamColor.WHITE;
-        }
+        // Switch turns
+        whoseTurn = (whoseTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
+
 
     /**
      * Determines if the given team is in check
