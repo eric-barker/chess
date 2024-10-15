@@ -76,7 +76,6 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = testPiece.pieceMoves(gameBoard, startPosition);
 
 
-
         // Filter out invalid moves that leave the king in check
         for (ChessMove move : possibleMoves) {
             ChessPiece capPiece = gameBoard.getPiece(move.getEndPosition());
@@ -147,7 +146,7 @@ public class ChessGame {
         Collection<ChessMove> validMoves = this.validMoves(startPosition);
 
         boolean validMovesExist;
-        if(validMoves == null){
+        if (validMoves == null) {
             validMovesExist = false;
         }
 
@@ -237,7 +236,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // Is the team in Check?  Has to be or its Stalemate not Checkmate
-        if(!isInCheck(teamColor)){
+        if (!isInCheck(teamColor)) {
             return false;
         }
 
@@ -310,17 +309,17 @@ public class ChessGame {
         findKings();
     }
 
-    private Collection<ChessMove> getTeamMoves(TeamColor color){
+    private Collection<ChessMove> getTeamMoves(TeamColor color) {
         ChessPosition myPos;
         ChessPiece myPiece;
         Collection<ChessMove> teamMoves = new ArrayList<>();
 
-        for(int i = 1; i <= 8; i++){
-            for(int j = 1; j <= 8; j++){
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 myPos = new ChessPosition(i, j);
                 myPiece = gameBoard.getPiece(myPos);
                 //Is there a piece && is it my team color?
-                if(myPiece != null && myPiece.getTeamColor() == color){
+                if (myPiece != null && myPiece.getTeamColor() == color) {
                     // add the piece moves to teamMoves
                     teamMoves.addAll(myPiece.pieceMoves(gameBoard, myPos));
                 }
@@ -330,18 +329,17 @@ public class ChessGame {
         return teamMoves;
     }
 
-    private void findKings(){
+    private void findKings() {
         ChessPosition myPos;
-        for(int i = 1; i <= 8; i++){
-            for(int j = 1; j <= 8; j++) {
+        for (int i = 1; i <= 8; i++) {
+            for (int j = 1; j <= 8; j++) {
                 myPos = new ChessPosition(i, j);
                 ChessPiece myPiece = gameBoard.getPiece(myPos);
                 // If there is a piece and it is a king
-                if(myPiece != null && myPiece.getPieceType() == ChessPiece.PieceType.KING){
-                    if(myPiece.getTeamColor() == TeamColor.WHITE){
+                if (myPiece != null && myPiece.getPieceType() == ChessPiece.PieceType.KING) {
+                    if (myPiece.getTeamColor() == TeamColor.WHITE) {
                         whiteKingPosition = myPos;
-                    }
-                    else{
+                    } else {
                         blackKingPosition = myPos;
                     }
                 }
@@ -350,9 +348,9 @@ public class ChessGame {
         }
     }
 
-    private void doMove(ChessMove move, ChessPiece startSquare, ChessPiece endSquare){
-            gameBoard.addPiece(move.getEndPosition(), endSquare);
-            gameBoard.addPiece(move.getStartPosition(), startSquare);
+    private void doMove(ChessMove move, ChessPiece startSquare, ChessPiece endSquare) {
+        gameBoard.addPiece(move.getEndPosition(), endSquare);
+        gameBoard.addPiece(move.getStartPosition(), startSquare);
     }
 
 }
