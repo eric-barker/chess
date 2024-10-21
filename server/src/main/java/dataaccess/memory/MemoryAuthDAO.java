@@ -31,6 +31,8 @@ public class MemoryAuthDAO implements AuthDAO {
         if (authTokens.get(oldAuthToken) != null) {
             Auth newAuth = new Auth(newAuthToken, authTokens.get(oldAuthToken).username());
             authTokens.put(newAuthToken, newAuth);
+            
+            authTokens.remove(oldAuthToken, authTokens.get(oldAuthToken));
         }
     }
 
