@@ -82,4 +82,22 @@ public class UserServiceTests {
         });
         assertEquals(401, thrown.StatusCode(), "Status code should be 401 for incorrect login.");
     }
+
+    @Test
+    @DisplayName("Logout Success")
+    public void testLogoutSuccess() throws DataAccessException, ResponseException {
+        // Test successful logout
+        userService.logout(existingAuthToken);
+        assertNull(authDAO.getAuth(existingAuthToken), "Auth token should be removed after logout.");
+    }
+
+    @Test
+    @DisplayName("Logout with Invalid AuthToken Should Fail")
+    public void testLogoutInvalidToken() {
+        // Test logout with invalid token
+        ResponseException thrown = assertThrows(ResponseException.class, () -> {
+            userService.logout("invalidAuthToken");
+        });
+        assertEquals(401, thrown.StatusCode(), "Status code should be 401 for invalid auth token.");
+    }
 }

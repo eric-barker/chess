@@ -46,5 +46,9 @@ public class UserService {
     }
 
     public void logout(String authToken) throws ResponseException {
+        if (authDAO.getAuth(authToken) == null) {
+            throw new ResponseException(401, "Error: Unauthorized");
+        }
+        authDAO.deleteAuth(authToken);
     }
 }
