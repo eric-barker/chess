@@ -3,6 +3,7 @@ package dataaccess.memory;
 import dataaccess.interfaces.AuthDAO;
 import model.Auth;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,14 +11,19 @@ public class MemoryAuthDAO implements AuthDAO {
     private final Map<String, Auth> authTokens = new HashMap<>();
 
     @Override
-    public void createAuth(String authToken, String username) {
+    public void addAuth(String authToken, String username) {
         Auth auth = new Auth(authToken, username);
         authTokens.put(authToken, auth);
     }
 
     @Override
-    public Auth readAuth(String authToken) {
+    public Auth getAuth(String authToken) {
         return authTokens.get(authToken);
+    }
+
+    @Override
+    public Collection<Auth> listTokens() {
+        return authTokens.values();
     }
 
     @Override
