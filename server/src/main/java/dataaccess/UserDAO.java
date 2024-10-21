@@ -1,24 +1,25 @@
 package dataaccess;
 
-import Models.User;
+import model.User;
+import exception.ResponseException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Collection;
+
 
 public interface UserDAO {
 
-    // Create a new user
-    void create(User user);
+    User addUser(User user) throws ResponseException;
 
-    // Read or retrieve a user by username
-    Optional<User> read(String username);
+    Collection<User> listUsers() throws ResponseException;
+
+    User getUser(String username) throws ResponseException;
+
+    void deleteUser(String username) throws ResponseException;
+
+    void deleteAllUsers();
+
 
     // Update an existing user
     void update(User user);
 
-    // Delete a user by username
-    void delete(String username);
-
-    // Retrieve all users
-    List<User> readAll();
 }

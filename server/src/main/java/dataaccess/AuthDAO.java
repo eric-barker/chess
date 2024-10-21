@@ -1,6 +1,6 @@
 package dataaccess;
 
-import Models.Auth;
+import model.Auth;
 
 public interface AuthDAO {
     // Create
