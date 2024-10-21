@@ -23,21 +23,22 @@ public class MemoryGameDAO implements GameDAO {
 
     @Override
     public Game getGame(int gameID) throws DataAccessException {
-        return null;
+        return games.get(gameID);
     }
 
     @Override
     public void updateGame(Game game) throws DataAccessException {
-
+        games.put(game.gameID(), game);
     }
 
     @Override
     public Collection<Game> listGames() throws DataAccessException {
-        return List.of();
+        return games.values();
     }
 
     @Override
     public void deleteAllGames() throws DataAccessException {
-
+        games.clear();
+        nextGameID = 1;
     }
 }
