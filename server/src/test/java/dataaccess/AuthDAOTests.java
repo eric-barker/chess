@@ -10,7 +10,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AuthDAOTest {
+public class AuthDAOTests {
 
     private AuthDAO authDAO;
 
@@ -53,5 +53,40 @@ public class AuthDAOTest {
 
         // Check that the old token no longer exists
         assertNull(authDAO.getAuth("authToken1"), "Old token should be removed.");
+    }
+
+    @Test
+    public void testDeleteAuth() {
+        // Add and then delete the token
+        authDAO.addAuth("authToken1", "user1");
+        authDAO.deleteAuth("authToken1");
+
+        // Check that it was deleted
+        assertNull(authDAO.getAuth("authToken1"), "Expected auth token to be deleted.");
+    }
+
+
+    @Test
+    public void testListTokens() {
+        // Add two tokens, then list them
+        authDAO.addAuth("authToken1", "user1");
+        authDAO.addAuth("authToken2", "user2");
+        Collection<Auth> tokens = authDAO.listTokens();
+
+        // Make sure the size is correct
+        assertEquals(2, tokens.size(), "Should have exactly 2 auth tokens.");
+    }
+
+    @Test
+    public void testDeleteAllAuthTokens() {
+        // Add some tokens
+        authDAO.addAuth("authToken1", "user1");
+        authDAO.addAuth("authToken2", "user2");
+
+        // Now clear them all
+        authDAO.deleteAllAuthTokens();
+
+        // Make sure no tokens remain
+        assertTrue(authDAO.listTokens().isEmpty(), "All auth tokens should be deleted.");
     }
 }
