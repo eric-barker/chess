@@ -13,8 +13,8 @@ public class Server {
     private final UserDAO userDAO;
     private final Gson gson = new Gson();
 
-    public Server(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    public Server() {
+        this.userDAO = new MemoryUserDAO();
     }
 
 
@@ -25,11 +25,10 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
 
-        // Endpoint to add a user
-        Spark.post("/user", this::addUser);
-
-        // Endpoint to list all users
+        // Endpoints
+        Spark.post("/user", this::registerUser);
         Spark.get("/user/list", this::listUsers);
+
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -38,7 +37,7 @@ public class Server {
         return Spark.port();
     }
 
-    private Object addUser(Request req, Response res) throws ResponseException {
+    private Object registerUser(Request req, Response res) throws ResponseException {
         User newUser = gson.fromJson(req.body(), User.class);
         userDAO.addUser(newUser);
         res.status(201); // Created

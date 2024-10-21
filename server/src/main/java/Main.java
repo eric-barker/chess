@@ -7,9 +7,8 @@ public class Main {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Server: " + piece);
 
-        var userDAO = new MemoryUserDAO();
         var port = 8080;
-        var server = new Server(userDAO);  // Create an instance of Server
+        var server = new Server();  // Create an instance of Server
         int actualPort = server.run(port);  // Call the run method on the instance
         System.out.println("Server is running on port: " + actualPort);
     }
