@@ -1,8 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.UserDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.interfaces.UserDAO;
+import dataaccess.memory.MemoryUserDAO;
 import exception.ResponseException;
 import model.User;
 

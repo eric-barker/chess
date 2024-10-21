@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.interfaces;
 
 import model.User;
 import exception.ResponseException;
@@ -18,8 +18,6 @@ public interface UserDAO {
 
     void deleteAllUsers();
 
-
-    // Update an existing user
     void update(User user);
 
 }

@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.memory;
 
+import dataaccess.interfaces.UserDAO;
 import exception.ResponseException;
 import model.User;
 
