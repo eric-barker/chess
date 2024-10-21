@@ -32,8 +32,17 @@ public class UserService {
     }
 
     public Auth login(User user) throws ResponseException, DataAccessException {
-
-        return null;
+        User knownUser = userDAO.getUser(user.username());
+        if (knownUser == null) {
+            throw new ResponseException(401, "Error: User doesn't exist");
+        }
+        if (!user.password().equals(user.password())) {
+            throw new ResponseException(401, "Error: Password is incorrect");
+        }
+        
+        String authToken = UUID.randomUUID().toString();
+        authDAO.addAuth(authToken, user.username());
+        return new Auth(authToken, user.username());
     }
 
     public void logout(String authToken) throws ResponseException {
