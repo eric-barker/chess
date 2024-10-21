@@ -36,10 +36,10 @@ public class UserService {
         if (knownUser == null) {
             throw new ResponseException(401, "Error: User doesn't exist");
         }
-        if (!user.password().equals(user.password())) {
+        if (!user.password().equals(knownUser.password())) {
             throw new ResponseException(401, "Error: Password is incorrect");
         }
-        
+
         String authToken = UUID.randomUUID().toString();
         authDAO.addAuth(authToken, user.username());
         return new Auth(authToken, user.username());
