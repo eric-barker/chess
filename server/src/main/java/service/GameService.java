@@ -26,7 +26,23 @@ public class GameService {
 
     public void joinGame(int gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException {
         Game game = gameDAO.getGame(gameID);
-        
+
+        // Join available color
+        if (playerColor == ChessGame.TeamColor.WHITE) {
+            if (game.whiteUsername() != null) {
+                throw new DataAccessException("Error: White player spot already taken");
+            }
+            Game updatedGame = new Game(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
+            gameDAO.updateGame(updatedGame);
+        } else if (playerColor == ChessGame.TeamColor.BLACK) {
+            if (game.blackUsername() != null) {
+                throw new DataAccessException("Error: Black player spot already taken");
+            }
+            Game updatedGame = new Game(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
+            gameDAO.updateGame(updatedGame);
+        } else {
+            throw new DataAccessException("Error: Invalid team color");
+        }
     }
 
     public Collection<Game> listGames() throws DataAccessException {
