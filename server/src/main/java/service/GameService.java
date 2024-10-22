@@ -6,20 +6,27 @@ import dataaccess.interfaces.GameDAO;
 import model.Game;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public class GameService {
     private final GameDAO gameDAO;
+    private int gameID = 1;
 
     public GameService(GameDAO gameDAO) {
         this.gameDAO = gameDAO;
     }
 
     public Game createGame(String gameName, String whiteUsername) throws DataAccessException {
-        return null;
+        ChessGame chessGame = new ChessGame();
+        Game newGame = new Game(gameID++, whiteUsername, null, gameName, chessGame);
+        gameDAO.createGame(newGame);
+        return newGame;
     }
 
 
     public void joinGame(int gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException {
+        Game game = gameDAO.getGame(gameID);
+        
     }
 
     public Collection<Game> listGames() throws DataAccessException {
@@ -32,9 +39,6 @@ public class GameService {
 
     public void clearGames() throws DataAccessException {
         gameDAO.deleteAllGames();
-    }
-
-    private int generateGameID() {
-        return 0;
+        gameID = 1;
     }
 }
