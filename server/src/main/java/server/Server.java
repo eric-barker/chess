@@ -8,13 +8,11 @@ import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryUserDAO;
 import exception.ResponseException;
-import handler.ClearHandler;
-import handler.LoginHandler;
-import handler.LogoutHandler;
-import handler.RegisterUserHandler;
+import handler.*;
 import model.User;
 
 import service.ClearService;
+import service.GameService;
 import service.UserService;
 import spark.*;
 
@@ -28,11 +26,13 @@ public class Server {
 
     private final UserService userService;
     private final ClearService clearService;
+    private final GameService gameService;
 
     private final RegisterUserHandler registerHandler;
     private final ClearHandler clearHandler;
     private final LoginHandler loginHandler;
     private final LogoutHandler logoutHandler;
+    private final CreateGameHandler createGameHandler;
 
     public Server() {
         this.userDAO = new MemoryUserDAO();
@@ -41,11 +41,13 @@ public class Server {
 
         this.userService = new UserService(userDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
+        this.gameService = new GameService(gameDAO, authDAO);
 
         this.registerHandler = new RegisterUserHandler(userService);
         this.clearHandler = new ClearHandler(clearService);
         this.loginHandler = new LoginHandler(userService);
         this.logoutHandler = new LogoutHandler(userService);
+        this.createGameHandler = new CreateGameHandler(gameService);
     }
 
 
@@ -62,6 +64,7 @@ public class Server {
         Spark.delete("/db", (req, res) -> clearHandler.handle(req, res));
         Spark.post("/session", loginHandler::handle);
         Spark.delete("/session", logoutHandler::handle);
+        Spark.post("/game", createGameHandler::handle);
 
         Spark.get("/user/list", this::listUsers);
         Spark.get("/user/delete", this::deleteUser);

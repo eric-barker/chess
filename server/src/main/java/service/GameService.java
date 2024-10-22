@@ -13,6 +13,7 @@ public class GameService {
 
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
+    private int officialGameID = 1;
 
     // Constructor
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
@@ -28,7 +29,7 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
 
-        Game newGame = new Game(0, null, null, gameName, null);  // Game created without assigning players
+        Game newGame = new Game(officialGameID++, null, null, gameName, null);  // Game created without assigning players
         gameDAO.createGame(newGame);
         return newGame;
     }
@@ -79,6 +80,7 @@ public class GameService {
     // Clear all game data (used for testing)
     public void clearGames() throws DataAccessException {
         gameDAO.deleteAllGames();
+        officialGameID = 1;
     }
 
     // Helper method to validate authToken
