@@ -1,20 +1,30 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.UserDAO;
+import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryUserDAO;
 import exception.ResponseException;
+import handler.RegisterUserHandler;
 import model.User;
 
+import service.UserService;
 import spark.*;
 
 public class Server {
 
     private final UserDAO userDAO;
     private final Gson gson = new Gson();
+    private final UserService userService;
+    private final RegisterUserHandler registerHandler;
 
     public Server() {
         this.userDAO = new MemoryUserDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
+
+        this.userService = new UserService(userDAO, authDAO);
+        this.registerHandler = new RegisterUserHandler(userService);
     }
 
 
@@ -26,6 +36,8 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         // Endpoints
+        // Register the RegisterHandler for the POST /user/register endpoint
+        Spark.post("/user/register", (req, res) -> registerHandler.handle(req, res));
         Spark.post("/user", this::registerUser);
         Spark.get("/user/list", this::listUsers);
         Spark.get("/user/delete", this::deleteUser);
