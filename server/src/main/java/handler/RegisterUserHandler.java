@@ -20,15 +20,26 @@ public class RegisterUserHandler {
             // Deserialize incoming JSON into an object
             User newUser = gson.fromJson(req.body(), User.class);
 
+            // Ensure the required fields are present
+            if (newUser.username() == null || newUser.password() == null || newUser.email() == null) {
+                res.status(400);  // Bad Request
+                return gson.toJson(new ErrorMessage("Error: bad request"));
+            }
+
             var auth = userService.register(newUser);
 
             // Respond with a success message and the auth token
             res.status(200);  // Success
             return gson.toJson(new TestAuthResult(newUser.username(), auth.authToken()));
         } catch (ResponseException e) {
-            // Handle known exceptions like user already exists
-            res.status(e.StatusCode());
-            return gson.toJson(new ErrorMessage(e.getMessage()));
+            // Handle known errors from ResponseException
+            if (e.getMessage().contains("already taken")) {
+                res.status(403);  // Forbidden
+                return gson.toJson(new ErrorMessage("Error: already taken"));
+            } else {
+                res.status(e.StatusCode());
+                return gson.toJson(new ErrorMessage(e.getMessage()));
+            }
         } catch (Exception e) {
             // Handle anything else
             res.status(500);

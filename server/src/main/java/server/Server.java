@@ -52,9 +52,9 @@ public class Server {
 
         // Endpoints
         // Register the RegisterHandler for the POST /user/register endpoint
-        Spark.post("/user/register", (req, res) -> registerHandler.handle(req, res));
+        Spark.post("/user", (req, res) -> registerHandler.handle(req, res));
         Spark.delete("/db", (req, res) -> clearHandler.handle(req, res));
-        Spark.post("/user", this::registerUser);
+
         Spark.get("/user/list", this::listUsers);
         Spark.get("/user/delete", this::deleteUser);
 
