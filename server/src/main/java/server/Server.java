@@ -2,29 +2,44 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.memory.MemoryAuthDAO;
+import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryUserDAO;
 import exception.ResponseException;
+import handler.ClearHandler;
 import handler.RegisterUserHandler;
 import model.User;
 
+import service.ClearService;
 import service.UserService;
 import spark.*;
 
 public class Server {
 
     private final UserDAO userDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
+
     private final Gson gson = new Gson();
+
     private final UserService userService;
+    private final ClearService clearService;
+
     private final RegisterUserHandler registerHandler;
+    private final ClearHandler clearHandler;
 
     public Server() {
         this.userDAO = new MemoryUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
+        this.authDAO = new MemoryAuthDAO();
+        this.gameDAO = new MemoryGameDAO();
 
         this.userService = new UserService(userDAO, authDAO);
+        this.clearService = new ClearService(userDAO, gameDAO, authDAO);
+
         this.registerHandler = new RegisterUserHandler(userService);
+        this.clearHandler = new ClearHandler(clearService);
     }
 
 
@@ -38,6 +53,7 @@ public class Server {
         // Endpoints
         // Register the RegisterHandler for the POST /user/register endpoint
         Spark.post("/user/register", (req, res) -> registerHandler.handle(req, res));
+        Spark.delete("/db", (req, res) -> clearHandler.handle(req, res));
         Spark.post("/user", this::registerUser);
         Spark.get("/user/list", this::listUsers);
         Spark.get("/user/delete", this::deleteUser);
