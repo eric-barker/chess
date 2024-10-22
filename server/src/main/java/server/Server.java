@@ -9,6 +9,7 @@ import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryUserDAO;
 import exception.ResponseException;
 import handler.ClearHandler;
+import handler.LoginHandler;
 import handler.RegisterUserHandler;
 import model.User;
 
@@ -29,6 +30,7 @@ public class Server {
 
     private final RegisterUserHandler registerHandler;
     private final ClearHandler clearHandler;
+    private final LoginHandler loginHandler;
 
     public Server() {
         this.userDAO = new MemoryUserDAO();
@@ -40,6 +42,7 @@ public class Server {
 
         this.registerHandler = new RegisterUserHandler(userService);
         this.clearHandler = new ClearHandler(clearService);
+        this.loginHandler = new LoginHandler(userService);
     }
 
 
@@ -54,6 +57,7 @@ public class Server {
         // Register the RegisterHandler for the POST /user/register endpoint
         Spark.post("/user", (req, res) -> registerHandler.handle(req, res));
         Spark.delete("/db", (req, res) -> clearHandler.handle(req, res));
+        Spark.post("/session", loginHandler::handle);
 
         Spark.get("/user/list", this::listUsers);
         Spark.get("/user/delete", this::deleteUser);
