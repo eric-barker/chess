@@ -78,4 +78,42 @@ public class GameServiceTests {
 
         assertTrue(exception.getMessage().contains("White player spot already taken"));
     }
+
+    @Test
+    @DisplayName("List Games Test")
+    public void testListGames() throws DataAccessException {
+        String game1Name = "Game 1";
+        String game2Name = "Game 2";
+        String whitePlayer1 = "WhitePlayer1";
+        String whitePlayer2 = "WhitePlayer2";
+
+        gameService.createGame(game1Name, whitePlayer1);
+        gameService.createGame(game2Name, whitePlayer2);
+
+        Collection<Game> games = gameService.listGames();
+
+        assertNotNull(games, "Games list should not be null");
+        assertEquals(2, games.size(), "There should be 2 games created");
+
+        assertTrue(games.stream().anyMatch(game -> game.gameName().equals(game1Name)), "Game 1 should exist in the list");
+        assertTrue(games.stream().anyMatch(game -> game.gameName().equals(game2Name)), "Game 2 should exist in the list");
+    }
+
+
+    @Test
+    @DisplayName("Clear Games Test")
+    public void testClearGames() throws DataAccessException {
+        String game1Name = "Game 1";
+        String whitePlayer1 = "WhitePlayer1";
+
+        gameService.createGame(game1Name, whitePlayer1);
+
+        Collection<Game> gamesBeforeClear = gameService.listGames();
+        assertEquals(1, gamesBeforeClear.size(), "There should be 1 game before clearing");
+
+        gameService.clearGames();
+
+        Collection<Game> gamesAfterClear = gameService.listGames();
+        assertEquals(0, gamesAfterClear.size(), "There should be no games after clearing");
+    }
 }
