@@ -33,6 +33,8 @@ public class Server {
     private final LoginHandler loginHandler;
     private final LogoutHandler logoutHandler;
     private final CreateGameHandler createGameHandler;
+    private final ListGamesHandler listGamesHandler;
+    private final JoinGameHandler joinGameHandler;
 
     public Server() {
         this.userDAO = new MemoryUserDAO();
@@ -48,6 +50,9 @@ public class Server {
         this.loginHandler = new LoginHandler(userService);
         this.logoutHandler = new LogoutHandler(userService);
         this.createGameHandler = new CreateGameHandler(gameService);
+        this.listGamesHandler = new ListGamesHandler(gameService);
+        this.joinGameHandler = new JoinGameHandler(gameService);
+
     }
 
 
@@ -59,18 +64,16 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         // Endpoints
-        // Register the RegisterHandler for the POST /user/register endpoint
         Spark.post("/user", (req, res) -> registerHandler.handle(req, res));
         Spark.delete("/db", (req, res) -> clearHandler.handle(req, res));
         Spark.post("/session", loginHandler::handle);
         Spark.delete("/session", logoutHandler::handle);
         Spark.post("/game", createGameHandler::handle);
+        Spark.get("/game", listGamesHandler::handle);
+        Spark.put("/game", joinGameHandler::handle);
 
-        Spark.get("/user/list", this::listUsers);
-        Spark.get("/user/delete", this::deleteUser);
 
-
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
 
         Spark.awaitInitialization();
