@@ -20,33 +20,42 @@ public class CreateGameHandler {
         try {
             String authToken = req.headers("authorization");
 
+            // Validate authorization token
             if (authToken == null || authToken.isEmpty()) {
-                res.status(401);
+                res.status(401);  // Unauthorized
                 return gson.toJson(new ErrorMessage("Error: unauthorized"));
             }
 
-            // Deserialize
-            Game newGame = gson.fromJson(req.body(), Game.class);
+            // Deserialize the request body to get the game name
+            CreateGameRequest createGameRequest = gson.fromJson(req.body(), CreateGameRequest.class);
 
-            if (newGame.gameName() == null || newGame.gameName().isEmpty()) {
-                res.status(400);
-                return gson.toJson(new ErrorMessage("Error: bad request"));
+            // Validate gameName
+            if (createGameRequest.gameName() == null || createGameRequest.gameName().isEmpty()) {
+                res.status(400);  // Bad Request
+                return gson.toJson(new ErrorMessage("Error: bad request - missing game name"));
             }
 
-            gameService.createGame(newGame.gameName(), newGame.whiteUsername());
+            Game createdGame = gameService.createGame(createGameRequest.gameName(), authToken);
 
+            // Return the new game ID in the response
             res.status(200);
-            return gson.toJson(new SuccessMessage("Game successfully created"));
-        } catch (ResponseException e) {
-            res.status(401);
-            return gson.toJson(new ErrorMessage("Error: bad request"));
-        } catch (Exception e) {
-            res.status(500);
-            return gson.toJson(new ErrorMessage("Error: " + e.getMessage()));
+            return gson.toJson(new CreateGameResult(createdGame.gameID()));
+
+        }
+//        catch (ResponseException e) {
+//            res.status(e.StatusCode());  // Use the status code from the exception
+//            return gson.toJson(new ErrorMessage(e.getMessage()));
+//        }
+        catch (Exception e) {
+            res.status(500);  // Internal Server Error
+            return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));
         }
     }
 
-    record SuccessMessage(String message) {
+    record CreateGameRequest(String gameName) {
+    }
+
+    record CreateGameResult(int gameID) {
     }
 
     record ErrorMessage(String message) {

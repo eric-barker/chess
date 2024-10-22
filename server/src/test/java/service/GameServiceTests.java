@@ -1,7 +1,9 @@
 package service;
 
 import dataaccess.DataAccessException;
+import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryGameDAO;
+import exception.ResponseException;
 import model.Game;
 import chess.ChessGame;
 import org.junit.jupiter.api.*;
@@ -18,7 +20,7 @@ public class GameServiceTests {
     @BeforeAll
     public static void init() {
         // Initialize the GameService with an in-memory DAO for testing
-        gameService = new GameService(new MemoryGameDAO());
+        gameService = new GameService(new MemoryGameDAO(), new MemoryAuthDAO());
     }
 
     @BeforeEach
@@ -29,7 +31,7 @@ public class GameServiceTests {
 
     @Test
     @DisplayName("Create Game Test")
-    public void testCreateGame() throws DataAccessException {
+    public void testCreateGame() throws DataAccessException, ResponseException {
         String gameName = "Test Game";
         String whitePlayer = "WhitePlayer";
 
@@ -42,18 +44,28 @@ public class GameServiceTests {
         assertNotNull(createdGame.game(), "ChessGame object should be initialized");
     }
 
+
     @Test
     @DisplayName("Join Game as Black Test")
-    public void testJoinGameAsBlack() throws DataAccessException {
+    public void testJoinGameAsBlack() throws DataAccessException, ResponseException {
         String gameName = "Test Join Game";
         String whitePlayer = "WhitePlayer";
         String blackPlayer = "BlackPlayer";
 
-        Game createdGame = gameService.createGame(gameName, whitePlayer);
+        // Simulate the login process to get a valid auth token
+        String whitePlayerAuthToken = UUID.randomUUID().toString();  // Generate a fake auth token
+        gameService.getAuthDAO().createAuth(whitePlayerAuthToken, whitePlayer);  // Store the auth token in the DAO
+
+        // Create the game with the white player using the auth token
+        Game createdGame = gameService.createGame(gameName, whitePlayerAuthToken);
+
+        // Join the game as Black
         gameService.joinGame(createdGame.gameID(), ChessGame.TeamColor.BLACK, blackPlayer);
 
+        // Retrieve the updated game
         Game updatedGame = gameService.getGame(createdGame.gameID());
 
+        // Assertions
         assertNotNull(updatedGame, "Game should exist after creation");
         assertEquals(blackPlayer, updatedGame.blackUsername(), "Black player should be assigned correctly");
         assertEquals(whitePlayer, updatedGame.whiteUsername(), "White player should remain unchanged");
@@ -61,7 +73,7 @@ public class GameServiceTests {
 
     @Test
     @DisplayName("Join Game as White (Fail) Test")
-    public void testJoinGameAsWhiteFail() throws DataAccessException {
+    public void testJoinGameAsWhiteFail() throws DataAccessException, ResponseException {
         String gameName = "Test Join Fail";
         String whitePlayer = "WhitePlayer";
         String anotherWhitePlayer = "AnotherWhitePlayer";
