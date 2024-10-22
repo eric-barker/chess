@@ -3,8 +3,10 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.GameDAO;
+import exception.ResponseException;
 import model.Game;
 
+import java.lang.module.ResolutionException;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -17,6 +19,9 @@ public class GameService {
     }
 
     public Game createGame(String gameName, String whiteUsername) throws DataAccessException {
+//        if (gameName == null || gameName.isEmpty()) {
+//            throw new ResponseException(400, "bad request");
+//        }
         ChessGame chessGame = new ChessGame();
         Game newGame = new Game(gameID++, whiteUsername, null, gameName, chessGame);
         gameDAO.createGame(newGame);
@@ -24,7 +29,7 @@ public class GameService {
     }
 
 
-    public void joinGame(int gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException {
+    public void joinGame(int gameID, ChessGame.TeamColor playerColor, String username) throws DataAccessException, ResponseException {
         Game game = gameDAO.getGame(gameID);
 
         // Join available color
