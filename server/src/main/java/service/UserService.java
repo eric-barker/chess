@@ -32,6 +32,10 @@ public class UserService {
         return new Auth(authToken, user.username());
     }
 
+    public User getUser(String authToken) throws ResponseException, DataAccessException {
+        return userDAO.getUser(authDAO.getAuth(authToken).username());
+    }
+
     public Auth login(User user) throws ResponseException, DataAccessException {
         User knownUser = userDAO.getUser(user.username());
         if (knownUser == null) {

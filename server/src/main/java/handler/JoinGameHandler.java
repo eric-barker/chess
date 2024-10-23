@@ -4,21 +4,24 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import exception.ResponseException;
 import service.GameService;
+import service.UserService;
 import spark.Request;
 import spark.Response;
 
 public class JoinGameHandler {
 
     private final GameService gameService;
+    private final UserService userService;
     private final Gson gson = new Gson();
 
-    public JoinGameHandler(GameService gameService) {
+    public JoinGameHandler(GameService gameService, UserService userService) {
         this.gameService = gameService;
+        this.userService = userService;
     }
 
     public Object handle(Request req, Response res) {
         try {
-            
+
             // Retrieve the authToken from header
             String authToken = req.headers("authorization");
             if (authToken == null || authToken.isEmpty()) {
@@ -35,7 +38,7 @@ public class JoinGameHandler {
             }
 
             // Join the game
-            gameService.joinGame(joinRequest.gameID, joinRequest.playerColor, req.headers("username"), authToken);
+            gameService.joinGame(joinRequest.gameID, joinRequest.playerColor, userService.getUser(authToken).username(), authToken);
             res.status(200);
             return "";
         } catch (ResponseException e) {

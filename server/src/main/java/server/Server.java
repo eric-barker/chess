@@ -51,7 +51,7 @@ public class Server {
         this.logoutHandler = new LogoutHandler(userService);
         this.createGameHandler = new CreateGameHandler(gameService, userService);
         this.listGamesHandler = new ListGamesHandler(gameService);
-        this.joinGameHandler = new JoinGameHandler(gameService);
+        this.joinGameHandler = new JoinGameHandler(gameService, userService);
 
     }
 
