@@ -57,7 +57,7 @@ public class GameServiceTests {
             gameService.createGame("Unauthorized Game", "invalidAuthToken");
             fail("Expected ResponseException for invalid auth token");
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode(), "Unauthorized status code should be 401");
+            assertEquals(401, e.statusCode(), "Unauthorized status code should be 401");
             assertEquals("Error: unauthorized", e.getMessage(), "Error message should be 'Error: unauthorized'");
         } catch (DataAccessException e) {
             fail("Unexpected DataAccessException thrown");
@@ -71,7 +71,7 @@ public class GameServiceTests {
             gameService.createGame("", validAuthToken);
             fail("Expected ResponseException for empty game name");
         } catch (ResponseException e) {
-            assertEquals(400, e.StatusCode(), "Bad request status code should be 400");
+            assertEquals(400, e.statusCode(), "Bad request status code should be 400");
             assertEquals("Error: bad request", e.getMessage(), "Error message should be 'Error: bad request'");
         } catch (DataAccessException e) {
             fail("Unexpected DataAccessException thrown");
@@ -96,7 +96,7 @@ public class GameServiceTests {
             gameService.getGame(9999);  // Assuming 9999 is an invalid game ID
             fail("Expected ResponseException for game not found");
         } catch (ResponseException e) {
-            assertEquals(504, e.StatusCode(), "Game not found status code should be 504");
+            assertEquals(504, e.statusCode(), "Game not found status code should be 504");
             assertEquals("Error: Game not found", e.getMessage(), "Error message should be 'Error: Game not found'");
         } catch (DataAccessException e) {
             fail("Unexpected DataAccessException thrown");
@@ -125,7 +125,7 @@ public class GameServiceTests {
             gameService.joinGame(createdGame.gameID(), "WHITE", "anotherUser", validAuthToken);
             fail("Expected ResponseException for trying to join already taken spot");
         } catch (ResponseException e) {
-            assertEquals(403, e.StatusCode(), "Already taken status code should be 403");
+            assertEquals(403, e.statusCode(), "Already taken status code should be 403");
             assertEquals("Error: already taken", e.getMessage(), "Error message should be 'Error: already taken'");
         } catch (DataAccessException e) {
             fail("Unexpected DataAccessException thrown");
@@ -140,7 +140,7 @@ public class GameServiceTests {
             gameService.joinGame(createdGame.gameID(), "INVALID", "testUser", validAuthToken);
             fail("Expected ResponseException for invalid color");
         } catch (ResponseException e) {
-            assertEquals(400, e.StatusCode(), "Bad request status code should be 400");
+            assertEquals(400, e.statusCode(), "Bad request status code should be 400");
             assertEquals("Error: bad request", e.getMessage(), "Error message should be 'Error: bad request'");
         } catch (DataAccessException e) {
             fail("Unexpected DataAccessException thrown");
@@ -165,7 +165,7 @@ public class GameServiceTests {
             gameService.listGames("invalidAuthToken");
             fail("Expected ResponseException for invalid auth token");
         } catch (ResponseException e) {
-            assertEquals(401, e.StatusCode(), "Unauthorized status code should be 401");
+            assertEquals(401, e.statusCode(), "Unauthorized status code should be 401");
             assertEquals("Error: unauthorized", e.getMessage(), "Error message should be 'Error: unauthorized'");
         } catch (DataAccessException e) {
             fail("Unexpected DataAccessException thrown");

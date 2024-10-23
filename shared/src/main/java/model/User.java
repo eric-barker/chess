@@ -4,10 +4,6 @@ import java.util.Objects;
 
 public record User(String username, String password, String email) {
 
-    public User setUsername(String username) {
-        return new User(username, this.password, this.email);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

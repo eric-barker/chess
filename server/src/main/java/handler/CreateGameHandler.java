@@ -47,7 +47,7 @@ public class CreateGameHandler {
             return gson.toJson(new CreateGameResult(createdGame.gameID()));
 
         } catch (ResponseException e) {
-            res.status(e.StatusCode());  // Use the status code from the exception
+            res.status(e.statusCode());  // Use the status code from the exception
             return gson.toJson(new ErrorMessage(e.getMessage()));
         } catch (Exception e) {
             res.status(503);  // Internal Server Error

@@ -37,7 +37,7 @@ public class RegisterUserHandler {
                 res.status(403);  // Forbidden
                 return gson.toJson(new ErrorMessage("Error: already taken"));
             } else {
-                res.status(e.StatusCode());
+                res.status(e.statusCode());
                 return gson.toJson(new ErrorMessage(e.getMessage()));
             }
         } catch (Exception e) {

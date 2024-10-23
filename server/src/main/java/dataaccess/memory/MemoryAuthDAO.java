@@ -31,14 +31,14 @@ public class MemoryAuthDAO implements AuthDAO {
         if (authTokens.get(oldAuthToken) != null) {
             Auth newAuth = new Auth(newAuthToken, authTokens.get(oldAuthToken).username());
             authTokens.put(newAuthToken, newAuth);
-            
+
             authTokens.remove(oldAuthToken, authTokens.get(oldAuthToken));
         }
     }
 
     @Override
-    public void deleteAuth(String AuthToken) {
-        authTokens.remove(AuthToken);
+    public void deleteAuth(String authToken) {
+        authTokens.remove(authToken);
     }
 
     @Override

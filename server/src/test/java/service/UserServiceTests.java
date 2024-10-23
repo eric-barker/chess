@@ -61,7 +61,7 @@ public class UserServiceTests {
         ResponseException thrown = assertThrows(ResponseException.class, () -> {
             userService.register(existingUser);
         });
-        assertEquals(403, thrown.StatusCode(), "Status code should be 403 for already existing user.");
+        assertEquals(403, thrown.statusCode(), "Status code should be 403 for already existing user.");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class UserServiceTests {
         ResponseException thrown = assertThrows(ResponseException.class, () -> {
             userService.login(new User(existingUser.username(), "wrongPassword", existingUser.email()));
         });
-        assertEquals(401, thrown.StatusCode(), "Status code should be 401 for incorrect login.");
+        assertEquals(401, thrown.statusCode(), "Status code should be 401 for incorrect login.");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class UserServiceTests {
         ResponseException thrown = assertThrows(ResponseException.class, () -> {
             userService.logout("invalidAuthToken");
         });
-        assertEquals(401, thrown.StatusCode(), "Status code should be 401 for invalid auth token.");
+        assertEquals(401, thrown.statusCode(), "Status code should be 401 for invalid auth token.");
     }
 
     // Extra test cases for new methods :(
@@ -118,7 +118,7 @@ public class UserServiceTests {
         ResponseException thrown = assertThrows(ResponseException.class, () -> {
             userService.getUser("invalidAuthToken");
         });
-        assertEquals(401, thrown.StatusCode(), "Status code should be 401 for unauthorized access.");
+        assertEquals(401, thrown.statusCode(), "Status code should be 401 for unauthorized access.");
     }
 
     @Test

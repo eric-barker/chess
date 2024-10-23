@@ -45,7 +45,7 @@ public class JoinGameHandler {
             return "";
 
         } catch (ResponseException e) {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return gson.toJson(new ErrorResponse(e.getMessage()));
 
         } catch (DataAccessException e) {

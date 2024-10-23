@@ -79,24 +79,7 @@ public class Server {
         Spark.awaitInitialization();
         return Spark.port();
     }
-
-
-    private Object registerUser(Request req, Response res) throws ResponseException {
-        User newUser = gson.fromJson(req.body(), User.class);
-
-        // Check if the user already exists
-        if (userDAO.getUser(newUser.username()) != null) {
-            res.status(403);  // Forbidden
-            return "User already exists";
-        }
-
-        // Add the new user
-        userDAO.addUser(newUser);
-        res.status(201);  // Created
-        return "User Successfully Added";
-        // return gson.toJson(new TestAuthResult(newUser.username(), "authToken123"));
-    }
-
+    
 
     private Object listUsers(Request req, Response res) throws ResponseException {
         res.type("application/json");

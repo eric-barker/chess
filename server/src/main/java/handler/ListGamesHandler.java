@@ -37,7 +37,7 @@ public class ListGamesHandler {
             res.status(200);  // Success
             return gson.toJson(response);
         } catch (ResponseException e) {
-            res.status(e.StatusCode());
+            res.status(e.statusCode());
             return gson.toJson(new ErrorResponse(e.getMessage()));
         } catch (DataAccessException e) {
             res.status(502);
