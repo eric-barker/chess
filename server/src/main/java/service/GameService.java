@@ -20,7 +20,6 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    // Create a new game (requires authToken for authorization)
     public Game createGame(String gameName, String authToken) throws DataAccessException, ResponseException {
         validateAuthToken(authToken);  // Check if authToken is valid
 
@@ -28,13 +27,10 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
 
-        Game newGame = new Game(1, null, null, gameName, null);  // Let DAO handle the gameID assignment
-        gameDAO.createGame(newGame);
+        Game newGame = new Game(0, null, null, gameName, null);  // ID doesn't matter for now.
+        newGame = gameDAO.createGame(newGame);  // Use the returned game with the correct ID
 
-        // Retrieve the game back to ensure the gameID is updated
-        Game createdGame = gameDAO.getGame(newGame.gameID());
-
-        return createdGame;  // Return the game with the correct gameID
+        return newGame;  // Return the game with the correct gameID
     }
 
     // Retrieve a game by its ID

@@ -79,6 +79,31 @@ public class GameServiceTests {
     }
 
     @Test
+    @DisplayName("Get Game - Success")
+    public void getGameSuccess() throws DataAccessException, ResponseException {
+        Game createdGame = gameService.createGame("Retrievable Game", validAuthToken);
+
+        Game retrievedGame = gameService.getGame(createdGame.gameID());
+
+        assertNotNull(retrievedGame, "Game should be retrieved successfully");
+        assertEquals(createdGame.gameID(), retrievedGame.gameID(), "Game ID should match");
+    }
+
+    @Test
+    @DisplayName("Get Game - Game Not Found")
+    public void getGameNotFound() {
+        try {
+            gameService.getGame(9999);  // Assuming 9999 is an invalid game ID
+            fail("Expected ResponseException for game not found");
+        } catch (ResponseException e) {
+            assertEquals(504, e.StatusCode(), "Game not found status code should be 504");
+            assertEquals("Error: Game not found", e.getMessage(), "Error message should be 'Error: Game not found'");
+        } catch (DataAccessException e) {
+            fail("Unexpected DataAccessException thrown");
+        }
+    }
+
+    @Test
     @DisplayName("Join Game - Success")
     public void joinGameSuccess() throws DataAccessException, ResponseException {
         Game createdGame = gameService.createGame("Joinable Game", validAuthToken);

@@ -100,4 +100,38 @@ public class UserServiceTests {
         });
         assertEquals(401, thrown.StatusCode(), "Status code should be 401 for invalid auth token.");
     }
+
+    // Extra test cases for new methods :(
+    @Test
+    @DisplayName("Get User by Auth Token Success")
+    public void testGetUserSuccess() throws DataAccessException, ResponseException {
+        // Test successful retrieval of user by valid auth token
+        User retrievedUser = userService.getUser(existingAuthToken);
+        assertNotNull(retrievedUser, "Retrieved user should not be null.");
+        assertEquals(existingUser.username(), retrievedUser.username(), "The retrieved username should match.");
+    }
+
+    @Test
+    @DisplayName("Get User by Invalid Auth Token Should Fail")
+    public void testGetUserInvalidToken() {
+        // Test get user with invalid auth token
+        ResponseException thrown = assertThrows(ResponseException.class, () -> {
+            userService.getUser("invalidAuthToken");
+        });
+        assertEquals(401, thrown.StatusCode(), "Status code should be 401 for unauthorized access.");
+    }
+
+    @Test
+    @DisplayName("Check User is Logged In")
+    public void testIsLoggedInSuccess() throws ResponseException {
+        // Test that the user is logged in with a valid auth token
+        assertTrue(userService.isLoggedIn(existingAuthToken), "The user should be logged in with a valid auth token.");
+    }
+
+    @Test
+    @DisplayName("Check User is Not Logged In with Invalid Auth Token")
+    public void testIsLoggedInInvalidToken() throws ResponseException {
+        // Test that the user is not logged in with an invalid auth token
+        assertFalse(userService.isLoggedIn("invalidAuthToken"), "The user should not be logged in with an invalid auth token.");
+    }
 }
