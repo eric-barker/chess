@@ -49,7 +49,7 @@ public class Server {
         this.clearHandler = new ClearHandler(clearService);
         this.loginHandler = new LoginHandler(userService);
         this.logoutHandler = new LogoutHandler(userService);
-        this.createGameHandler = new CreateGameHandler(gameService);
+        this.createGameHandler = new CreateGameHandler(gameService, userService);
         this.listGamesHandler = new ListGamesHandler(gameService);
         this.joinGameHandler = new JoinGameHandler(gameService);
 

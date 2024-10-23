@@ -7,6 +7,7 @@ import exception.ResponseException;
 import model.Auth;
 import model.User;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -43,6 +44,16 @@ public class UserService {
         String authToken = UUID.randomUUID().toString();
         authDAO.addAuth(authToken, user.username());
         return new Auth(authToken, user.username());
+    }
+
+    public boolean isLoggedIn(String authToken) throws ResponseException {
+        for (var token : authDAO.listTokens()) {
+            if (!Objects.equals(authToken, token.authToken())) {
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
     public void logout(String authToken) throws ResponseException {
