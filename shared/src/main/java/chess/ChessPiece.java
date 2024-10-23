@@ -24,8 +24,12 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessPiece piece = (ChessPiece) o;
         return pieceColor == piece.pieceColor && type == piece.type;
     }
@@ -79,7 +83,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
 
-        moves = switch (type){
+        moves = switch (type) {
             case KING -> new KingMoves().calculateMoves(board, myPosition);
             case QUEEN -> new QueenMoves().calculateMoves(board, myPosition);
             case BISHOP -> new BishopMoves().calculateMoves(board, myPosition);

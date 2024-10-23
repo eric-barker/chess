@@ -13,7 +13,7 @@ public class ChessBoard {
     ChessPiece[][] squares = new ChessPiece[8][8];
 
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -48,29 +48,28 @@ public class ChessBoard {
     }
 
     private void clearBoard() {
-        for(int i = 0; i < 8; i++){
-            for(int j = 0; j < 8; j++){
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 squares[i][j] = null;
             }
         }
     }
 
-    private void setTeamPieces(ChessGame.TeamColor color){
+    private void setTeamPieces(ChessGame.TeamColor color) {
         int frontRow;
         int backRow;
 
-        if(color == ChessGame.TeamColor.WHITE){
+        if (color == ChessGame.TeamColor.WHITE) {
             frontRow = 1;
             backRow = 0;
-        }
-        else{
+        } else {
             frontRow = 6;
             backRow = 7;
         }
 
         // Populate the pawns
-        for(int i = 0; i < 8; i++){
-            squares[frontRow][i]= new ChessPiece(color, ChessPiece.PieceType.PAWN);
+        for (int i = 0; i < 8; i++) {
+            squares[frontRow][i] = new ChessPiece(color, ChessPiece.PieceType.PAWN);
         }
 
         // Populate the backRow
@@ -89,8 +88,12 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessBoard that = (ChessBoard) o;
         return Objects.deepEquals(squares, that.squares);
     }
