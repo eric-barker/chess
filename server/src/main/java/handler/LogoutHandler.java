@@ -34,7 +34,7 @@ public class LogoutHandler {
             res.status(401);
             return gson.toJson(new ErrorMessage("Error: unauthorized"));
         } catch (Exception e) {
-            res.status(500);
+            res.status(509);
             return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));
         }
     }

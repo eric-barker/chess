@@ -13,7 +13,6 @@ public class GameService {
 
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
-    private int officialGameID = 1;
 
     // Constructor
     public GameService(GameDAO gameDAO, AuthDAO authDAO) {
@@ -29,16 +28,20 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
 
-        Game newGame = new Game(officialGameID++, null, null, gameName, null);  // Game created without assigning players
+        Game newGame = new Game(1, null, null, gameName, null);  // Let DAO handle the gameID assignment
         gameDAO.createGame(newGame);
-        return newGame;
+
+        // Retrieve the game back to ensure the gameID is updated
+        Game createdGame = gameDAO.getGame(newGame.gameID());
+
+        return createdGame;  // Return the game with the correct gameID
     }
 
     // Retrieve a game by its ID
     public Game getGame(int gameID) throws ResponseException, DataAccessException {
         Game game = gameDAO.getGame(gameID);
         if (game == null) {
-            throw new ResponseException(500, "Error: Game not found");
+            throw new ResponseException(504, "Error: Game not found");
         }
         return game;
     }
@@ -49,7 +52,6 @@ public class GameService {
         return gameDAO.listGames();
     }
 
-    // Join a game by adding a player as white or black (requires authToken)
     public void joinGame(int gameID, String playerColor, String username, String authToken) throws DataAccessException, ResponseException {
         validateAuthToken(authToken);  // Check if authToken is valid
 
@@ -59,28 +61,29 @@ public class GameService {
 
         Game game = gameDAO.getGame(gameID);
         if (game == null) {
-            throw new ResponseException(500, "Error: Game not found");
+            throw new ResponseException(507, "Error: Game not found");
         }
 
+        // Assign player to the correct color
         if (playerColor.equalsIgnoreCase("WHITE")) {
             if (game.whiteUsername() != null) {
                 throw new ResponseException(403, "Error: already taken");
             }
-            game = new Game(gameID, username, game.blackUsername(), game.gameName(), game.game());
+            game = new Game(game.gameID(), username, game.blackUsername(), game.gameName(), game.game());
         } else if (playerColor.equalsIgnoreCase("BLACK")) {
             if (game.blackUsername() != null) {
                 throw new ResponseException(403, "Error: already taken");
             }
-            game = new Game(gameID, game.whiteUsername(), username, game.gameName(), game.game());
+            game = new Game(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
 
+        // Update the game after assigning the player
         gameDAO.updateGame(game);
     }
 
     // Clear all game data (used for testing)
     public void clearGames() throws DataAccessException {
         gameDAO.deleteAllGames();
-        officialGameID = 1;
     }
 
     // Helper method to validate authToken

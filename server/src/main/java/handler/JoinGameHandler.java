@@ -3,6 +3,7 @@ package handler;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import exception.ResponseException;
+import model.User;
 import service.GameService;
 import service.UserService;
 import spark.Request;
@@ -21,31 +22,34 @@ public class JoinGameHandler {
 
     public Object handle(Request req, Response res) {
         try {
-
-            // Retrieve the authToken from header
             String authToken = req.headers("authorization");
             if (authToken == null || authToken.isEmpty()) {
-                res.status(401);
+                res.status(401);  // Unauthorized
                 return gson.toJson(new ErrorResponse("Error: unauthorized"));
             }
-            // Deserialize to get the playerColor and gameID
-            JoinGameRequest joinRequest = gson.fromJson(req.body(), JoinGameRequest.class);
 
-            // Validate that both fields are provided
+            User user = userService.getUser(authToken);
+            if (user == null) {
+                res.status(401);  // Unauthorized
+                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+            }
+
+            JoinGameRequest joinRequest = gson.fromJson(req.body(), JoinGameRequest.class);
             if (joinRequest.playerColor == null || joinRequest.gameID == null) {
-                res.status(400);
+                res.status(400);  // Bad Request
                 return gson.toJson(new ErrorResponse("Error: bad request"));
             }
 
-            // Join the game
-            gameService.joinGame(joinRequest.gameID, joinRequest.playerColor, userService.getUser(authToken).username(), authToken);
-            res.status(200);
+            gameService.joinGame(joinRequest.gameID, joinRequest.playerColor, user.username(), authToken);
+            res.status(200);  // Success
             return "";
+
         } catch (ResponseException e) {
             res.status(e.StatusCode());
             return gson.toJson(new ErrorResponse(e.getMessage()));
+
         } catch (DataAccessException e) {
-            res.status(500);
+            res.status(501);  // Internal Server Error
             return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
         }
     }

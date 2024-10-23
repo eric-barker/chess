@@ -50,7 +50,7 @@ public class CreateGameHandler {
             res.status(e.StatusCode());  // Use the status code from the exception
             return gson.toJson(new ErrorMessage(e.getMessage()));
         } catch (Exception e) {
-            res.status(500);  // Internal Server Error
+            res.status(503);  // Internal Server Error
             return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));
         }
     }

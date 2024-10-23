@@ -42,7 +42,7 @@ public class RegisterUserHandler {
             }
         } catch (Exception e) {
             // Handle anything else
-            res.status(500);
+            res.status(508);
             return gson.toJson(new ErrorMessage("Internal Server Error: " + e.getMessage()));
         }
     }

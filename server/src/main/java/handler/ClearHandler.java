@@ -26,11 +26,11 @@ public class ClearHandler {
 
         } catch (DataAccessException e) {
             // Handle any unexpected exceptions
-            res.status(500); // Internal Server Error
+            res.status(505); // Internal Server Error
             return gson.toJson(new ErrorResponse("Error: Unable to clear the database. " + e.getMessage()));
         } catch (Exception e) {
             // Handle everything else
-            res.status(500); // Internal Server Error
+            res.status(506); // Internal Server Error
             return gson.toJson(new ErrorResponse("Error: Unable to clear the database. " + e.getMessage()));
         }
 

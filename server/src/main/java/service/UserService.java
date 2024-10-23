@@ -33,7 +33,12 @@ public class UserService {
     }
 
     public User getUser(String authToken) throws ResponseException, DataAccessException {
-        return userDAO.getUser(authDAO.getAuth(authToken).username());
+        Auth auth = authDAO.getAuth(authToken);
+        if (auth == null) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+        String username = auth.username();
+        return userDAO.getUser(username);
     }
 
     public Auth login(User user) throws ResponseException, DataAccessException {

@@ -40,7 +40,7 @@ public class ListGamesHandler {
             res.status(e.StatusCode());
             return gson.toJson(new ErrorResponse(e.getMessage()));
         } catch (DataAccessException e) {
-            res.status(500);
+            res.status(502);
             return gson.toJson(new ErrorResponse("Error: " + e.getMessage()));
         }
     }
@@ -65,17 +65,8 @@ public class ListGamesHandler {
 
         public GameEntry(int gameID, String whiteUsername, String blackUsername, String gameName) {
             this.gameID = gameID;
-            this.whiteUsername = (whiteUsername != null) ? whiteUsername : "";
-
-            // or
-//            this.whiteUsername = Objects.requireNonNullElse(whiteUsername, "");
-            // or
-//            if(whiteUsername != null){
-//                this.whiteUsername = whiteUsername;
-//            }else {
-//                this.whiteUsername = "";
-//            }
-            this.blackUsername = (blackUsername != null) ? blackUsername : "";
+            this.whiteUsername = whiteUsername;
+            this.blackUsername = blackUsername;
 
             this.gameName = gameName;
         }
