@@ -53,8 +53,15 @@ public class MySQLUserDAO implements UserDAO {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    public void configureDatabase() throws ResponseException {
-        DatabaseManager.createDatabase();
+    private void configureDatabase() throws DataAccessException {
+        // Ensures the database is created if it doesn't exist
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Failed to create database: " + e.getMessage());
+        }
+
+        // Establishes a connection and creates the users table if not present
         try (Connection conn = DatabaseManager.getConnection()) {
             String createTable = """
                         CREATE TABLE IF NOT EXISTS users (
@@ -64,11 +71,12 @@ public class MySQLUserDAO implements UserDAO {
                             PRIMARY KEY (id)
                         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
                     """;
+
             try (PreparedStatement preparedStatement = conn.prepareStatement(createTable)) {
                 preparedStatement.executeUpdate();
             }
         } catch (SQLException ex) {
-            throw new ResponseException(500, "Unable to configure database: " + ex.getMessage());
+            throw new DataAccessException("Unable to configure database: " + ex.getMessage());
         }
     }
 }
