@@ -126,9 +126,22 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     @Override
-    public void update(User user) {
-        // Placeholder method
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void update(User user) throws DataAccessException {
+        String updateStatement = "UPDATE users SET password_hash = ?, email = ? WHERE username = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(updateStatement)) {
+
+            // Set the parameters for the password, email, and username
+            ps.setString(1, user.password());
+            ps.setString(2, user.email());
+            ps.setString(3, user.username());
+
+            // Execute the update
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to update user: " + e.getMessage());
+        }
     }
 
     private void configureDatabase() throws DataAccessException {

@@ -19,6 +19,6 @@ public interface UserDAO {
 
     void deleteAllUsers() throws DataAccessException;
 
-    void update(User user);
+    void update(User user) throws DataAccessException;
 
 }

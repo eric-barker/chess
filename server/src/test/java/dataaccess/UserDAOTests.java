@@ -2,6 +2,7 @@ package dataaccess;
 
 import dataaccess.interfaces.UserDAO;
 import dataaccess.memory.MemoryUserDAO;
+import dataaccess.MySQLUserDAO;
 import model.User;
 import exception.ResponseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ public class UserDAOTests {
     private UserDAO userDAO;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws DataAccessException {
         userDAO = new MemoryUserDAO();  // Setup fresh instance for each test
     }
 
