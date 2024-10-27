@@ -1,5 +1,6 @@
 package dataaccess.interfaces;
 
+import dataaccess.DataAccessException;
 import model.User;
 import exception.ResponseException;
 
@@ -8,13 +9,13 @@ import java.util.Collection;
 
 public interface UserDAO {
 
-    User addUser(User user) throws ResponseException;
+    User addUser(User user) throws DataAccessException;
 
-    Collection<User> listUsers() throws ResponseException;
+    Collection<User> listUsers() throws DataAccessException;
 
-    User getUser(String username) throws ResponseException;
+    User getUser(String username) throws DataAccessException;
 
-    void deleteUser(String username) throws ResponseException;
+    void deleteUser(String username) throws DataAccessException;
 
     void deleteAllUsers();
 

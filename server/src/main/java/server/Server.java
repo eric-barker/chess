@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
@@ -79,14 +80,14 @@ public class Server {
         Spark.awaitInitialization();
         return Spark.port();
     }
-    
 
-    private Object listUsers(Request req, Response res) throws ResponseException {
+
+    private Object listUsers(Request req, Response res) throws DataAccessException {
         res.type("application/json");
         return gson.toJson(userDAO.listUsers());
     }
 
-    private Object deleteUser(Request req, Response res) throws ResponseException {
+    private Object deleteUser(Request req, Response res) throws DataAccessException {
         User newUser = gson.fromJson(req.body(), User.class);
         if (userDAO.getUser(newUser.username()) != null) {
             res.status(201);

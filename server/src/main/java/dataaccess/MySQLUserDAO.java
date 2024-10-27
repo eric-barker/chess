@@ -18,44 +18,62 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     @Override
-    public User addUser(User user) throws ResponseException {
-        String statement = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
+    public User addUser(User user) throws DataAccessException {
+        String insertStatement = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(statement, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = conn.prepareStatement(insertStatement, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(1, user.username());  // Accessor without "get" prefix
-            ps.setString(2, user.password());
+            // Set parameters for the SQL statement
+            ps.setString(1, user.username());   // Assuming username matches the User record's username field
+            ps.setString(2, user.password());   // Assuming password matches the User record's password field
+            ps.setString(3, user.email());      // Assuming email matches the User record's email field
             ps.executeUpdate();
 
-            // Retrieve the generated ID
+            // Retrieve and return the generated key if available
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    int id = rs.getInt(1);
-                    return new User(user.username(), user.password(), user.email());
+                    int id = rs.getInt(1); // Generated ID from the database
+                    return new User(user.username(), user.password(), user.email()); // Return user without assumptions
                 } else {
-                    throw new ResponseException("Failed to retrieve generated ID for new user.");
+                    throw new DataAccessException("Failed to retrieve generated ID for new user.");
                 }
             }
         } catch (SQLException e) {
-            throw new ResponseException("Unable to add user: " + e.getMessage());
+            throw new DataAccessException("Unable to add user: " + e.getMessage());
         }
     }
 
+    public Collection<User> listUsers() throws DataAccessException {
+        String selectStatement = "SELECT username, password_hash, email FROM users";
+        Collection<User> users = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(selectStatement);
+             ResultSet rs = ps.executeQuery()) {
+
+            // Loop through the result set and add each user to the collection
+            while (rs.next()) {
+                String username = rs.getString("username");
+                String passwordHash = rs.getString("password_hash");
+                String email = rs.getString("email");
+
+                users.add(new User(username, passwordHash, email));
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to list users: " + e.getMessage());
+        }
+        return users;
+    }
+
     @Override
-    public Collection<User> listUsers() throws ResponseException {
+    public User getUser(String username) throws DataAccessException {
         // Placeholder method
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
-    public User getUser(String username) throws ResponseException {
-        // Placeholder method
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public void deleteUser(String username) throws ResponseException {
+    public void deleteUser(String username) throws DataAccessException {
         // Placeholder method
         throw new UnsupportedOperationException("Not implemented yet");
     }

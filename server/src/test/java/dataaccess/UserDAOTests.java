@@ -21,7 +21,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void testAddAndGetUser() throws ResponseException {
+    public void testAddAndGetUser() throws DataAccessException {
         // Add a user
         User user = new User("user1", "password1", "user1@mail.com");
         userDAO.addUser(user);
@@ -33,7 +33,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void testUpdateUser() throws ResponseException {
+    public void testUpdateUser() throws DataAccessException {
         // Add a user
         User user = new User("user1", "password1", "user1@mail.com");
         userDAO.addUser(user);
@@ -48,7 +48,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void testDeleteUser() throws ResponseException {
+    public void testDeleteUser() throws DataAccessException {
         // Add and delete a user
         User user = new User("user1", "password1", "user1@mail.com");
         userDAO.addUser(user);
@@ -60,7 +60,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void testListUsers() throws ResponseException {
+    public void testListUsers() throws DataAccessException {
         // Add multiple users
         userDAO.addUser(new User("user1", "password1", "user1@mail.com"));
         userDAO.addUser(new User("user2", "password2", "user2@mail.com"));
@@ -71,7 +71,7 @@ public class UserDAOTests {
     }
 
     @Test
-    public void testDeleteAllUsers() throws ResponseException {
+    public void testDeleteAllUsers() throws DataAccessException {
         // Add users
         userDAO.addUser(new User("user1", "password1", "user1@mail.com"));
         userDAO.addUser(new User("user2", "password2", "user2@mail.com"));
