@@ -13,14 +13,33 @@ import java.util.Collection;
 
 public class MySQLUserDAO implements UserDAO {
 
-    public MySQLUserDAO() throws ResponseException {
+    public MySQLUserDAO() throws DataAccessException {
         configureDatabase();
     }
 
     @Override
     public User addUser(User user) throws ResponseException {
-        // Placeholder method
-        throw new UnsupportedOperationException("Not implemented yet");
+        String statement = "INSERT INTO users (username, password_hash) VALUES (?, ?)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, user.username());  // Accessor without "get" prefix
+            ps.setString(2, user.password());
+            ps.executeUpdate();
+
+            // Retrieve the generated ID
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    return new User(user.username(), user.password(), user.email());
+                } else {
+                    throw new ResponseException("Failed to retrieve generated ID for new user.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new ResponseException("Unable to add user: " + e.getMessage());
+        }
     }
 
     @Override
