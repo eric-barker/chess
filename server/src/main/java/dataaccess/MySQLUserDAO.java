@@ -52,8 +52,23 @@ public class MySQLUserDAO implements UserDAO {
         // Placeholder method
         throw new UnsupportedOperationException("Not implemented yet");
     }
-    
+
     public void configureDatabase() throws ResponseException {
-        throw new UnsupportedOperationException("Not implemented yet");
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String createTable = """
+                        CREATE TABLE IF NOT EXISTS users (
+                            id INT NOT NULL AUTO_INCREMENT,
+                            username VARCHAR(50) NOT NULL UNIQUE,
+                            password_hash VARCHAR(255) NOT NULL,
+                            PRIMARY KEY (id)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+                    """;
+            try (PreparedStatement preparedStatement = conn.prepareStatement(createTable)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new ResponseException(500, "Unable to configure database: " + ex.getMessage());
+        }
     }
 }
