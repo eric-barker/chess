@@ -68,8 +68,30 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public User getUser(String username) throws DataAccessException {
-        // Placeholder method
-        throw new UnsupportedOperationException("Not implemented yet");
+        String selectStatement = "SELECT username, password_hash, email FROM users WHERE username = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(selectStatement)) {
+
+            // Set the username parameter
+            ps.setString(1, username);
+
+            // Execute the query and process the result
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String passwordHash = rs.getString("password_hash");
+                    String email = rs.getString("email");
+
+                    // Return the User object if found
+                    return new User(username, passwordHash, email);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to retrieve user: " + e.getMessage());
+        }
+
+        // Return null if the user is not found
+        return null;
     }
 
     @Override
