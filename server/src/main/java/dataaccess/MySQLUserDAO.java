@@ -96,14 +96,33 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public void deleteUser(String username) throws DataAccessException {
-        // Placeholder method
-        throw new UnsupportedOperationException("Not implemented yet");
+        String deleteStatement = "DELETE FROM users WHERE username = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(deleteStatement)) {
+
+            // Set the username parameter
+            ps.setString(1, username);
+
+            // Execute the delete operation
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to delete user: " + e.getMessage());
+        }
     }
 
     @Override
-    public void deleteAllUsers() {
-        // Placeholder method
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void deleteAllUsers() throws DataAccessException {
+        String truncateStatement = "TRUNCATE TABLE users";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(truncateStatement)) {
+
+            // Execute the truncate operation
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to delete all users: " + e.getMessage());
+        }
     }
 
     @Override
