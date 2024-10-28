@@ -8,6 +8,11 @@ import exception.ResponseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import dataaccess.DatabaseManager;
+
+import java.sql.Connection;
+
+import java.sql.SQLException;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,6 +27,17 @@ public class UserDAOTests {
 
         // Clear existing data to ensure clean state for each test
         userDAO.deleteAllUsers();
+    }
+
+    @Test
+    public void testDatabaseConnection() {
+        // Attempt to establish a connection
+        try (Connection conn = DatabaseManager.getConnection()) {
+            assertNotNull(conn, "Connection should be established.");
+            System.out.println("Database connection successful.");
+        } catch (DataAccessException | SQLException e) {
+            fail("Database connection failed: " + e.getMessage());
+        }
     }
 
     @Test
