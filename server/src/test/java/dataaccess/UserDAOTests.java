@@ -18,7 +18,10 @@ public class UserDAOTests {
 
     @BeforeEach
     public void setUp() throws DataAccessException {
-        userDAO = new MemoryUserDAO();  // Setup fresh instance for each test
+        userDAO = new MySQLUserDAO();  // Setup fresh instance for each test
+
+        // Clear existing data to ensure clean state for each test
+        userDAO.deleteAllUsers();
     }
 
     @Test
