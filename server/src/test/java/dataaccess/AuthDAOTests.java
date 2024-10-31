@@ -21,7 +21,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void testAddAndGetAuth() {
+    public void testAddAndGetAuth() throws DataAccessException {
         // add an auth token and then retrieve it
         authDAO.addAuth("authToken1", "user1");
         Auth auth = authDAO.getAuth("authToken1");
@@ -30,7 +30,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void testUpdateAuth() {
+    public void testUpdateAuth() throws DataAccessException {
         // Add the original token, then update it to a new one
         authDAO.addAuth("authToken1", "user1");
 
@@ -56,7 +56,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void testDeleteAuth() {
+    public void testDeleteAuth() throws DataAccessException {
         // Add and then delete the token
         authDAO.addAuth("authToken1", "user1");
         authDAO.deleteAuth("authToken1");
@@ -67,7 +67,7 @@ public class AuthDAOTests {
 
 
     @Test
-    public void testListTokens() {
+    public void testListTokens() throws DataAccessException {
         // Add two tokens, then list them
         authDAO.addAuth("authToken1", "user1");
         authDAO.addAuth("authToken2", "user2");
@@ -78,7 +78,7 @@ public class AuthDAOTests {
     }
 
     @Test
-    public void testDeleteAllAuthTokens() {
+    public void testDeleteAllAuthTokens() throws DataAccessException {
         // Add some tokens
         authDAO.addAuth("authToken1", "user1");
         authDAO.addAuth("authToken2", "user2");

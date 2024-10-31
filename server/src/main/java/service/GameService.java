@@ -83,7 +83,7 @@ public class GameService {
     }
 
     // Helper method to validate authToken
-    private void validateAuthToken(String authToken) throws ResponseException {
+    private void validateAuthToken(String authToken) throws ResponseException, DataAccessException {
         Auth auth = authDAO.getAuth(authToken);
         if (auth == null) {
             throw new ResponseException(401, "Error: unauthorized");

@@ -123,14 +123,14 @@ public class UserServiceTests {
 
     @Test
     @DisplayName("Check User is Logged In")
-    public void testIsLoggedInSuccess() throws ResponseException {
+    public void testIsLoggedInSuccess() throws DataAccessException, ResponseException {
         // Test that the user is logged in with a valid auth token
         assertTrue(userService.isLoggedIn(existingAuthToken), "The user should be logged in with a valid auth token.");
     }
 
     @Test
     @DisplayName("Check User is Not Logged In with Invalid Auth Token")
-    public void testIsLoggedInInvalidToken() throws ResponseException {
+    public void testIsLoggedInInvalidToken() throws DataAccessException, ResponseException {
         // Test that the user is not logged in with an invalid auth token
         assertFalse(userService.isLoggedIn("invalidAuthToken"), "The user should not be logged in with an invalid auth token.");
     }

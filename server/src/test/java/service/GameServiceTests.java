@@ -10,6 +10,7 @@ import org.junit.jupiter.api.*;
 import exception.ResponseException;
 import dataaccess.DataAccessException;
 
+import javax.xml.crypto.Data;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +24,7 @@ public class GameServiceTests {
     private static String validAuthToken;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws DataAccessException {
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDAO();
         gameService = new GameService(gameDAO, authDAO);

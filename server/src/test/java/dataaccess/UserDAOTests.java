@@ -1,14 +1,12 @@
 package dataaccess;
 
 import dataaccess.interfaces.UserDAO;
-import dataaccess.memory.MemoryUserDAO;
-import dataaccess.MySQLUserDAO;
+import dataaccess.mysql.MySQLUserDAO;
 import model.User;
-import exception.ResponseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import dataaccess.DatabaseManager;
+import dataaccess.mysql.DatabaseManager;
 
 import java.sql.Connection;
 

@@ -55,7 +55,7 @@ public class UserService {
         return new Auth(authToken, user.username());
     }
 
-    public boolean isLoggedIn(String authToken) throws ResponseException {
+    public boolean isLoggedIn(String authToken) throws ResponseException, DataAccessException {
         for (var token : authDAO.listTokens()) {
             if (!Objects.equals(authToken, token.authToken())) {
                 continue;
@@ -65,7 +65,7 @@ public class UserService {
         return false;
     }
 
-    public void logout(String authToken) throws ResponseException {
+    public void logout(String authToken) throws ResponseException, DataAccessException {
         if (authDAO.getAuth(authToken) == null) {
             throw new ResponseException(401, "Error: Unauthorized");
         }
