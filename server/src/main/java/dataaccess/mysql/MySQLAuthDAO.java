@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.mysql;
 
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.DataAccessException;
@@ -18,8 +18,17 @@ public class MySQLAuthDAO implements AuthDAO {
 
     @Override
     public void addAuth(String authToken, String username) throws DataAccessException {
-        // Placeholder for adding a new auth token
-        throw new UnsupportedOperationException("Not implemented yet");
+        String insertStatement = "INSERT INTO auth (auth_token, username) VALUES (?, ?)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(insertStatement)) {
+
+            ps.setString(1, authToken);
+            ps.setString(2, username);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to add auth token: " + e.getMessage());
+        }
     }
 
     @Override
@@ -53,7 +62,25 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     private void configureDatabase() throws DataAccessException {
-        // Placeholder for configuring database if table doesn't exist
-        throw new UnsupportedOperationException("Not implemented yet");
+        try {
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Failed to create database: " + e.getMessage());
+        }
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            String createTable = """
+                        CREATE TABLE IF NOT EXISTS auth (
+                            auth_token VARCHAR(255) PRIMARY KEY,
+                            username VARCHAR(50) NOT NULL
+                        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+                    """;
+
+            try (PreparedStatement preparedStatement = conn.prepareStatement(createTable)) {
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException("Unable to configure database: " + ex.getMessage());
+        }
     }
 }

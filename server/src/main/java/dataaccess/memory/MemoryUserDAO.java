@@ -2,10 +2,9 @@ package dataaccess.memory;
 
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.UserDAO;
-import exception.ResponseException;
 import model.User;
 
-import javax.xml.crypto.Data;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
