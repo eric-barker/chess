@@ -6,6 +6,7 @@ import dataaccess.interfaces.GameDAO;
 import model.Game;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -90,13 +91,43 @@ public class MySQLGameDAO implements GameDAO {
 
     @Override
     public Collection<Game> listGames() throws DataAccessException {
-        return List.of();
+        String selectSql = "SELECT gameID, white_username, black_username, game_name, game_data FROM games";
+        Collection<Game> gameList = new ArrayList<>();
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                gameList.add(new Game(
+                        resultSet.getInt("gameID"),
+                        resultSet.getString("white_username"),
+                        resultSet.getString("black_username"),
+                        resultSet.getString("game_name"),
+                        (ChessGame) resultSet.getObject("game_data") // Assuming serialization
+                ));
+            }
+        } catch (SQLException sqlException) {
+            throw new DataAccessException("Error retrieving games: " + sqlException.getMessage()); // Slightly different message
+        }
+        return gameList;
     }
 
     @Override
     public void deleteAllGames() throws DataAccessException {
+        String sql = "TRUNCATE TABLE games";
 
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int rowsAffected = ps.executeUpdate();  // Variable for rows affected, though unused
+            System.out.println("Deleted all games from the table."); // Extra debug message
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Couldn’t delete all games: " + e.getMessage()); // Different phrasing
+        }
     }
+
 
     private void configureDatabase() throws DataAccessException {
         try {
