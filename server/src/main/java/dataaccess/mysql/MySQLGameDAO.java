@@ -8,7 +8,6 @@ import model.Game;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class MySQLGameDAO implements GameDAO {
 
@@ -19,28 +18,13 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public Game createGame(Game game) throws DataAccessException {
         String insertStatement = "INSERT INTO games (white_username, black_username, game_name, game_data) VALUES (?, ?, ?, ?)";
+        int gameID = executeUpdate(insertStatement, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
 
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, game.whiteUsername());
-            ps.setString(2, game.blackUsername());
-            ps.setString(3, game.gameName());
-            ps.setObject(4, game.game());  // Assuming game data can be stored as a BLOB or JSON
-
-            ps.executeUpdate();
-
-            // Retrieve generated game ID
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    int gameID = rs.getInt(1);
-                    return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
-                }
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to create game: " + e.getMessage());
+        if (gameID > 0) {
+            return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        } else {
+            throw new DataAccessException("Game creation failed, no ID obtained.");
         }
-        throw new DataAccessException("Game creation failed, no ID obtained.");
     }
 
     @Override
@@ -58,7 +42,7 @@ public class MySQLGameDAO implements GameDAO {
                             rs.getString("white_username"),
                             rs.getString("black_username"),
                             rs.getString("game_name"),
-                            (ChessGame) rs.getObject("game_data")  // Casting based on assumption
+                            (ChessGame) rs.getObject("game_data")  // Assuming ChessGame is serializable
                     );
                 }
             }
@@ -71,22 +55,7 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public void updateGame(Game game) throws DataAccessException {
         String updateStatement = "UPDATE games SET white_username = ?, black_username = ?, game_name = ?, game_data = ? WHERE gameID = ?";
-
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(updateStatement)) {
-
-            ps.setString(1, game.whiteUsername());
-            ps.setString(2, game.blackUsername());
-            ps.setString(3, game.gameName());
-            ps.setObject(4, game.game());  // Assuming the data can be stored as BLOB or JSON
-            ps.setInt(5, game.gameID());
-
-            if (ps.executeUpdate() == 0) {
-                throw new DataAccessException("No game found to update with ID: " + game.gameID());
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to update game: " + e.getMessage());
-        }
+        executeUpdate(updateStatement, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game(), game.gameID());
     }
 
     @Override
@@ -104,46 +73,65 @@ public class MySQLGameDAO implements GameDAO {
                         resultSet.getString("white_username"),
                         resultSet.getString("black_username"),
                         resultSet.getString("game_name"),
-                        (ChessGame) resultSet.getObject("game_data") // Assuming serialization
+                        (ChessGame) resultSet.getObject("game_data")  // Assuming serialization
                 ));
             }
         } catch (SQLException sqlException) {
-            throw new DataAccessException("Error retrieving games: " + sqlException.getMessage()); // Slightly different message
+            throw new DataAccessException("Error retrieving games: " + sqlException.getMessage());
         }
         return gameList;
     }
 
     @Override
     public void deleteAllGames() throws DataAccessException {
-        String sql = "TRUNCATE TABLE games";
+        String truncateStatement = "TRUNCATE TABLE games";
+        executeUpdate(truncateStatement);
+    }
 
+    /**
+     * Utility method to execute SQL update statements with dynamic parameters.
+     * Returns the generated key if available; otherwise, returns 0.
+     */
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 
-            int rowsAffected = ps.executeUpdate();  // Variable for rows affected, though unused
-            System.out.println("Deleted all games from the table."); // Extra debug message
+            for (int i = 0; i < params.length; i++) {
+                Object param = params[i];
+                switch (param) {
+                    case String s -> ps.setString(i + 1, s);
+                    case Integer integer -> ps.setInt(i + 1, integer);
+                    case ChessGame chessGame -> ps.setObject(i + 1, param); // Assuming ChessGame serializable
+                    case null -> ps.setNull(i + 1, Types.NULL);
+                    default -> {
+                    }
+                }
+            }
 
+            ps.executeUpdate();
+
+            // Retrieve generated keys
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+            return 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Couldn’t delete all games: " + e.getMessage()); // Different phrasing
+            throw new DataAccessException("Unable to execute update: " + statement + ", " + e.getMessage());
         }
     }
 
-
     private void configureDatabase() throws DataAccessException {
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new DataAccessException("Failed to create database: " + e.getMessage());
-        }
-
+        DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             String createTable = """
                     CREATE TABLE IF NOT EXISTS games (
                         gameID INT AUTO_INCREMENT PRIMARY KEY,
-                        white_username VARCHAR(50) NOT NULL,
-                        black_username VARCHAR(50) NOT NULL,
-                        game_name VARCHAR(100) NOT NULL,
-                        game_data BLOB  -- Modify type if JSON storage is needed
+                        white_username VARCHAR(50),
+                        black_username VARCHAR(50),
+                        game_name VARCHAR(100),
+                        game_data BLOB
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
                     """;
 

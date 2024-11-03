@@ -8,6 +8,9 @@ import dataaccess.interfaces.UserDAO;
 import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryUserDAO;
+import dataaccess.mysql.MySQLAuthDAO;
+import dataaccess.mysql.MySQLGameDAO;
+import dataaccess.mysql.MySQLUserDAO;
 import exception.ResponseException;
 import handler.*;
 import model.User;
@@ -38,9 +41,14 @@ public class Server {
     private final JoinGameHandler joinGameHandler;
 
     public Server() {
-        this.userDAO = new MemoryUserDAO();
-        this.authDAO = new MemoryAuthDAO();
-        this.gameDAO = new MemoryGameDAO();
+        try {
+            this.userDAO = new MySQLUserDAO();
+            this.authDAO = new MySQLAuthDAO();
+            this.gameDAO = new MySQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        ;
 
         this.userService = new UserService(userDAO, authDAO);
         this.clearService = new ClearService(userDAO, gameDAO, authDAO);
