@@ -48,14 +48,28 @@ public class GameDAOTests {
 
     @Test
     public void testCreateAndGetGame() throws DataAccessException {
+        // Initialize a new ChessGame instance
         ChessGame chessGame = new ChessGame();
-        Game game = new Game(1, "user1", "user2", "Test Game", chessGame);
+        Game game = new Game(0, "user1", "user2", "Test Game", chessGame); // Use ID = 0, will be assigned in create
 
+        // Create the game in the DAO
         Game createdGame = gameDAO.createGame(game);
+
+        // Verify that the created game has a valid, unique game ID
+        assertNotNull(createdGame, "The created game should not be null.");
+        assertTrue(createdGame.gameID() > 0, "The game ID should be a positive integer.");
+
+        // Retrieve the game from DAO by ID
         Game retrievedGame = gameDAO.getGame(createdGame.gameID());
 
-        assertNotNull(retrievedGame, "The game should be retrievable after creation.");
+        // Verify that the game was successfully retrieved and has matching data
+        assertNotNull(retrievedGame, "The retrieved game should not be null.");
+        assertEquals(createdGame.gameID(), retrievedGame.gameID(), "Game ID should match the created game.");
         assertEquals("Test Game", retrievedGame.gameName(), "Game name should match the created game.");
+        assertEquals("user1", retrievedGame.whiteUsername(), "White username should match the created game.");
+        assertEquals("user2", retrievedGame.blackUsername(), "Black username should match the created game.");
+        assertNotNull(retrievedGame.game(), "Game data (ChessGame) should not be null.");
+        assertEquals(createdGame.game(), retrievedGame.game(), "Game data should match the created ChessGame instance.");
     }
 
     @Test

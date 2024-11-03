@@ -48,7 +48,7 @@ public class MySQLGameDAO implements GameDAO {
 
     @Override
     public void updateGame(Game game) throws DataAccessException {
-        
+
     }
 
     @Override
@@ -115,6 +115,4 @@ public class MySQLGameDAO implements GameDAO {
             throw new DataAccessException("Failed to configure games table: " + e.getMessage());
         }
     }
-
-    // Additional CRUD methods to follow...
 }
