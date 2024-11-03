@@ -20,11 +20,43 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public Game createGame(Game game) throws DataAccessException {
         String insertStatement = "INSERT INTO games (white_username, black_username, game_name, game_data) VALUES (?, ?, ?, ?)";
-        String gameDataJson = gson.toJson(game.game()); // Serialize ChessGame to JSON
 
-        int gameID = executeUpdate(insertStatement, game.whiteUsername(), game.blackUsername(), game.gameName(), gameDataJson);
-        return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(insertStatement, Statement.RETURN_GENERATED_KEYS)) {
+
+            // Use setNull for nullable values if they are actually null
+            if (game.whiteUsername() == null) {
+                ps.setNull(1, Types.VARCHAR);
+            } else {
+                ps.setString(1, game.whiteUsername());
+            }
+
+            if (game.blackUsername() == null) {
+                ps.setNull(2, Types.VARCHAR);
+            } else {
+                ps.setString(2, game.blackUsername());
+            }
+
+            ps.setString(3, game.gameName());
+
+            // Serialize the game data to JSON format
+            String gameDataJson = gson.toJson(game.game());
+            ps.setString(4, gameDataJson);
+
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int gameID = rs.getInt(1);
+                    return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to create game: " + e.getMessage());
+        }
+        throw new DataAccessException("Game creation failed, no ID obtained.");
     }
+
 
     @Override
     public Game getGame(int gameID) throws DataAccessException {
@@ -112,19 +144,31 @@ public class MySQLGameDAO implements GameDAO {
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 
-            for (int i = 0; i < params.length; i++) {
-                if (params[i] instanceof String) ps.setString(i + 1, (String) params[i]);
-                else if (params[i] instanceof Integer) ps.setInt(i + 1, (Integer) params[i]);
-                else if (params[i] == null) ps.setNull(i + 1, Types.NULL);
-            }
+                // Bind each parameter to the PreparedStatement
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
+                    else if (param instanceof ChessGame p) {
+                        String json = gson.toJson(p); // Convert the ChessGame to JSON
+                        ps.setString(i + 1, json);
+                    } else if (param == null) ps.setNull(i + 1, Types.NULL);
+                }
 
-            ps.executeUpdate();
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) return rs.getInt(1);
-                return 0;
+                // Execute the update
+                ps.executeUpdate();
+
+                // Retrieve and return generated keys (like auto-incremented IDs)
+                try (var rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+                return 0;  // Return 0 if no generated key is obtained
+
             }
         } catch (SQLException e) {
             throw new DataAccessException("Unable to update database: " + e.getMessage());

@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import exception.ResponseException;
 import model.Auth;
 import model.Game;
@@ -49,6 +50,9 @@ public class CreateGameHandler {
         } catch (ResponseException e) {
             res.status(e.statusCode());  // Use the status code from the exception
             return gson.toJson(new ErrorMessage(e.getMessage()));
+        } catch (DataAccessException e) {
+            res.status(510);
+            return gson.toJson(new ErrorMessage("Error: Data Access Error: " + e.getMessage()));
         } catch (Exception e) {
             res.status(503);  // Internal Server Error
             return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));
