@@ -22,12 +22,16 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public Game createGame(Game game) throws DataAccessException {
         String statement = "INSERT INTO games (white_username, black_username, game_name, game_data) VALUES (?, ?, ?, ?)";
-        String gameDataJson = gson.toJson(game.game()); // Serialize ChessGame to JSON
+        String gameDataJson = gson.toJson(game.game());
 
-        int gameID = executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), gameDataJson);
+        // Replace null usernames with empty strings
+        String whiteUsername = (game.whiteUsername() == null) ? "" : game.whiteUsername();
+        String blackUsername = (game.blackUsername() == null) ? "" : game.blackUsername();
+
+        int gameID = executeUpdate(statement, whiteUsername, blackUsername, game.gameName(), gameDataJson);
         return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
     }
-
+    
     @Override
     public Game getGame(int gameID) throws DataAccessException {
         String statement = "SELECT gameID, white_username, black_username, game_name, game_data FROM games WHERE gameID = ?";
@@ -75,12 +79,15 @@ public class MySQLGameDAO implements GameDAO {
              PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 
             for (int i = 0; i < params.length; i++) {
-                if (params[i] instanceof String param) {
+                if (params[i] == null) {
+                    System.out.println("Setting NULL for parameter index: " + (i + 1));
+                    ps.setNull(i + 1, Types.NULL);
+                } else if (params[i] instanceof String param) {
+                    System.out.println("Setting String parameter: " + param + " at index: " + (i + 1));
                     ps.setString(i + 1, param);
                 } else if (params[i] instanceof Integer param) {
+                    System.out.println("Setting Integer parameter: " + param + " at index: " + (i + 1));
                     ps.setInt(i + 1, param);
-                } else if (params[i] == null) {
-                    ps.setNull(i + 1, Types.NULL);
                 }
             }
 
@@ -94,7 +101,7 @@ public class MySQLGameDAO implements GameDAO {
             return 0; // Return 0 if no generated key is found
 
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to execute update: " + e.getMessage());
+            throw new DataAccessException("Unable to execute update: " + e.getMessage() + "; SQLState: " + e.getSQLState() + "; ErrorCode: " + e.getErrorCode());
         }
     }
 
