@@ -149,7 +149,8 @@ public class MySQLGameDAO implements GameDAO {
             return 0; // Return 0 if no generated key is found
 
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to execute update: " + e.getMessage() + "; SQLState: " + e.getSQLState() + "; ErrorCode: " + e.getErrorCode());
+            throw new DataAccessException("Unable to execute update: " + e.getMessage() + "; SQLState: " +
+                    e.getSQLState() + "; ErrorCode: " + e.getErrorCode());
         }
     }
 
