@@ -52,10 +52,16 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessGame chessGame = (ChessGame) o;
-        return Objects.equals(gameBoard, chessGame.gameBoard) && whoseTurn == chessGame.whoseTurn && Objects.equals(invalidMoveException, chessGame.invalidMoveException) && Objects.equals(whiteKingPosition, chessGame.whiteKingPosition) && Objects.equals(blackKingPosition, chessGame.blackKingPosition);
+        return Objects.equals(gameBoard, chessGame.gameBoard) && whoseTurn == chessGame.whoseTurn && Objects.equals(invalidMoveException,
+                chessGame.invalidMoveException) && Objects.equals(whiteKingPosition, chessGame.whiteKingPosition) && Objects.equals(blackKingPosition,
+                chessGame.blackKingPosition);
     }
 
     @Override

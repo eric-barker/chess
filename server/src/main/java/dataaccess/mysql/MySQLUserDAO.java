@@ -170,24 +170,6 @@ public class MySQLUserDAO implements UserDAO {
         }
     }
 
-    public void storeUserPassword(String username, String clearTextPassword, String email) throws DataAccessException {
-        // Hash the password using bcrypt
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
-
-        String sql = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, username);
-            ps.setString(2, hashedPassword);  // Store the hashed password
-            ps.setString(3, email);           // Use the provided email
-
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new DataAccessException("Failed to store user password: " + e.getMessage());
-        }
-    }
-
 
     @Override
     public boolean verifyUserPassword(String username, String providedClearTextPassword) throws DataAccessException {
@@ -207,5 +189,5 @@ public class MySQLUserDAO implements UserDAO {
             throw new DataAccessException("Failed to verify user password: " + e.getMessage());
         }
     }
-    
+
 }

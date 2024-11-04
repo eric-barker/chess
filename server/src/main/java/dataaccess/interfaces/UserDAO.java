@@ -21,7 +21,5 @@ public interface UserDAO {
 
     void update(User user) throws DataAccessException;
 
-    void storeUserPassword(String username, String password, String email) throws DataAccessException;
-
     boolean verifyUserPassword(String username, String providedClearTextPassword) throws DataAccessException;
 }

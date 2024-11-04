@@ -43,17 +43,7 @@ public class MemoryUserDAO implements UserDAO {
     public void update(User user) {
         users.put(user.username(), user);
     }
-
-    @Override
-    public void storeUserPassword(String username, String clearTextPassword, String email) throws DataAccessException {
-        // Hash the password using bcrypt
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
-
-        // Create and store a new User object with the hashed password
-        User user = new User(username, hashedPassword, email);
-        users.put(username, user);  // Use `users` instead of `userMap`
-    }
-
+    
     @Override
     public boolean verifyUserPassword(String username, String providedClearTextPassword) {
         User user = users.get(username);  // Use `users` instead of `userMap`
