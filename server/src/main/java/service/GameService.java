@@ -60,6 +60,8 @@ public class GameService {
             throw new ResponseException(507, "Error: Game not found");
         }
 
+        System.out.println("Joining game with ID: " + gameID + " - Current state: " + game);
+
         // Assign player to the correct color
         if (playerColor.equalsIgnoreCase("WHITE")) {
             if (game.whiteUsername() != null) {
@@ -73,9 +75,10 @@ public class GameService {
             game = new Game(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
 
-        // Update the game after assigning the player
+        System.out.println("Updating game: " + game);
         gameDAO.updateGame(game);
     }
+
 
     // Clear all game data (used for testing)
     public void clearGames() throws DataAccessException {

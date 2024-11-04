@@ -48,8 +48,29 @@ public class MySQLGameDAO implements GameDAO {
 
     @Override
     public void updateGame(Game game) throws DataAccessException {
+        String statement = "UPDATE games SET white_username = ?, black_username = ?, game_name = ?, game_data = ? WHERE gameID = ?";
+        String gameDataJson = gson.toJson(game.game()); // Serialize ChessGame to JSON
 
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+
+            // Set parameters for the update
+            ps.setString(1, game.whiteUsername() != null ? game.whiteUsername() : null);
+            ps.setString(2, game.blackUsername() != null ? game.blackUsername() : null);
+            ps.setString(3, game.gameName());
+            ps.setString(4, gameDataJson);
+            ps.setInt(5, game.gameID());
+
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DataAccessException("Update failed: no rows affected. Check if gameID exists.");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to update game: " + e.getMessage());
+        }
     }
+
 
     @Override
     public Collection<Game> listGames() throws DataAccessException {
