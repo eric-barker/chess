@@ -22,16 +22,12 @@ public class MySQLGameDAO implements GameDAO {
     @Override
     public Game createGame(Game game) throws DataAccessException {
         String statement = "INSERT INTO games (white_username, black_username, game_name, game_data) VALUES (?, ?, ?, ?)";
-        String gameDataJson = gson.toJson(game.game());
+        String gameDataJson = gson.toJson(game.game()); // Serialize ChessGame to JSON
 
-        // Replace null usernames with empty strings
-        String whiteUsername = (game.whiteUsername() == null) ? "" : game.whiteUsername();
-        String blackUsername = (game.blackUsername() == null) ? "" : game.blackUsername();
-
-        int gameID = executeUpdate(statement, whiteUsername, blackUsername, game.gameName(), gameDataJson);
+        int gameID = executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), gameDataJson);
         return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
     }
-    
+
     @Override
     public Game getGame(int gameID) throws DataAccessException {
         String statement = "SELECT gameID, white_username, black_username, game_name, game_data FROM games WHERE gameID = ?";
