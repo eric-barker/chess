@@ -3,6 +3,7 @@ package dataaccess.mysql;
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.UserDAO;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,22 +20,20 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public User addUser(User user) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         String insertStatement = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(insertStatement, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            // Set parameters for the SQL statement
-            ps.setString(1, user.username());   // Assuming username matches the User record's username field
-            ps.setString(2, user.password());   // Assuming password matches the User record's password field
-            ps.setString(3, user.email());      // Assuming email matches the User record's email field
+            ps.setString(1, user.username());
+            ps.setString(2, hashedPassword);
+            ps.setString(3, user.email());
             ps.executeUpdate();
 
-            // Retrieve and return the generated key if available
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    int id = rs.getInt(1); // Generated ID from the database
-                    return new User(user.username(), user.password(), user.email()); // Return user without assumptions
+                    return new User(user.username(), hashedPassword, user.email());
                 } else {
                     throw new DataAccessException("Failed to retrieve generated ID for new user.");
                 }
@@ -127,22 +126,21 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public void update(User user) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         String updateStatement = "UPDATE users SET password_hash = ?, email = ? WHERE username = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(updateStatement)) {
 
-            // Set the parameters for the password, email, and username
-            ps.setString(1, user.password());
+            ps.setString(1, hashedPassword);
             ps.setString(2, user.email());
             ps.setString(3, user.username());
-
-            // Execute the update
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException("Unable to update user: " + e.getMessage());
         }
     }
+
 
     private void configureDatabase() throws DataAccessException {
         // Ensures the database is created if it doesn't exist
@@ -171,4 +169,43 @@ public class MySQLUserDAO implements UserDAO {
             throw new DataAccessException("Unable to configure database: " + ex.getMessage());
         }
     }
+
+    public void storeUserPassword(String username, String clearTextPassword, String email) throws DataAccessException {
+        // Hash the password using bcrypt
+        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
+
+        String sql = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setString(2, hashedPassword);  // Store the hashed password
+            ps.setString(3, email);           // Use the provided email
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to store user password: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public boolean verifyUserPassword(String username, String providedClearTextPassword) throws DataAccessException {
+        String sql = "SELECT password_hash FROM users WHERE username = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String storedHash = rs.getString("password_hash");
+                return BCrypt.checkpw(providedClearTextPassword, storedHash);
+            }
+            return false;
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to verify user password: " + e.getMessage());
+        }
+    }
+    
 }

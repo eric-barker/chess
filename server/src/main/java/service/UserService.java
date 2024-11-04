@@ -46,7 +46,10 @@ public class UserService {
         if (knownUser == null) {
             throw new ResponseException(401, "Error: User doesn't exist");
         }
-        if (!user.password().equals(knownUser.password())) {
+
+        // Verify the provided password using bcrypt
+        boolean passwordMatches = userDAO.verifyUserPassword(user.username(), user.password());
+        if (!passwordMatches) {
             throw new ResponseException(401, "Error: Password is incorrect");
         }
 
