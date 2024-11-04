@@ -61,7 +61,14 @@ public class MySQLGameDAO implements GameDAO {
             ps.setString(4, gameDataJson);
             ps.setInt(5, game.gameID());
 
+            System.out.println("Executing update with parameters:");
+            System.out.println("White username: " + game.whiteUsername());
+            System.out.println("Black username: " + game.blackUsername());
+            System.out.println("Game name: " + game.gameName());
+            System.out.println("Game ID: " + game.gameID());
+
             int affectedRows = ps.executeUpdate();
+            System.out.println("Rows affected by update: " + affectedRows);
 
             if (affectedRows == 0) {
                 throw new DataAccessException("Update failed: no rows affected. Check if gameID exists.");
@@ -71,15 +78,39 @@ public class MySQLGameDAO implements GameDAO {
         }
     }
 
-
     @Override
     public Collection<Game> listGames() throws DataAccessException {
-        return List.of();
+        String query = "SELECT gameID, white_username, black_username, game_name, game_data FROM games";
+        List<Game> games = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                games.add(readGame(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to list games: " + e.getMessage());
+        }
+
+        return games;
     }
 
     @Override
     public void deleteAllGames() throws DataAccessException {
+        String statement = "DELETE FROM games";
 
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(statement)) {
+
+            int affectedRows = ps.executeUpdate();
+            System.out.println("All games deleted, rows affected: " + affectedRows);
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to delete all games: " + e.getMessage());
+        }
     }
 
     private Game readGame(ResultSet rs) throws SQLException {
