@@ -7,6 +7,7 @@ import dataaccess.memory.MemoryUserDAO;
 import model.User;
 import model.Auth;
 import org.junit.jupiter.api.*;
+import org.mindrot.jbcrypt.BCrypt;
 import service.UserService;
 import exception.ResponseException;
 import dataaccess.DataAccessException;
@@ -30,8 +31,10 @@ public class UserServiceTests {
         userDAO = new MemoryUserDAO();
         userService = new UserService(userDAO, authDAO);
 
-        existingUser = new User("ExistingUser", "existingPassword", "existingUser@mail.com");
-        newUser = new User("NewUser", "newPassword", "newUser@mail.com");
+        // Hash the existing user's password before setting it up
+        String hashedPassword = BCrypt.hashpw("existingPassword", BCrypt.gensalt());
+        existingUser = new User("ExistingUser", hashedPassword, "existingUser@mail.com");
+        newUser = new User("NewUser", BCrypt.hashpw("newPassword", BCrypt.gensalt()), "newUser@mail.com");
     }
 
     @BeforeEach
@@ -67,10 +70,12 @@ public class UserServiceTests {
     @Test
     @DisplayName("Successful User Login")
     public void testLoginSuccess() throws DataAccessException, ResponseException {
-        // Test successful login
-        Auth auth = userService.login(existingUser);
+        // Attempt to log in with the correct password
+        User loginAttemptUser = new User("ExistingUser", "existingPassword", "existingUser@mail.com");
+        Auth auth = userService.login(loginAttemptUser);
+
         assertNotNull(auth, "Auth token should not be null after successful login.");
-        assertEquals(existingUser.username(), auth.username(), "Logged in username should match.");
+        assertEquals(existingUser.username(), auth.username(), "Logged-in username should match.");
     }
 
     @Test

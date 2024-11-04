@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dataaccess.mysql.DatabaseManager;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 
@@ -52,17 +53,20 @@ public class UserDAOTests {
 
     @Test
     public void testUpdateUser() throws DataAccessException {
-        // Add a user
-        User user = new User("user1", "password1", "user1@mail.com");
+        // Step 1: Add a user with an initial hashed password
+        User user = new User("user1", BCrypt.hashpw("password1", BCrypt.gensalt()), "user1@mail.com");
         userDAO.addUser(user);
 
-        // Update the user's password
-        User updatedUser = new User("user1", "newPassword", "user1@mail.com");
+        // Step 2: Update the user's password to a new value and hash it
+        String newPassword = "newPassword";
+        User updatedUser = new User("user1", newPassword, "user1@mail.com");
         userDAO.update(updatedUser);
 
-        // Retrieve the updated user
+        // Step 3: Retrieve the updated user
         User retrievedUser = userDAO.getUser("user1");
-        assertEquals("newPassword", retrievedUser.password(), "Password should reflect the update.");
+
+        // Step 4: Use BCrypt.checkpw to verify that the new password matches the stored hash
+        assertTrue(BCrypt.checkpw(newPassword, retrievedUser.password()), "Password should reflect the update.");
     }
 
     @Test
