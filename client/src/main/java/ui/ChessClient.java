@@ -1,10 +1,20 @@
 package ui;
 
+import server.ServerFacade;
+import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
+
 public class ChessClient {
     private final String serverUrl;
+    private final ServerFacade server;
+    private final NotificationHandler notificationHandler;
+    private final WebSocketFacade ws;
+    private UserState state = UserState.SIGNEDOUT;
 
-    public ChessClient(String serverUrl) {
+
+    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
     }
 
     public void eval(String input) throws Exception {
