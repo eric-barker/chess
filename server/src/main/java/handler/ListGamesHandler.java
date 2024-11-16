@@ -9,7 +9,6 @@ import spark.Request;
 import spark.Response;
 
 import java.util.Collection;
-import java.util.Objects;
 
 public class ListGamesHandler {
 

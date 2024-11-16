@@ -2,7 +2,6 @@ package dataaccess.interfaces;
 
 import dataaccess.DataAccessException;
 import model.User;
-import exception.ResponseException;
 
 import java.util.Collection;
 

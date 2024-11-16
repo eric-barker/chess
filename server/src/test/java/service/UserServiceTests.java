@@ -8,7 +8,6 @@ import model.User;
 import model.Auth;
 import org.junit.jupiter.api.*;
 import org.mindrot.jbcrypt.BCrypt;
-import service.UserService;
 import exception.ResponseException;
 import dataaccess.DataAccessException;
 

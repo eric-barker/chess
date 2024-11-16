@@ -4,13 +4,11 @@ import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryAuthDAO;
-import model.Auth;
 import model.Game;
 import org.junit.jupiter.api.*;
 import exception.ResponseException;
 import dataaccess.DataAccessException;
 
-import javax.xml.crypto.Data;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
