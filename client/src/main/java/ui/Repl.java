@@ -6,11 +6,10 @@ import ui.websocket.NotificationHandler;
 import java.util.Scanner;
 
 public class Repl implements NotificationHandler {
-    private final ChessClient chessClient; // Client facade for server interaction
+    private final ChessClient client;
 
     public Repl(String serverUrl) {
-        // Initialize the client with the server URL
-        this.chessClient = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run() {
@@ -26,12 +25,12 @@ public class Repl implements NotificationHandler {
 
             if (input.equalsIgnoreCase("quit")) {
                 System.out.println("Exiting the application...");
-                chessClient.cleanup(); // Disconnect WebSocket and other cleanup tasks
+                client.cleanup(); // Disconnect WebSocket and other cleanup tasks
                 break;
             }
 
             try {
-                chessClient.eval(input); // Delegate command processing to ChessClient
+                client.eval(input); // Delegate command processing to ChessClient
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }

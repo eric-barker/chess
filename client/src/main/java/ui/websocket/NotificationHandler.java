@@ -1,4 +1,7 @@
 package ui.websocket;
 
-public class NotificationHandler {
+import webSocketMessages.Notification;
+
+public interface NotificationHandler {
+    void notify(Notification notification);
 }
