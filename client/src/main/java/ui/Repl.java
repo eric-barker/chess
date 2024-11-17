@@ -2,6 +2,8 @@ package ui;
 
 import ui.ChessClient;
 import ui.websocket.NotificationHandler;
+import ui.EscapeSequences.*;
+import webSocketMessages.Notification;
 
 import java.util.Scanner;
 
@@ -17,32 +19,29 @@ public class Repl implements NotificationHandler {
         System.out.println("Type 'help' for a list of commands.");
 
         Scanner scanner = new Scanner(System.in);
-        String input;
-
-        while (true) {
-            System.out.print("> ");
-            input = scanner.nextLine().trim();
-
-            if (input.equalsIgnoreCase("quit")) {
-                System.out.println("Exiting the application...");
-                client.cleanup(); // Disconnect WebSocket and other cleanup tasks
-                break;
-            }
+        var result = "";
+        while (!result.equals("quit")) {
+            printPrompt();
+            String line = scanner.nextLine();
 
             try {
-                client.eval(input); // Delegate command processing to ChessClient
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                result = client.eval(line);
+                System.out.print(EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_BLACK + result);
+            } catch (Throwable e) {
+                var msg = e.toString();
+                System.out.println(msg);
             }
         }
-
-        scanner.close();
+        System.out.println();
     }
 
     @Override
-    public void handleNotification(String message) {
-        // Print notifications from the server
-        System.out.println("\n[Notification]: " + message);
-        System.out.print("> "); // Reprint prompt after a notification
+    public void notify(Notification notification) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + notification.message());
+        printPrompt();
+    }
+
+    private void printPrompt() {
+        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 }
