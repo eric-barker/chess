@@ -9,10 +9,11 @@ import ui.websocket.WebSocketFacade;
 import java.util.Arrays;
 
 public class ChessClient {
+    private String userName = null;
     private final String serverUrl;
     private final ServerFacade server;
     private final NotificationHandler notificationHandler;
-    private final WebSocketFacade ws;
+    private WebSocketFacade ws;
     private UserState state = UserState.SIGNEDOUT;
 
 
@@ -27,35 +28,32 @@ public class ChessClient {
             var tokens = input.toLowerCase().split(" ");
             var cmd = (tokens.length > 0) ? tokens[0] : "help";
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            switch (input.toLowerCase()) {
-                case "help":
-                    displayHelp();
-                    break;
-                case "login":
-                    System.out.println("Login functionality coming soon!");
-                    break;
-                case "list":
-                    System.out.println("List of games coming soon!");
-                    break;
-                default:
-                    System.out.println("Unknown command. Type 'help' for a list of commands.");
-            }
-            ;
+            return switch (cmd) {
+                case "quit" -> "quit";
+                case "login" -> login(params);
+                case "register" -> "register placeholder";
+                case "create" -> "create placeholder";
+                case "list" -> list();
+                case "join" -> "join placeholder";
+                case "observe" -> "observe placeholder";
+                case "logout" -> "logout placeholder";
+                default -> displayHelp();
+            };
         } catch (ResponseException e) {
             return e.getMessage();
         }
     }
 
-//    public String signIn(String... params) throws ResponseException {
-//        if(params.length >= 1){
-//            state = UserState.SIGNEDIN;
-//            visitorName = String.join("-", params);
-//            ws = new WebSocketFacade(serverUrl, notificationHandler);
-//            ws.enterPetShop(visitorName);
-//            return String.format("You signed in as %s.", visitorName);
-//        }
-//        throw new ResponseException(400, "Expected: <yourname>");
-//    }
+    public String login(String... params) throws ResponseException {
+        if (params.length >= 1) {
+            state = UserState.SIGNEDIN;
+            userName = String.join("-", params);
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            ws.enterChess(userName);
+            return String.format("You signed in as %s.", userName);
+        }
+        throw new ResponseException(400, "Expected: <yourname>");
+    }
 
     public String list() throws ResponseException {
         assertSignedIn();
