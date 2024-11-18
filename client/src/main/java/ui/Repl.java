@@ -1,8 +1,6 @@
 package ui;
 
-import ui.ChessClient;
 import ui.websocket.NotificationHandler;
-import ui.EscapeSequences.*;
 import webSocketMessages.Notification;
 
 import java.util.Scanner;
@@ -26,7 +24,7 @@ public class Repl implements NotificationHandler {
 
             try {
                 result = client.eval(line);
-                System.out.print(EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_TEXT_COLOR_BLACK + result);
+                System.out.print(EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_BG_COLOR_DARK_GREY + result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.println(msg);
@@ -37,7 +35,7 @@ public class Repl implements NotificationHandler {
 
     @Override
     public void notify(Notification notification) {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + notification.message());
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + notification.message() + EscapeSequences.RESET_TEXT_COLOR);
         printPrompt();
     }
 
