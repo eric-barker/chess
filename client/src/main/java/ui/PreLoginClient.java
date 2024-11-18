@@ -1,15 +1,19 @@
-
 package ui;
+
+import model.User;
+import server.ServerFacade;
 
 import java.util.Scanner;
 
 public class PreLoginClient {
     private final String serverUrl;
     private final Repl repl;
+    private final ServerFacade serverFacade;
 
     public PreLoginClient(String serverUrl, Repl repl) {
         this.serverUrl = serverUrl;
         this.repl = repl;
+        this.serverFacade = new ServerFacade(serverUrl); // Initialize ServerFacade with serverUrl
     }
 
     public String eval(String input) {
@@ -47,15 +51,13 @@ public class PreLoginClient {
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
-        // Placeholder for server login interaction
         System.out.println("Attempting to login...");
-        boolean success = stubServerLogin(username, password);
-
-        if (success) {
+        try {
+            var auth = serverFacade.login(username, password); // Use ServerFacade for login
             repl.changeState(UserState.LOGGEDIN);
-            return "Login successful. Welcome, " + username + "!";
-        } else {
-            return "Login failed. Please try again.";
+            return "Login successful. Welcome, " + auth.username() + "!";
+        } catch (Exception e) {
+            return "Login failed: " + e.getMessage();
         }
     }
 
@@ -65,28 +67,18 @@ public class PreLoginClient {
         String username = scanner.nextLine();
         System.out.print("Enter new password: ");
         String password = scanner.nextLine();
+        System.out.print("Enter email: ");
+        String email = scanner.nextLine();
 
-        // Stub for server registration interaction
         System.out.println("Attempting to register...");
-        boolean success = stubServerRegister(username, password);
+        User newUser = new User(username, password, email);
 
-        if (success) {
+        try {
+            var auth = serverFacade.register(newUser); // Use ServerFacade for registration
             repl.changeState(UserState.LOGGEDIN);
-            return "Registration successful. Welcome, " + username + "!";
-        } else {
-            return "Registration failed. Username may already exist.";
+            return "Registration successful. Welcome, " + auth.username() + "!";
+        } catch (Exception e) {
+            return "Registration failed: " + e.getMessage();
         }
     }
-
-    // Stub methods for server interaction
-    private boolean stubServerLogin(String username, String password) {
-        // Replace this with actual server interaction later.
-        return "user".equals(username) && "pass".equals(password);
-    }
-
-    private boolean stubServerRegister(String username, String password) {
-        // Replace this with actual server interaction later.
-        return !username.isEmpty() && !password.isEmpty();
-    }
 }
-

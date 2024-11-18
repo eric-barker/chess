@@ -1,5 +1,6 @@
 package client;
 
+import model.Auth;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
@@ -13,6 +14,7 @@ public class ServerFacadeTests {
     private static Server server;
     private static int port;
     private ServerFacade facade;
+
 
     @BeforeAll
     public static void init() {
@@ -53,13 +55,20 @@ public class ServerFacadeTests {
 
     @Test
     public void testRegisterPositive() {
-        User user = new User("testuser", "password123", "testemail@email.com");
-        assertDoesNotThrow(() -> {
-            User registeredUser = facade.register(user);
-            assertNotNull(registeredUser);
-            assertEquals("testuser", registeredUser.getUsername());
-        });
+        User user = new User("testuser" + System.currentTimeMillis(), "password123", "testemail@email.com");
+        try {
+            Auth registeredUser = facade.register(user);
+
+            // Check if the registered user object is not null
+            assertNotNull(registeredUser, "Registered user should not be null");
+
+            // Validate the username in the response matches
+            assertEquals(user.getUsername(), registeredUser.username(), "Returned username does not match");
+        } catch (Exception e) {
+            fail("An unexpected exception was thrown: " + e.getMessage());
+        }
     }
+
 
     @Test
     public void testRegisterNegative() {

@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import exception.ResponseException;
+import model.Auth;
 import model.Game;
 import com.google.gson.Gson;
 import model.User;
@@ -39,9 +40,9 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public User register(User user) throws ResponseException {
+    public Auth register(User user) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, User.class);
+        return this.makeRequest("POST", path, user, Auth.class);
     }
 
     public User login(String username, String password) throws ResponseException {
@@ -117,6 +118,7 @@ public class ServerFacade {
         T response = null;
         if (http.getContentLength() > 0) {
             try (InputStream respBody = http.getInputStream()) {
+                System.out.println("Response Body: " + respBody);
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
                     response = new Gson().fromJson(reader, responseClass);
