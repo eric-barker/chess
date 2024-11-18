@@ -1,15 +1,22 @@
 package ui;
 
-import ui.websocket.NotificationHandler;
-import webSocketMessages.Notification;
+
+import exception.ResponseException;
 
 import java.util.Scanner;
 
-public class Repl implements NotificationHandler {
-    private final ChessClient client;
+public class Repl {
+    private final PreLoginClient preLoginClient;
+    private final PostLoginClient postLoginClient;
+    private final InGameClient inGameClient;
+    private UserState state;
+
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl, this);
+        this.preLoginClient = new PreLoginClient(serverUrl, this);
+        this.postLoginClient = new PostLoginClient(serverUrl, this);
+        this.inGameClient = new InGameClient(serverUrl, this);
+        this.state = UserState.LOGGEDOUT; // Initial state is logged out
     }
 
     public void run() {
@@ -17,26 +24,47 @@ public class Repl implements NotificationHandler {
         System.out.println("Type 'help' for a list of commands.");
 
         Scanner scanner = new Scanner(System.in);
-        var result = "";
-        while (!result.equals("quit")) {
-            printPrompt();
-            String line = scanner.nextLine();
+        var input = "";
 
-            try {
-                result = client.eval(line);
-                System.out.print(EscapeSequences.SET_TEXT_BOLD + EscapeSequences.SET_BG_COLOR_DARK_GREY + result);
-            } catch (Throwable e) {
-                var msg = e.toString();
-                System.out.println(msg);
+        try {
+            while (!input.equalsIgnoreCase("quit")) {
+                printPrompt();
+
+                input = scanner.nextLine().trim();
+                String result = "";
+                try {
+                    switch (state) {
+                        case LOGGEDOUT:
+                            result = preLoginClient.eval(input);
+                            break;
+                        case LOGGEDIN:
+                            result = postLoginClient.eval(input);
+                            break;
+                        case INGAME:
+                            result = inGameClient.eval(input);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected state: " + state);
+                    }
+
+                    if (!result.isEmpty()) {
+                        System.out.println(result);
+                    }
+
+                } catch (Exception e) {
+                    throw new ResponseException(500, e.getMessage());
+                }
+
             }
+        } catch (ResponseException e) {
+            System.out.println(e.getMessage());
         }
+
         System.out.println();
     }
 
-    @Override
-    public void notify(Notification notification) {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + notification.message() + EscapeSequences.RESET_TEXT_COLOR);
-        printPrompt();
+    public void changeState(UserState newState) {
+        this.state = newState;
     }
 
     private void printPrompt() {

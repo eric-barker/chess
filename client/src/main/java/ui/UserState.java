@@ -1,6 +1,7 @@
 package ui;
 
 public enum UserState {
-    SIGNEDOUT,
-    SIGNEDIN
+    LOGGEDOUT,
+    LOGGEDIN,
+    INGAME
 }
