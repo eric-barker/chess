@@ -4,6 +4,7 @@ import chess.ChessGame;
 import exception.ResponseException;
 import model.Game;
 import com.google.gson.Gson;
+import model.User;
 
 import java.io.*;
 import java.net.*;
@@ -21,9 +22,16 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, null, null);
     }
 
-    public void register() throws ResponseException {
+    public User register(User user) throws ResponseException {
         var path = "/user";
-        this.makeRequest("POST", path, null, null);
+        return this.makeRequest("POST", path, user, User.class);
+    }
+
+    public User login(String username, String password) throws ResponseException {
+        var path = "/session";
+        var requestBody = new User(username, password, null);
+
+        return this.makeRequest("POST", path, requestBody, User.class);
     }
 
     public Game[] listGames() throws ResponseException {
@@ -33,10 +41,6 @@ public class ServerFacade {
         var response = this.makeRequest("GET", path, null, listGameResponse.class);
         return response.game();
     }
-
-    // login
-
-    // register
 
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
