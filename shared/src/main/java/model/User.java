@@ -20,4 +20,19 @@ public record User(String username, String password, String email) {
     public int hashCode() {
         return Objects.hash(username, password, email);
     }
+
+
+    public String getUsername() {
+        return username;
+    }
+
+
+    public String getPassword() {
+        return password;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
 }
