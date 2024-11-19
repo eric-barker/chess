@@ -76,6 +76,8 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        Spark.before(this::logRequest);
+
         // Register your endpoints and handle exceptions here.
 
         // Endpoints
@@ -98,30 +100,18 @@ public class Server {
         return Spark.port();
     }
 
-
-    private Object listUsers(Request req, Response res) throws DataAccessException {
-        res.type("application/json");
-        return gson.toJson(userDAO.listUsers());
-    }
-
-    private Object deleteUser(Request req, Response res) throws DataAccessException {
-        User newUser = gson.fromJson(req.body(), User.class);
-        if (userDAO.getUser(newUser.username()) != null) {
-            res.status(201);
-            return "User successfully deleted";
-        }
-
-        res.status(403);
-        return "User does not exist";
-    }
-
-    public int port() {
-        return Spark.port();
-    }
-
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private void logRequest(spark.Request req, spark.Response res) {
+
+//        // Log the details
+//        logger.info("Request Method: " + req.requestMethod());
+//        logger.info("Request URL: " + req.url());
+//        logger.info("Request Headers: " + req.headers());
+
     }
 
     private void logResponse(spark.Request req, spark.Response res) {

@@ -29,9 +29,14 @@ public class LoginHandler {
         try {
             logger.log(Level.INFO, "Processing login request");
 
+            // Log the request details
+            logger.info("Request Method: " + req.requestMethod());
+            logger.info("Request URL: " + req.url());
+            logger.info("Request Headers: " + req.headers());
+
             // Deserialize login credentials
             User loginUser = gson.fromJson(req.body(), User.class);
-            logger.log(Level.FINE, "Deserialized user: {0}", loginUser);
+            logger.log(Level.INFO, "Deserialized request body: {0}", loginUser);
 
             // Validate required fields
             if (loginUser.username() == null || loginUser.password() == null) {
