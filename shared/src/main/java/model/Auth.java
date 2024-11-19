@@ -1,14 +1,16 @@
 package model;
 
-public record Auth(String authToken, String username) {
-    @Override
-    public String username() {
-        return username;
-    }
+import com.google.gson.annotations.SerializedName;
 
-    @Override
-    public String authToken() {
-        return authToken;
-    }
+public record Auth(@SerializedName("user_name") String username, @SerializedName("auth_token") String authToken) {
+//    @Override
+//    public String username() {
+//        return username;
+//    }
+//
+//    @Override
+//    public String authToken() {
+//        return authToken;
+//    }
 }
 

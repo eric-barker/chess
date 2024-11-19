@@ -29,7 +29,9 @@ public class UserService {
         String authToken = UUID.randomUUID().toString();
         authDAO.addAuth(authToken, user.username());
 
-        return new Auth(authToken, user.username());
+        Auth auth = new Auth(authToken, user.username());
+        System.out.println("Generated Auth: " + auth);
+        return auth;
     }
 
     public User getUser(String authToken) throws ResponseException, DataAccessException {

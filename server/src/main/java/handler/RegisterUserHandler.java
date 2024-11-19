@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.Auth;
 import model.User;
 import service.UserService;
 import spark.Request;
@@ -29,8 +30,13 @@ public class RegisterUserHandler {
             var auth = userService.register(newUser);
 
             // Respond with a success message and the auth token
-            res.status(200);  // Success
-            return gson.toJson(new TestAuthResult(newUser.username(), auth.authToken()));
+            String json = gson.toJson(new Auth(newUser.username(), auth.authToken()));
+
+            res.status(202);  // Success
+            res.type("application/json");
+            res.header("Content-Length", String.valueOf(json.length()));
+
+            return json;
         } catch (ResponseException e) {
             // Handle known errors from ResponseException
             if (e.getMessage().contains("already taken")) {

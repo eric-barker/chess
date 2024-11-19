@@ -2,6 +2,7 @@ package handler;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.Auth;
 import model.User;
 import service.UserService;
 import spark.Request;
@@ -29,8 +30,14 @@ public class LoginHandler {
 
             var auth = userService.login(userToLogin);
 
-            res.status(200);
-            return gson.toJson(new AuthResult(userToLogin.username(), auth.authToken()));
+            // Respond with a success message and the auth token
+            String json = gson.toJson(new Auth(auth.username(), auth.authToken()));
+
+            res.status(202);  // Success
+            res.type("application/json");
+            res.header("Content-Length", String.valueOf(json.length()));
+
+            return json;
 
         } catch (ResponseException e) {
             res.status(401);  // Unauthorized

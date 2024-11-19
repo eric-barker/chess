@@ -22,12 +22,12 @@ public record User(String username, String password, String email) {
     }
 
 
-    public String getUsername() {
+    public String username() {
         return username;
     }
 
 
-    public String getPassword() {
+    public String password() {
         return password;
     }
 

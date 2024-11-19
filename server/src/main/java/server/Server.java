@@ -58,6 +58,7 @@ public class Server {
         this.listGamesHandler = new ListGamesHandler(gameService);
         this.joinGameHandler = new JoinGameHandler(gameService, userService);
 
+
     }
 
 
@@ -76,6 +77,13 @@ public class Server {
         Spark.post("/game", createGameHandler::handle);
         Spark.get("/game", listGamesHandler::handle);
         Spark.put("/game", joinGameHandler::handle);
+
+        // After filter to log the response
+        Spark.after((req, res) -> {
+            System.out.println("Response Status: " + res.status());
+            System.out.println("Response Type: " + res.type());
+            System.out.println("Response Body: " + res.body());
+        });
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint

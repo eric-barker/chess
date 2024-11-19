@@ -61,7 +61,11 @@ public class ServerFacade {
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
-            URL url = (new URI(serverUrl + path)).toURL();
+            String fullPath = serverUrl + path;
+            logger.info("Constructing URL with serverUrl: " + serverUrl + " and path: " + path);
+            logger.info("Full URL: " + fullPath);
+
+            URL url = (new URI(fullPath)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(request != null);
@@ -74,10 +78,11 @@ public class ServerFacade {
 
             http.connect();
             logger.info("[HTTP] Response Code: " + http.getResponseCode());
-
+            logger.info("[HTTP] Response Body: " + http.getContentLength());
             throwIfNotSuccessful(http);
             T response = readBody(http, responseClass);
 
+            logger.info("[HTTP] Response body: " + new Gson().toJson(response));
             if (response != null) {
                 logger.info("[HTTP] Response body: " + new Gson().toJson(response));
             }

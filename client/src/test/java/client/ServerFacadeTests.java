@@ -63,7 +63,7 @@ public class ServerFacadeTests {
             assertNotNull(registeredUser, "Registered user should not be null");
 
             // Validate the username in the response matches
-            assertEquals(user.getUsername(), registeredUser.username(), "Returned username does not match");
+            assertEquals(user.username(), registeredUser.username(), "Returned username does not match");
         } catch (Exception e) {
             fail("An unexpected exception was thrown: " + e.getMessage());
         }
@@ -86,7 +86,7 @@ public class ServerFacadeTests {
         assertDoesNotThrow(() -> {
             User loggedInUser = facade.login("testuser", "password123");
             assertNotNull(loggedInUser);
-            assertEquals("testuser", loggedInUser.getUsername());
+            assertEquals("testuser", loggedInUser.username());
         });
     }
 
