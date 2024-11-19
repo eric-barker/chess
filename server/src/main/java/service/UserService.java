@@ -6,7 +6,7 @@ import dataaccess.interfaces.UserDAO;
 import exception.ResponseException;
 import model.Auth;
 import model.User;
-import utils.LoggerManager;
+import logging.LoggerManager;
 
 import java.util.Objects;
 import java.util.UUID;

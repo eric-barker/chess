@@ -1,6 +1,11 @@
-package utils;
+package logging;
 
-import java.util.logging.*;
+import logging.ColorFormatter;
+
+import java.awt.*;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LoggerManager {
     private static final Logger globalLogger = Logger.getLogger(LoggerManager.class.getName());
@@ -11,16 +16,19 @@ public class LoggerManager {
 
     private static void configureLogger() {
         try {
-            // Set global logging level
-            globalLogger.setLevel(Level.INFO);
+            // Get logging level from environment variable or default to INFO
+            String logLevel = System.getenv("LOG_LEVEL");
+            Level level = logLevel != null ? Level.parse(logLevel) : Level.INFO;
 
-            // Create and configure console handler
+            // Set global logging level
+            globalLogger.setLevel(level);
+
+            // Configure console handler
             ConsoleHandler consoleHandler = new ConsoleHandler();
-            consoleHandler.setLevel(Level.ALL); // Log all levels to console
-            consoleHandler.setFormatter(new SimpleFormatter()); // Use simple formatting
+            consoleHandler.setLevel(Level.ALL);
+            consoleHandler.setFormatter(new ColorFormatter());
             globalLogger.addHandler(consoleHandler);
 
-            // Prevent logging duplication by removing default handlers
             globalLogger.setUseParentHandlers(false);
         } catch (Exception e) {
             System.err.println("Failed to configure logger: " + e.getMessage());
@@ -29,7 +37,7 @@ public class LoggerManager {
 
     public static Logger getLogger(String name) {
         Logger logger = Logger.getLogger(name);
-        logger.setParent(globalLogger); // Use global logger as parent
+        logger.setParent(globalLogger);
         return logger;
     }
 

@@ -9,6 +9,7 @@ import dataaccess.mysql.MySQLAuthDAO;
 import dataaccess.mysql.MySQLGameDAO;
 import dataaccess.mysql.MySQLUserDAO;
 import handler.*;
+import logging.LoggerManager;
 import model.User;
 
 import service.ClearService;
@@ -16,7 +17,15 @@ import service.GameService;
 import service.UserService;
 import spark.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Server {
+    private static final Logger logger = LoggerManager.getLogger(Server.class.getName());
+
+    static {
+        logger.setLevel(Level.ALL);
+    }
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
@@ -79,11 +88,7 @@ public class Server {
         Spark.put("/game", joinGameHandler::handle);
 
         // After filter to log the response
-        Spark.after((req, res) -> {
-            System.out.println("Response Status: " + res.status());
-            System.out.println("Response Type: " + res.type());
-            System.out.println("Response Body: " + res.body());
-        });
+        Spark.after(this::logResponse);
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint
@@ -117,6 +122,12 @@ public class Server {
     public void stop() {
         Spark.stop();
         Spark.awaitStop();
+    }
+
+    private void logResponse(spark.Request req, spark.Response res) {
+        logger.info("Response Status: " + res.status());
+        logger.info("Response Type: " + res.type());
+        logger.info("Response Body: " + res.body());
     }
 
 
