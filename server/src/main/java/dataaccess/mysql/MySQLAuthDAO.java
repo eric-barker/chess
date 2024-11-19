@@ -124,8 +124,8 @@ public class MySQLAuthDAO implements AuthDAO {
         try (Connection conn = DatabaseManager.getConnection()) {
             String createTable = """
                         CREATE TABLE IF NOT EXISTS auth (
-                            auth_token VARCHAR(255) PRIMARY KEY,
-                            username VARCHAR(50) NOT NULL
+                            username VARCHAR(50) NOT NULL,
+                            auth_token VARCHAR(255) PRIMARY KEY
                         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
                     """;
 

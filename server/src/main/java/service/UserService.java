@@ -56,8 +56,8 @@ public class UserService {
         }
 
         String authToken = UUID.randomUUID().toString();
-        authDAO.addAuth(authToken, user.username());
-        return new Auth(authToken, user.username());
+        authDAO.addAuth(user.username(), authToken);
+        return new Auth(user.username(), authToken);
     }
 
     public boolean isLoggedIn(String authToken) throws ResponseException, DataAccessException {

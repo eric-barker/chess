@@ -51,6 +51,11 @@ public class ServerFacade {
         return this.makeRequest("POST", path, requestBody, User.class);
     }
 
+    public void logout(String authToken) throws ResponseException {
+        var path = "/logout"; // The endpoint for LogoutHandler
+        this.makeRequest("DELETE", path, authToken, null);
+    }
+
     public Game[] listGames() throws ResponseException {
         var path = "/game";
         record listGameResponse(Game[] game) {

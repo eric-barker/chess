@@ -78,7 +78,7 @@ public class ServerFacadeTests {
 
     @Test
     public void testLoginPositive() {
-        User user = new User("testuser", "password123", null);
+        User user = new User("testuser", "password123", "testemail@email.com");
         // Ensure the user is registered first
         assertDoesNotThrow(() -> facade.register(user));
 

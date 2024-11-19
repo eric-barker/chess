@@ -17,21 +17,25 @@ public class LogoutHandler {
 
     public Object handle(Request req, Response res) {
         try {
-            // Deserialize
-            String authToken = req.headers("authorization");
+            // Deserialize authToken from request body
+            String authToken = new Gson().fromJson(req.body(), String.class);
 
             if (authToken == null || authToken.isEmpty()) {
                 res.status(401);  // Unauthorized
                 return gson.toJson(new ErrorMessage("Error: Missing authorization token"));
             }
 
-            this.userService.logout(authToken);
+            userService.logout(authToken);
 
+            String json = gson.toJson(new SuccessMessage("User successfully logged out"));
             res.status(200);
-            return gson.toJson(new SuccessMessage("User successfully Logged out"));
+            res.type("application/json");
+            res.header("Content-Length", String.valueOf(json.length()));
+
+            return json;
         } catch (ResponseException e) {
             res.status(401);
-            return gson.toJson(new ErrorMessage("Error: unauthorized"));
+            return gson.toJson(new ErrorMessage("Error: Unauthorized"));
         } catch (Exception e) {
             res.status(509);
             return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));

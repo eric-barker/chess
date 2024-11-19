@@ -24,8 +24,12 @@ public class LoginHandler {
 
             // is the User valid?
             if (userToLogin.password() == null || userToLogin.username() == null) {
-                res.status(400);
-                return gson.toJson(new ErrorMessage("Error: missing username or password"));
+                res.status(401);
+                String json = gson.toJson(new ErrorMessage("Error: missing username or password"));
+                res.type("application/json");
+                res.header("Content-Length", String.valueOf(json.length()));
+
+                return json;
             }
 
             var auth = userService.login(userToLogin);
@@ -33,7 +37,7 @@ public class LoginHandler {
             // Respond with a success message and the auth token
             String json = gson.toJson(new Auth(auth.username(), auth.authToken()));
 
-            res.status(202);  // Success
+            res.status(203);  // Success
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
 
@@ -49,9 +53,6 @@ public class LoginHandler {
     }
 
     record ErrorMessage(String message) {
-    }
-
-    record AuthResult(String username, String authToken) {
     }
 
 }
