@@ -19,22 +19,24 @@ public class MySQLAuthDAO implements AuthDAO {
 
     @Override
     public void addAuth(String authToken, String username) throws DataAccessException {
-        String insertStatement = "INSERT INTO auth (auth_token, username) VALUES (?, ?)";
+        String insertStatement = "INSERT INTO auth (username, auth_token) VALUES (?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(insertStatement)) {
 
-            ps.setString(1, authToken);
-            ps.setString(2, username);
+            // Correct order: username, auth_token
+            ps.setString(1, username);
+            ps.setString(2, authToken);
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException("Failed to add auth token: " + e.getMessage());
         }
     }
+    
 
     @Override
     public Auth getAuth(String authToken) throws DataAccessException {
-        String selectStatement = "SELECT auth_token, username FROM auth WHERE auth_token = ?";
+        String selectStatement = "SELECT username, auth_token FROM auth WHERE auth_token = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(selectStatement)) {
@@ -43,7 +45,8 @@ public class MySQLAuthDAO implements AuthDAO {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Auth(rs.getString("auth_token"), rs.getString("username"));
+                    // Map fields in correct order: username, auth_token
+                    return new Auth(rs.getString("username"), rs.getString("auth_token"));
                 }
             }
         } catch (SQLException e) {
@@ -54,7 +57,7 @@ public class MySQLAuthDAO implements AuthDAO {
 
     @Override
     public Collection<Auth> listTokens() throws DataAccessException {
-        String selectStatement = "SELECT auth_token, username FROM auth";
+        String selectStatement = "SELECT username, auth_token FROM auth";
         Collection<Auth> tokens = new ArrayList<>();
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -62,13 +65,15 @@ public class MySQLAuthDAO implements AuthDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                tokens.add(new Auth(rs.getString("auth_token"), rs.getString("username")));
+                // Map fields in correct order: username, auth_token
+                tokens.add(new Auth(rs.getString("username"), rs.getString("auth_token")));
             }
         } catch (SQLException e) {
             throw new DataAccessException("Failed to list auth tokens: " + e.getMessage());
         }
         return tokens;
     }
+
 
     @Override
     public void updateAuth(String oldAuthToken, String newAuthToken) throws DataAccessException {

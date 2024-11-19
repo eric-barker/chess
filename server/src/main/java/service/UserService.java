@@ -6,74 +6,96 @@ import dataaccess.interfaces.UserDAO;
 import exception.ResponseException;
 import model.Auth;
 import model.User;
+import utils.LoggerManager;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UserService {
+    private static final Logger logger = LoggerManager.getLogger(UserService.class.getName());
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO) {
+        logger.setLevel(Level.WARNING);
         this.userDAO = userDAO;
         this.authDAO = authDAO;
     }
 
     public Auth register(User user) throws ResponseException, DataAccessException {
+        logger.log(Level.INFO, "Attempting to register user: {0}", user.username());
 
         if (userDAO.getUser(user.username()) != null) {
+            logger.log(Level.WARNING, "User already exists: {0}", user.username());
             throw new ResponseException(403, "Error: User already exists");
         }
 
         userDAO.addUser(user);
         String authToken = UUID.randomUUID().toString();
-        authDAO.addAuth(authToken, user.username());
+        authDAO.addAuth(user.username(), authToken);
 
-        Auth auth = new Auth(authToken, user.username());
-        System.out.println("Generated Auth: " + auth);
+        Auth auth = new Auth(user.username(), authToken);
+        logger.log(Level.INFO, "Registration successful. Generated Auth: {0}", auth);
         return auth;
     }
 
     public User getUser(String authToken) throws ResponseException, DataAccessException {
+        logger.log(Level.INFO, "Fetching user for authToken: {0}", authToken);
+
         Auth auth = authDAO.getAuth(authToken);
         if (auth == null) {
+            logger.log(Level.WARNING, "Unauthorized access attempt with authToken: {0}", authToken);
             throw new ResponseException(401, "Error: unauthorized");
         }
+
         String username = auth.username();
-        return userDAO.getUser(username);
+        User user = userDAO.getUser(username);
+        logger.log(Level.INFO, "User fetched successfully: {0}", username);
+        return user;
     }
 
-    public Auth login(User user) throws ResponseException, DataAccessException {
-        User knownUser = userDAO.getUser(user.username());
-        if (knownUser == null) {
-            throw new ResponseException(401, "Error: User doesn't exist");
+    public Auth login(String username, String password) throws ResponseException, DataAccessException {
+        logger.log(Level.INFO, "Attempting login for username: {0}", username);
+
+        User user = userDAO.getUser(username);
+        if (user == null || !Objects.equals(user.password(), password)) {
+            logger.log(Level.WARNING, "Invalid login attempt for username: {0}", username);
+            throw new ResponseException(401, "Invalid credentials");
         }
 
-        // Verify the provided password using bcrypt
-        boolean passwordMatches = userDAO.verifyUserPassword(user.username(), user.password());
-        if (!passwordMatches) {
-            throw new ResponseException(401, "Error: Password is incorrect");
-        }
+        String authToken = UUID.randomUUID().toString(); // Generate new auth token
+        authDAO.addAuth(authToken, username);           // Save to database
 
-        String authToken = UUID.randomUUID().toString();
-        authDAO.addAuth(user.username(), authToken);
-        return new Auth(user.username(), authToken);
+        Auth auth = new Auth(authToken, username);
+        logger.log(Level.INFO, "Login successful. Generated Auth: {0}", auth);
+        return auth;
     }
 
     public boolean isLoggedIn(String authToken) throws ResponseException, DataAccessException {
+        logger.log(Level.INFO, "Checking login status for authToken: {0}", authToken);
+
         for (var token : authDAO.listTokens()) {
-            if (!Objects.equals(authToken, token.authToken())) {
-                continue;
+            if (Objects.equals(authToken, token.authToken())) {
+                logger.log(Level.INFO, "Auth token is valid: {0}", authToken);
+                return true;
             }
-            return true;
         }
+
+        logger.log(Level.WARNING, "Auth token is not valid: {0}", authToken);
         return false;
     }
 
     public void logout(String authToken) throws ResponseException, DataAccessException {
+        logger.log(Level.INFO, "Attempting logout for authToken: {0}", authToken);
+
         if (authDAO.getAuth(authToken) == null) {
+            logger.log(Level.WARNING, "Unauthorized logout attempt with authToken: {0}", authToken);
             throw new ResponseException(401, "Error: Unauthorized");
         }
+
         authDAO.deleteAuth(authToken);
+        logger.log(Level.INFO, "Logout successful for authToken: {0}", authToken);
     }
 }

@@ -95,4 +95,28 @@ public class ServerFacadeTests {
         // Test login with incorrect credentials
         assertThrows(ResponseException.class, () -> facade.login("wronguser", "wrongpassword"));
     }
+
+    @Test
+    public void testLogoutPositive() {
+        try {
+            // Register a user and get an auth token
+            User user = new User("testuser_logout", "password123", "testlogout@email.com");
+            Auth auth = facade.register(user);
+
+            // Ensure the auth token is not null
+            assertNotNull(auth.authToken(), "Auth token should not be null after registration");
+
+            // Logout using the auth token
+            assertDoesNotThrow(() -> facade.logout(auth.authToken()));
+        } catch (Exception e) {
+            fail("An unexpected exception was thrown: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testLogoutNegative() {
+        // Attempt to logout with an invalid auth token
+        String invalidAuthToken = "invalid-token";
+        assertThrows(ResponseException.class, () -> facade.logout(invalidAuthToken));
+    }
 }

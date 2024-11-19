@@ -71,7 +71,7 @@ public class UserServiceTests {
     public void testLoginSuccess() throws DataAccessException, ResponseException {
         // Attempt to log in with the correct password
         User loginAttemptUser = new User("ExistingUser", "existingPassword", "existingUser@mail.com");
-        Auth auth = userService.login(loginAttemptUser);
+        Auth auth = userService.login(loginAttemptUser.username(), loginAttemptUser.password());
 
         assertNotNull(auth, "Auth token should not be null after successful login.");
         assertEquals(existingUser.username(), auth.username(), "Logged-in username should match.");
@@ -82,7 +82,7 @@ public class UserServiceTests {
     public void testLoginWithIncorrectPassword() throws DataAccessException {
         // Test failed login due to wrong password
         ResponseException thrown = assertThrows(ResponseException.class, () -> {
-            userService.login(new User(existingUser.username(), "wrongPassword", existingUser.email()));
+            userService.login(existingUser.username(), "wrongpassword");
         });
         assertEquals(401, thrown.statusCode(), "Status code should be 401 for incorrect login.");
     }

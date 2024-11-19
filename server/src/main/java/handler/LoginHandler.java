@@ -19,40 +19,32 @@ public class LoginHandler {
 
     public Object handle(Request req, Response res) {
         try {
-            // Deserialize
-            User userToLogin = gson.fromJson(req.body(), User.class);
+            // Deserialize login credentials
+            User loginUser = gson.fromJson(req.body(), User.class);
 
-            // is the User valid?
-            if (userToLogin.password() == null || userToLogin.username() == null) {
-                res.status(401);
-                String json = gson.toJson(new ErrorMessage("Error: missing username or password"));
-                res.type("application/json");
-                res.header("Content-Length", String.valueOf(json.length()));
-
-                return json;
+            // Validate required fields
+            if (loginUser.username() == null || loginUser.password() == null) {
+                res.status(400);  // Bad Request
+                return gson.toJson("Error: Missing credentials");
             }
 
-            var auth = userService.login(userToLogin);
+            // Perform login and get Auth object
+            Auth auth = userService.login(loginUser.username(), loginUser.password());
 
-            // Respond with a success message and the auth token
-            String json = gson.toJson(new Auth(auth.username(), auth.authToken()));
-
-            res.status(203);  // Success
+            // Serialize and send response
+            String json = gson.toJson(auth);
+            res.status(203);
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
-
             return json;
 
         } catch (ResponseException e) {
-            res.status(401);  // Unauthorized
-            return gson.toJson(new ErrorMessage("Error: unauthorized"));
+            res.status(500);
+            return gson.toJson(e.getMessage());
         } catch (Exception e) {
             res.status(509);
-            return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));
+            return gson.toJson("Error: Internal Server Error: " + e.getMessage());
         }
-    }
-
-    record ErrorMessage(String message) {
     }
 
 }
