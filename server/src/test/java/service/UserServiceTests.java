@@ -4,6 +4,8 @@ import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.memory.MemoryAuthDAO;
 import dataaccess.memory.MemoryUserDAO;
+import dataaccess.mysql.MySQLAuthDAO;
+import dataaccess.mysql.MySQLUserDAO;
 import model.User;
 import model.Auth;
 import org.junit.jupiter.api.*;
@@ -26,14 +28,18 @@ public class UserServiceTests {
 
     @BeforeAll
     public static void init() {
-        authDAO = new MemoryAuthDAO();
-        userDAO = new MemoryUserDAO();
+        try {
+            userDAO = new MySQLUserDAO();
+            authDAO = new MySQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+
         userService = new UserService(userDAO, authDAO);
 
-        // Hash the existing user's password before setting it up
-        String hashedPassword = BCrypt.hashpw("existingPassword", BCrypt.gensalt());
-        existingUser = new User("ExistingUser", hashedPassword, "existingUser@mail.com");
-        newUser = new User("NewUser", BCrypt.hashpw("newPassword", BCrypt.gensalt()), "newUser@mail.com");
+        // Use plain text password for initialization
+        existingUser = new User("ExistingUser", "existingPassword", "existingUser@mail.com");
+        newUser = new User("NewUser", "newPassword", "newUser@mail.com");
     }
 
     @BeforeEach

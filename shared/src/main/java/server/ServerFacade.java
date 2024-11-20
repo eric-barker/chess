@@ -41,11 +41,11 @@ public class ServerFacade {
     public Auth login(String username, String password) throws ResponseException {
         var path = "/session";
         var requestBody = new User(username, password, null);
-        return this.makeRequest("POST", path, requestBody, User.class);
+        return this.makeRequest("POST", path, requestBody, Auth.class);
     }
 
     public void logout(String authToken) throws ResponseException {
-        var path = "/logout"; // The endpoint for LogoutHandler
+        var path = "/session"; // The endpoint for LogoutHandler
         this.makeRequest("DELETE", path, authToken, null);
     }
 
