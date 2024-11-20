@@ -101,6 +101,22 @@ public class PostLoginClient {
 
 
     private String joinGame() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the name of the game you want to join: ");
+
+        boolean isUsername = false;
+        String gameName = "";
+        while (!isUsername || gameName == "exit") {
+            gameName = scanner.nextLine();
+
+            // validate that the game exists in the database
+
+        }
+        // List available colors.
+
+        // Ask for user to choose one of the available colors
+
+
         // Stub for joining a game
         repl.changeState(UserState.INGAME);
         return "Joining game (stub).";

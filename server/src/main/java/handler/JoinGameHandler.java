@@ -42,6 +42,7 @@ public class JoinGameHandler {
 
             gameService.joinGame(joinRequest.gameID, joinRequest.playerColor, user.username(), authToken);
             res.status(200);  // Success
+            res.type("application/json");
             return "";
 
         } catch (ResponseException e) {

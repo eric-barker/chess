@@ -107,8 +107,6 @@ public class ServerFacade {
             // Connect and log the raw response
             http.connect();
             if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
-//                logger.info("Raw response JSON: " + new BufferedReader(new InputStreamReader(http.getInputStream()))
-//                        .lines().reduce("", String::concat));
 
                 // Parse the response body into ListGamesResponse
                 ListGamesResponse response = readBody(http, ListGamesResponse.class);
@@ -149,6 +147,23 @@ public class ServerFacade {
         public String getGameName() {
             return gameName;
         }
+    }
+
+    public void joinGame(int gameID, String playerColor, String authToken) throws ResponseException {
+        if (playerColor == null || playerColor.isEmpty()) {
+            throw new IllegalArgumentException("Player color cannot be null or empty.");
+        }
+        if (authToken == null || authToken.isEmpty()) {
+            throw new IllegalArgumentException("Auth token cannot be null or empty.");
+        }
+
+        var path = "/game";
+        record JoinGameRequest(int gameID, String playerColor) {
+        }
+        var requestBody = new JoinGameRequest(gameID, playerColor);
+
+        // Use your existing makeRequest method
+        makeRequest("PUT", path, requestBody, null);
     }
 
 
