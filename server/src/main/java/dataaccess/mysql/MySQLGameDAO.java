@@ -4,82 +4,95 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.GameDAO;
+import logging.LoggerManager;
 import model.Game;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class MySQLGameDAO implements GameDAO {
 
+    private static final Logger logger = LoggerManager.getLogger(MySQLGameDAO.class.getName());
     private final Gson gson = new Gson();
 
     public MySQLGameDAO() throws DataAccessException {
+        logger.info("Initializing MySQLGameDAO...");
         configureDatabase();
     }
 
     @Override
     public Game createGame(Game game) throws DataAccessException {
+        logger.info("Creating game: " + game);
         String statement = "INSERT INTO games (white_username, black_username, game_name, game_data) VALUES (?, ?, ?, ?)";
-        String gameDataJson = gson.toJson(game.game()); // Serialize ChessGame to JSON
+        String gameDataJson = gson.toJson(game.game());
+        logger.info("Serialized game data: " + gameDataJson);
 
         int gameID = executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), gameDataJson);
+        logger.info("Game created with ID: " + gameID);
+
         return new Game(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
     }
 
     @Override
     public Game getGame(int gameID) throws DataAccessException {
+        logger.info("Fetching game with ID: " + gameID);
         String statement = "SELECT gameID, white_username, black_username, game_name, game_data FROM games WHERE gameID = ?";
+
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
 
             ps.setInt(1, gameID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return readGame(rs); // Use helper to map ResultSet to Game
+                    Game game = readGame(rs);
+                    logger.info("Game retrieved: " + game);
+                    return game;
                 }
             }
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to retrieve game: " + e.getMessage(), e);
             throw new DataAccessException("Failed to retrieve game: " + e.getMessage());
         }
-        return null; // Return null if no game is found
+        logger.warning("No game found with ID: " + gameID);
+        return null;
     }
 
     @Override
     public void updateGame(Game game) throws DataAccessException {
+        logger.info("Updating game: " + game);
         String statement = "UPDATE games SET white_username = ?, black_username = ?, game_name = ?, game_data = ? WHERE gameID = ?";
-        String gameDataJson = gson.toJson(game.game()); // Serialize ChessGame to JSON
+        String gameDataJson = gson.toJson(game.game());
+        logger.info("Serialized game data for update: " + gameDataJson);
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
 
-            // Set parameters for the update
-            ps.setString(1, game.whiteUsername() != null ? game.whiteUsername() : null);
-            ps.setString(2, game.blackUsername() != null ? game.blackUsername() : null);
+            ps.setString(1, game.whiteUsername());
+            ps.setString(2, game.blackUsername());
             ps.setString(3, game.gameName());
             ps.setString(4, gameDataJson);
             ps.setInt(5, game.gameID());
 
-            System.out.println("Executing update with parameters:");
-            System.out.println("White username: " + game.whiteUsername());
-            System.out.println("Black username: " + game.blackUsername());
-            System.out.println("Game name: " + game.gameName());
-            System.out.println("Game ID: " + game.gameID());
-
             int affectedRows = ps.executeUpdate();
-            System.out.println("Rows affected by update: " + affectedRows);
+            logger.info("Rows affected by update: " + affectedRows);
 
             if (affectedRows == 0) {
-                throw new DataAccessException("Update failed: no rows affected. Check if gameID exists.");
+                logger.warning("Update failed: no rows affected.");
+                throw new DataAccessException("Update failed: no rows affected.");
             }
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to update game: " + e.getMessage(), e);
             throw new DataAccessException("Failed to update game: " + e.getMessage());
         }
     }
 
     @Override
     public Collection<Game> listGames() throws DataAccessException {
+        logger.info("Listing all games...");
         String query = "SELECT gameID, white_username, black_username, game_name, game_data FROM games";
         List<Game> games = new ArrayList<>();
 
@@ -88,27 +101,31 @@ public class MySQLGameDAO implements GameDAO {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                games.add(readGame(rs));
+                Game game = readGame(rs);
+                logger.info("Game found: " + game);
+                games.add(game);
             }
-
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to list games: " + e.getMessage(), e);
             throw new DataAccessException("Failed to list games: " + e.getMessage());
         }
-
+        logger.info("Total games found: " + games.size());
         return games;
     }
 
     @Override
     public void deleteAllGames() throws DataAccessException {
+        logger.info("Deleting all games...");
         String statement = "DELETE FROM games";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement)) {
 
             int affectedRows = ps.executeUpdate();
-            System.out.println("All games deleted, rows affected: " + affectedRows);
+            logger.info("All games deleted. Rows affected: " + affectedRows);
 
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to delete all games: " + e.getMessage(), e);
             throw new DataAccessException("Failed to delete all games: " + e.getMessage());
         }
     }
@@ -118,43 +135,46 @@ public class MySQLGameDAO implements GameDAO {
         String whiteUsername = rs.getString("white_username");
         String blackUsername = rs.getString("black_username");
         String gameName = rs.getString("game_name");
-        ChessGame gameData = gson.fromJson(rs.getString("game_data"), ChessGame.class); // Deserialize JSON to ChessGame
-        return new Game(gameID, whiteUsername, blackUsername, gameName, gameData);
+        ChessGame gameData = gson.fromJson(rs.getString("game_data"), ChessGame.class);
+
+        Game game = new Game(gameID, whiteUsername, blackUsername, gameName, gameData);
+        logger.fine("Deserialized game: " + game);
+        return game;
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        logger.info("Executing update: " + statement);
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
 
             for (int i = 0; i < params.length; i++) {
                 if (params[i] == null) {
-                    System.out.println("Setting NULL for parameter index: " + (i + 1));
                     ps.setNull(i + 1, Types.NULL);
                 } else if (params[i] instanceof String param) {
-                    System.out.println("Setting String parameter: " + param + " at index: " + (i + 1));
                     ps.setString(i + 1, param);
                 } else if (params[i] instanceof Integer param) {
-                    System.out.println("Setting Integer parameter: " + param + " at index: " + (i + 1));
                     ps.setInt(i + 1, param);
                 }
             }
 
             ps.executeUpdate();
-
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1);
+                    int generatedKey = rs.getInt(1);
+                    logger.info("Generated key: " + generatedKey);
+                    return generatedKey;
                 }
             }
-            return 0; // Return 0 if no generated key is found
+            return 0;
 
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to execute update: " + e.getMessage() + "; SQLState: " +
-                    e.getSQLState() + "; ErrorCode: " + e.getErrorCode());
+            logger.log(Level.SEVERE, "Unable to execute update: " + e.getMessage(), e);
+            throw new DataAccessException("Unable to execute update: " + e.getMessage());
         }
     }
 
     private void configureDatabase() throws DataAccessException {
+        logger.info("Configuring database...");
         String createTable = """
                 CREATE TABLE IF NOT EXISTS games (
                     gameID INT AUTO_INCREMENT PRIMARY KEY,
@@ -167,7 +187,9 @@ public class MySQLGameDAO implements GameDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(createTable)) {
             ps.executeUpdate();
+            logger.info("Database configuration completed.");
         } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Failed to configure games table: " + e.getMessage(), e);
             throw new DataAccessException("Failed to configure games table: " + e.getMessage());
         }
     }

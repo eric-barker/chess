@@ -4,6 +4,8 @@ package ui;
 import exception.ResponseException;
 import server.ServerFacade;
 
+import java.util.Scanner;
+
 public class PostLoginClient {
     private final String serverUrl;
     private final Repl repl;
@@ -28,8 +30,8 @@ public class PostLoginClient {
                 return createGame();
             case "listgames":
                 return listGames();
-            case "playgame":
-                return playGame();
+            case "joingame":
+                return joinGame();
             case "observegame":
                 return observeGame();
             default:
@@ -43,7 +45,7 @@ public class PostLoginClient {
                 "logout       - Logout and return to the main menu.\n" +
                 "creategame   - Create a new game.\n" +
                 "listgames    - List all available games.\n" +
-                "playgame     - Join a game to play.\n" +
+                "joingame     - Join a game to play.\n" +
                 "observegame  - Observe a game in progress.\n";
     }
 
@@ -61,8 +63,20 @@ public class PostLoginClient {
     }
 
     private String createGame() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Game Name: ");
+        String gameName = scanner.nextLine();
+
+        System.out.println("Attempting to create game...");
+        try {
+            String authToken = repl.getAuthToken();
+            var auth = serverFacade.createGame(gameName, authToken);
+            repl.changeState(UserState.INGAME);
+        } catch (ResponseException e) {
+            return "Game creation failed: " + e.getMessage();
+        }
         // Stub for creating a game
-        return "Game created successfully (stub).";
+        return "Game created successfully.";
     }
 
     private String listGames() {
@@ -70,7 +84,7 @@ public class PostLoginClient {
         return "Listing games (stub).";
     }
 
-    private String playGame() {
+    private String joinGame() {
         // Stub for joining a game
         repl.changeState(UserState.INGAME);
         return "Joining game (stub).";

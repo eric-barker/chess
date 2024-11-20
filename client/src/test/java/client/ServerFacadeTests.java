@@ -1,6 +1,7 @@
 package client;
 
 import model.Auth;
+import model.Game;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
@@ -119,4 +120,36 @@ public class ServerFacadeTests {
         String invalidAuthToken = "invalid-token";
         assertThrows(ResponseException.class, () -> facade.logout(invalidAuthToken));
     }
+
+    @Test
+    @DisplayName("Create Game - Positive Case")
+    public void testCreateGamePositive() {
+        try {
+            // Register a user to ensure proper authorization
+            User user = new User("game_creator", "password123", "creator@email.com");
+            Auth auth = facade.register(user);
+            assertNotNull(auth.authToken(), "Auth token should not be null after registration");
+
+            // Set the auth token in the ServerFacade
+            facade.logout(auth.authToken()); // Use the auth token in a realistic setup for createGame
+
+            // Attempt to create a new game
+            int createdGameID = facade.createGame("test_game", auth.authToken());
+            assertNotEquals(0, createdGameID, "Created game should not be null");
+        } catch (Exception e) {
+            fail("Unexpected exception during createGame: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Create Game - Negative Case")
+    public void testCreateGameNegative() {
+        try {
+            // Attempt to create a game without being logged in (no auth token)
+            assertThrows(ResponseException.class, () -> facade.createGame("Here is my Gamename", "authToken"), "Expected an exception when creating game without login");
+        } catch (Exception e) {
+            fail("Unexpected exception type: " + e.getMessage());
+        }
+    }
+
 }

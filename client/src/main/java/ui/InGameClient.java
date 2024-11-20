@@ -19,6 +19,10 @@ public class InGameClient {
                 return getHelpText();
             case "renderboard":
                 return renderBoard();
+            case "makemove":
+                return makeMove();
+            case "exitgame":
+                return exitGame();
             default:
                 return "Unknown command. Type 'help' for a list of commands.";
         }
@@ -27,11 +31,23 @@ public class InGameClient {
     private String getHelpText() {
         return "Available commands:\n" +
                 "help         - Show this help text.\n" +
-                "renderboard  - Display the chessboard.\n";
+                "renderboard  - Display the chessboard.\n" +
+                "makeMove     - Make a move.\n" +
+                "exitGame     - Exit the game.\n";
     }
 
     private String renderBoard() {
         // Stub for rendering the board
         return "Rendering the chessboard (stub).";
+    }
+
+    private String makeMove() {
+        // Stupb for making moves
+        return "Making a move";
+    }
+
+    private String exitGame() {
+        repl.changeState(UserState.LOGGEDIN);
+        return "Exiting Game";
     }
 }

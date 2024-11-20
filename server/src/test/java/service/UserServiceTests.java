@@ -144,4 +144,5 @@ public class UserServiceTests {
         // Test that the user is not logged in with an invalid auth token
         assertFalse(userService.isLoggedIn("invalidAuthToken"), "The user should not be logged in with an invalid auth token.");
     }
+
 }

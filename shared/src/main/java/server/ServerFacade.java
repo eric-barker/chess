@@ -49,6 +49,47 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, authToken, null);
     }
 
+    public int createGame(String gameName, String authToken) throws ResponseException {
+        if (gameName == null || gameName.isEmpty()) {
+            throw new IllegalArgumentException("Game name cannot be null or empty.");
+        }
+        if (authToken == null || authToken.isEmpty()) {
+            throw new IllegalArgumentException("Auth token cannot be null or empty.");
+        }
+
+        var path = "/game";
+        record CreateGameRequest(String gameName) {
+        }
+        var requestBody = new CreateGameRequest(gameName);
+
+        try {
+            HttpURLConnection http = (HttpURLConnection) new URL(serverUrl + path).openConnection();
+            http.setRequestMethod("POST");
+            http.setRequestProperty("Authorization", authToken); // Set the auth token in the header
+            http.setRequestProperty("Content-Type", "application/json");
+            http.setDoOutput(true);
+
+            // Write the request body
+            try (OutputStream reqBody = http.getOutputStream()) {
+                reqBody.write(new Gson().toJson(requestBody).getBytes());
+            }
+
+            // Read and handle the response
+            if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                try (InputStream respBody = http.getInputStream();
+                     InputStreamReader reader = new InputStreamReader(respBody)) {
+                    Game createdGame = new Gson().fromJson(reader, Game.class); // Parse response as a Game object
+                    return createdGame.gameID(); // Extract the gameID
+                }
+            } else {
+                throw new ResponseException(http.getResponseCode(), "Failed to create game");
+            }
+        } catch (IOException e) {
+            throw new ResponseException(500, "Error communicating with the server: " + e.getMessage());
+        }
+    }
+
+
     public Game[] listGames() throws ResponseException {
         var path = "/game";
         record listGameResponse(Game[] game) {
