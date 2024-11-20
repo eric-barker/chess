@@ -34,7 +34,10 @@ public class ListGamesHandler {
             // Create a response
             ListGamesResponse response = new ListGamesResponse(games);
             res.status(200);  // Success
-            return gson.toJson(response);
+            var json = gson.toJson(response);
+            res.type("application/json");
+            res.header("Content-Length", String.valueOf(json.length()));
+            return json;
         } catch (ResponseException e) {
             res.status(e.statusCode());
             return gson.toJson(new ErrorResponse(e.getMessage()));

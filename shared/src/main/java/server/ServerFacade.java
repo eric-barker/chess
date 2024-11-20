@@ -10,6 +10,7 @@ import model.User;
 
 import java.io.*;
 import java.net.*;
+import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,7 @@ public class ServerFacade {
 
     private final String serverUrl;
     private static final Logger logger = LoggerManager.getLogger(ServerFacade.class.getName());
+
 
     static {
         // Set the logger level to ALL to capture all log messages
@@ -90,13 +92,65 @@ public class ServerFacade {
     }
 
 
-    public Game[] listGames() throws ResponseException {
-        var path = "/game";
-        record listGameResponse(Game[] game) {
+    public Game[] listGames(String authToken) throws ResponseException {
+        if (authToken == null || authToken.isEmpty()) {
+            throw new IllegalArgumentException("Auth token cannot be null or empty.");
         }
-        var response = this.makeRequest("GET", path, null, listGameResponse.class);
-        return response.game();
+
+        var path = "/game";
+        try {
+            // Construct the URL and open a connection
+            HttpURLConnection http = (HttpURLConnection) new URL(serverUrl + path).openConnection();
+            http.setRequestMethod("GET");
+            http.setRequestProperty("Authorization", authToken); // Set the auth token in the header
+
+            // Connect and log the raw response
+            http.connect();
+            if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
+//                logger.info("Raw response JSON: " + new BufferedReader(new InputStreamReader(http.getInputStream()))
+//                        .lines().reduce("", String::concat));
+
+                // Parse the response body into ListGamesResponse
+                ListGamesResponse response = readBody(http, ListGamesResponse.class);
+                if (response == null || response.getGames() == null) {
+                    throw new ResponseException(500, "Failed to parse games from server response.");
+                }
+
+                // Map GameEntry[] to Game[] for client-side use
+                return Arrays.stream(response.getGames())
+                        .map(entry -> new Game(entry.getGameID(), null, null, entry.getGameName(), null))
+                        .toArray(Game[]::new);
+            } else {
+                throw new ResponseException(http.getResponseCode(), "Failed to list games");
+            }
+        } catch (IOException e) {
+            throw new ResponseException(500, "Error communicating with the server: " + e.getMessage());
+        }
     }
+
+
+    private static class ListGamesResponse {
+        private GameEntry[] games;
+
+        public GameEntry[] getGames() {
+            return games;
+        }
+    }
+
+    private static class GameEntry {
+        private int gameID;
+        private String gameName;
+
+        // Add getters for deserialization
+        public int getGameID() {
+            return gameID;
+        }
+
+        public String getGameName() {
+            return gameName;
+        }
+    }
+
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {

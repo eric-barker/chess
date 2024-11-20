@@ -71,7 +71,6 @@ public class PostLoginClient {
         try {
             String authToken = repl.getAuthToken();
             var auth = serverFacade.createGame(gameName, authToken);
-            repl.changeState(UserState.INGAME);
         } catch (ResponseException e) {
             return "Game creation failed: " + e.getMessage();
         }
@@ -80,9 +79,26 @@ public class PostLoginClient {
     }
 
     private String listGames() {
-        // Stub for listing games
-        return "Listing games (stub).";
+        System.out.println("Attempting to list games...");
+        try {
+            // Retrieve the list of games
+            var listOfGames = serverFacade.listGames(repl.getAuthToken());
+            if (listOfGames == null || listOfGames.length == 0) {
+                return "No games found.";
+            }
+
+            // Print the game names to the console
+            System.out.println("Games available:");
+            for (var game : listOfGames) {
+                System.out.println("- " + game.gameName());
+            }
+
+            return "Games listed successfully.";
+        } catch (ResponseException e) {
+            return "List games failed: " + e.getMessage();
+        }
     }
+
 
     private String joinGame() {
         // Stub for joining a game

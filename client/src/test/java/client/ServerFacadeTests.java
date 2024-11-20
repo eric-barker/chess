@@ -8,6 +8,8 @@ import server.ServerFacade;
 import model.User;
 import exception.ResponseException;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
@@ -122,34 +124,113 @@ public class ServerFacadeTests {
     }
 
     @Test
-    @DisplayName("Create Game - Positive Case")
-    public void testCreateGamePositive() {
+    @DisplayName("Create Game - Positive")
+    public void testListGamesDebug() {
         try {
-            // Register a user to ensure proper authorization
-            User user = new User("game_creator", "password123", "creator@email.com");
+            User user = new User("debug_user", "password123", "debug@email.com");
+            Auth auth = facade.register(user);
+            assertNotNull(auth.authToken(), "Auth token should not be null");
+
+            facade.createGame("game1", auth.authToken());
+            facade.createGame("game2", auth.authToken());
+
+            Game[] games = facade.listGames(auth.authToken());
+            assertNotNull(games, "Games list should not be null");
+            assertTrue(games.length >= 2, "Games list should contain at least 2 games");
+
+            Arrays.stream(games).forEach(game ->
+                    System.out.println("GameID: " + game.gameID() + ", GameName: " + game.gameName())
+            );
+        } catch (Exception e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
+    }
+
+
+    @Test
+    @DisplayName("Create Game - Invalid Auth Token")
+    public void testCreateGameInvalidAuthToken() {
+        // Attempt to create a game with an invalid auth token
+        String invalidAuthToken = "invalid_token";
+        String gameName = "test_game_invalid_auth";
+
+        assertThrows(ResponseException.class, () -> facade.createGame(gameName, invalidAuthToken),
+                "Expected ResponseException when creating a game with an invalid auth token");
+    }
+
+    @Test
+    @DisplayName("Create Game - Invalid Game Name")
+    public void testCreateGameInvalidGameName() {
+        try {
+            // Register a user to obtain a valid auth token
+            User user = new User("game_creator_invalid_name", "password123", "creator_invalid@email.com");
             Auth auth = facade.register(user);
             assertNotNull(auth.authToken(), "Auth token should not be null after registration");
 
-            // Set the auth token in the ServerFacade
-            facade.logout(auth.authToken()); // Use the auth token in a realistic setup for createGame
+            // Attempt to create a game with an invalid game name
+            assertThrows(IllegalArgumentException.class, () -> facade.createGame(null, auth.authToken()),
+                    "Expected IllegalArgumentException when creating a game with a null game name");
 
-            // Attempt to create a new game
-            int createdGameID = facade.createGame("test_game", auth.authToken());
-            assertNotEquals(0, createdGameID, "Created game should not be null");
+            assertThrows(IllegalArgumentException.class, () -> facade.createGame("", auth.authToken()),
+                    "Expected IllegalArgumentException when creating a game with an empty game name");
         } catch (Exception e) {
-            fail("Unexpected exception during createGame: " + e.getMessage());
+            fail("Unexpected exception during invalid game name test: " + e.getMessage());
         }
     }
 
     @Test
-    @DisplayName("Create Game - Negative Case")
-    public void testCreateGameNegative() {
+    @DisplayName("Create Game - No Auth Token")
+    public void testCreateGameNoAuthToken() {
+        String gameName = "test_game_no_auth";
+
+        // Attempt to create a game with no auth token
+        assertThrows(IllegalArgumentException.class, () -> facade.createGame(gameName, null),
+                "Expected IllegalArgumentException when creating a game with no auth token");
+
+        assertThrows(IllegalArgumentException.class, () -> facade.createGame(gameName, ""),
+                "Expected IllegalArgumentException when creating a game with an empty auth token");
+    }
+
+    @Test
+    @DisplayName("List Games - Positive Case")
+    public void testListGamesPositive() {
         try {
-            // Attempt to create a game without being logged in (no auth token)
-            assertThrows(ResponseException.class, () -> facade.createGame("Here is my Gamename", "authToken"), "Expected an exception when creating game without login");
+            // Register a user to obtain a valid auth token
+            User user = new User("list_games_user", "password123", "listgames@email.com");
+            Auth auth = facade.register(user);
+            assertNotNull(auth.authToken(), "Auth token should not be null");
+
+            // Create a few games
+            facade.createGame("game1", auth.authToken());
+            facade.createGame("game2", auth.authToken());
+
+            // List the games
+            Game[] games = facade.listGames(auth.authToken());
+            assertNotNull(games, "Games list should not be null");
+            assertTrue(games.length >= 2, "Games list should contain at least 2 games");
+
+            // Verify that game names are returned
+            boolean game1Found = Arrays.stream(games).anyMatch(game -> "game1".equals(game.gameName()));
+            boolean game2Found = Arrays.stream(games).anyMatch(game -> "game2".equals(game.gameName()));
+
+            assertTrue(game1Found, "Game1 should be in the list of games");
+            assertTrue(game2Found, "Game2 should be in the list of games");
         } catch (Exception e) {
-            fail("Unexpected exception type: " + e.getMessage());
+            fail("Unexpected exception during listGames: " + e.getMessage());
         }
     }
+
+
+    @Test
+    @DisplayName("List Games - Negative Case")
+    public void testListGamesNegative() {
+        // Use an invalid auth token
+        String invalidAuthToken = "invalid_auth_token";
+
+        // Attempt to list games with an invalid auth token
+        assertThrows(ResponseException.class, () -> facade.listGames(invalidAuthToken),
+                "Expected ResponseException when listing games with an invalid auth token");
+    }
+
 
 }
