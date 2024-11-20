@@ -5,3 +5,4 @@ public enum UserState {
     LOGGEDIN,
     INGAME
 }
+

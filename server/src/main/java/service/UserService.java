@@ -60,15 +60,15 @@ public class UserService {
         logger.log(Level.INFO, "Attempting login for username: {0}", username);
 
         User user = userDAO.getUser(username);
-        if (user == null || !Objects.equals(user.password(), password)) {
+        if (user == null || !userDAO.verifyUserPassword(username, password)) {
             logger.log(Level.WARNING, "Invalid login attempt for username: {0}", username);
             throw new ResponseException(401, "Invalid credentials");
         }
 
         String authToken = UUID.randomUUID().toString(); // Generate new auth token
-        authDAO.addAuth(authToken, username);           // Save to database
+        authDAO.addAuth(username, authToken);           // Save to database
 
-        Auth auth = new Auth(authToken, username);
+        Auth auth = new Auth(username, authToken);
         logger.log(Level.INFO, "Login successful. Generated Auth: {0}", auth);
         return auth;
     }

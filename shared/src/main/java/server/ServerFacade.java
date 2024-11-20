@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessGame;
 import exception.ResponseException;
+import logging.LoggerManager;
 import model.Auth;
 import model.Game;
 import com.google.gson.Gson;
@@ -16,19 +17,11 @@ import java.util.logging.Logger;
 public class ServerFacade {
 
     private final String serverUrl;
-    private static final Logger logger = Logger.getLogger(ServerFacade.class.getName());
+    private static final Logger logger = LoggerManager.getLogger(ServerFacade.class.getName());
 
     static {
         // Set the logger level to ALL to capture all log messages
         logger.setLevel(Level.ALL);
-
-        // Ensure the ConsoleHandler is set up correctly
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.ALL); // Capture all log levels
-        logger.addHandler(consoleHandler);
-
-        // Prevent parent handlers from duplicating the logs
-        logger.setUseParentHandlers(false);
     }
 
     public ServerFacade(String url) {
@@ -45,7 +38,7 @@ public class ServerFacade {
         return this.makeRequest("POST", path, user, Auth.class);
     }
 
-    public User login(String username, String password) throws ResponseException {
+    public Auth login(String username, String password) throws ResponseException {
         var path = "/session";
         var requestBody = new User(username, password, null);
         return this.makeRequest("POST", path, requestBody, User.class);
@@ -77,8 +70,9 @@ public class ServerFacade {
 
             logger.info("[HTTP] Making " + method + " request to: " + url);
             if (request != null) {
-                logger.info("[HTTP] Request body: " + new Gson().toJson(request));
-                writeBody(request, http);
+
+                var body = writeBody(request, http);
+//                logger.info("[HTTP] Request body: " + body);
             }
 
             http.connect();
@@ -99,13 +93,16 @@ public class ServerFacade {
         }
     }
 
-    private static void writeBody(Object request, HttpURLConnection http) throws IOException {
+    private static String writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
             }
+            return reqData;
+        } else {
+            return "Req body is null";
         }
     }
 
@@ -128,7 +125,6 @@ public class ServerFacade {
         T response = null;
         if (http.getContentLength() > 0) {
             try (InputStream respBody = http.getInputStream()) {
-                System.out.println("Response Body: " + respBody);
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
                     response = new Gson().fromJson(reader, responseClass);

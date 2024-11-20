@@ -84,7 +84,7 @@ public class ServerFacadeTests {
 
         // Test login with correct credentials
         assertDoesNotThrow(() -> {
-            User loggedInUser = facade.login("testuser", "password123");
+            Auth loggedInUser = facade.login("testuser", "password123");
             assertNotNull(loggedInUser);
             assertEquals("testuser", loggedInUser.username());
         });

@@ -22,7 +22,19 @@ public class ColorFormatter extends Formatter {
 
         // Generate a short timestamp (HH:MM:SS)
         String shortTimestamp = String.format("%1$tH:%1$tM:%1$tS", record.getMillis());
-        String resolvedMessage = MessageFormat.format(record.getMessage(), record.getParameters());
+
+        // Safely format the message with parameters
+        String resolvedMessage;
+        if (record.getParameters() != null && record.getMessage().contains("{")) {
+            try {
+                resolvedMessage = MessageFormat.format(record.getMessage(), record.getParameters());
+            } catch (IllegalArgumentException e) {
+                // If formatting fails, fallback to raw message
+                resolvedMessage = record.getMessage();
+            }
+        } else {
+            resolvedMessage = record.getMessage();
+        }
 
         // Format the log message
         return String.format(

@@ -55,6 +55,8 @@ public class PreLoginClient {
         try {
             var auth = serverFacade.login(username, password); // Use ServerFacade for login
             repl.changeState(UserState.LOGGEDIN);
+            repl.setUsername(auth.username());
+            repl.setAuthToken(auth.authToken());
             return "Login successful. Welcome, " + auth.username() + "!";
         } catch (Exception e) {
             return "Login failed: " + e.getMessage();
@@ -76,6 +78,8 @@ public class PreLoginClient {
         try {
             var auth = serverFacade.register(newUser); // Use ServerFacade for registration
             repl.changeState(UserState.LOGGEDIN);
+            repl.setUsername(auth.username());
+            repl.setAuthToken(auth.authToken());
             return "Registration successful. Welcome, " + auth.username() + "!";
         } catch (Exception e) {
             return "Registration failed: " + e.getMessage();

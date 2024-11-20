@@ -27,7 +27,7 @@ public class MySQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void addAuth(String authToken, String username) throws DataAccessException {
+    public void addAuth(String username, String authToken) throws DataAccessException {
         logger.log(Level.INFO, "Adding auth token for username: {0}", username);
         String insertStatement = "INSERT INTO auth (username, auth_token) VALUES (?, ?)";
 

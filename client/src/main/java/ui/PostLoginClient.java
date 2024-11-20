@@ -1,13 +1,18 @@
 
 package ui;
 
+import exception.ResponseException;
+import server.ServerFacade;
+
 public class PostLoginClient {
     private final String serverUrl;
     private final Repl repl;
+    private final ServerFacade serverFacade;
 
     public PostLoginClient(String serverUrl, Repl repl) {
         this.serverUrl = serverUrl;
         this.repl = repl;
+        this.serverFacade = new ServerFacade(serverUrl);
     }
 
     public String eval(String input) {
@@ -44,6 +49,14 @@ public class PostLoginClient {
 
     private String logout() {
         repl.changeState(UserState.LOGGEDOUT);
+
+        try {
+            String authToken = repl.getAuthToken();
+            serverFacade.logout(authToken);
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
+        }
+
         return "You have been logged out.";
     }
 

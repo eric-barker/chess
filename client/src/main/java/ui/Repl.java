@@ -2,6 +2,7 @@ package ui;
 
 
 import exception.ResponseException;
+import model.Auth;
 
 import java.util.Scanner;
 
@@ -10,6 +11,9 @@ public class Repl {
     private final PostLoginClient postLoginClient;
     private final InGameClient inGameClient;
     private UserState state;
+    private Auth auth = null;
+    private String username = null;
+    private String authToken = null;
 
 
     public Repl(String serverUrl) {
@@ -69,5 +73,22 @@ public class Repl {
 
     private void printPrompt() {
         System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_YELLOW);
+    }
+
+
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
