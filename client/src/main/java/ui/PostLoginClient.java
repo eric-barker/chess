@@ -64,19 +64,42 @@ public class PostLoginClient {
 
     private String createGame() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter Game Name: ");
-        String gameName = scanner.nextLine();
+        String gameName = "";
+        boolean gameNameExists = true;
 
-        System.out.println("Attempting to create game...");
         try {
             String authToken = repl.getAuthToken();
-            var auth = serverFacade.createGame(gameName, authToken);
+
+            while (gameNameExists) {
+                System.out.print("Enter Game Name: ");
+                gameName = scanner.nextLine();
+
+                // Validate the game name against existing games
+                var listOfGames = serverFacade.listGames(authToken);
+                gameNameExists = false;
+                for (var game : listOfGames) {
+                    if (game.gameName().equalsIgnoreCase(gameName)) {
+                        gameNameExists = true;
+                        System.out.println("Game name already exists. Please choose a different name.");
+                        break;
+                    }
+                }
+
+                if (gameName.isBlank()) {
+                    System.out.println("Game name cannot be empty. Please try again.");
+                    gameNameExists = true;
+                }
+            }
+
+            System.out.println("Attempting to create game...");
+            serverFacade.createGame(gameName, authToken);
+            return "Game created successfully.";
+
         } catch (ResponseException e) {
             return "Game creation failed: " + e.getMessage();
         }
-        // Stub for creating a game
-        return "Game created successfully.";
     }
+
 
     private String listGames() {
         System.out.println("Attempting to list games...");
@@ -104,23 +127,59 @@ public class PostLoginClient {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the name of the game you want to join: ");
 
-        boolean isUsername = false;
+        boolean gameExists = false;
         String gameName = "";
-        while (!isUsername || gameName == "exit") {
+        int gameID = 0;
+
+        while (!gameExists) {
             gameName = scanner.nextLine();
 
-            // validate that the game exists in the database
+            // Validate that the game exists in the database
+            try {
+                var listOfGames = serverFacade.listGames(repl.getAuthToken());
+                for (var game : listOfGames) {
+                    if (game.gameName().equalsIgnoreCase(gameName)) {
+                        gameExists = true;
+                        gameID = game.gameID();
+                        break;
+                    }
+                }
 
+                if (!gameExists) {
+                    System.out.println("Game not found. Please try again or type 'exit' to cancel.");
+                    if (gameName.equalsIgnoreCase("exit")) {
+                        return "Join game cancelled.";
+                    }
+                }
+            } catch (ResponseException e) {
+                return "Error retrieving game list: " + e.getMessage();
+            }
         }
-        // List available colors.
 
-        // Ask for user to choose one of the available colors
+        // List available colors
+        System.out.println("Available colors: white, black");
 
+        // Ask the user to choose one of the available colors
+        String playerColor = "";
+        while (!playerColor.equalsIgnoreCase("white") && !playerColor.equalsIgnoreCase("black")) {
+            System.out.print("Choose your color (white/black): ");
+            playerColor = scanner.nextLine();
+            if (!playerColor.equalsIgnoreCase("white") && !playerColor.equalsIgnoreCase("black")) {
+                System.out.println("Invalid color. Please choose 'white' or 'black'.");
+            }
+        }
 
-        // Stub for joining a game
-        repl.changeState(UserState.INGAME);
-        return "Joining game (stub).";
+        // Attempt to join the game
+        try {
+            String authToken = repl.getAuthToken();
+            serverFacade.joinGame(gameID, playerColor, authToken);
+            repl.changeState(UserState.INGAME);
+            return "Successfully joined the game '" + gameName + "' as " + playerColor + ".";
+        } catch (ResponseException e) {
+            return "Failed to join the game: " + e.getMessage();
+        }
     }
+
 
     private String observeGame() {
         // Stub for observing a game

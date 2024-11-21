@@ -25,13 +25,13 @@ public class JoinGameHandler {
             String authToken = req.headers("authorization");
             if (authToken == null || authToken.isEmpty()) {
                 res.status(401);  // Unauthorized
-                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+                return gson.toJson(new ErrorResponse("Error: unauthorized no AuthToken"));
             }
 
             User user = userService.getUser(authToken);
             if (user == null) {
                 res.status(401);  // Unauthorized
-                return gson.toJson(new ErrorResponse("Error: unauthorized"));
+                return gson.toJson(new ErrorResponse("Error: unauthorized no User"));
             }
 
             JoinGameRequest joinRequest = gson.fromJson(req.body(), JoinGameRequest.class);

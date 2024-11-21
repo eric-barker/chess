@@ -32,8 +32,8 @@ public class InGameClient {
         return "Available commands:\n" +
                 "help         - Show this help text.\n" +
                 "renderboard  - Display the chessboard.\n" +
-                "makeMove     - Make a move.\n" +
-                "exitGame     - Exit the game.\n";
+                "makemove     - Make a move.\n" +
+                "exitgame     - Exit the game.\n";
     }
 
     private String renderBoard() {

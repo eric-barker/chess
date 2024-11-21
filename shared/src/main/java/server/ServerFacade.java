@@ -162,8 +162,27 @@ public class ServerFacade {
         }
         var requestBody = new JoinGameRequest(gameID, playerColor);
 
-        // Use your existing makeRequest method
-        makeRequest("PUT", path, requestBody, null);
+        try {
+            // Construct the full URL and open a connection
+            HttpURLConnection http = (HttpURLConnection) new URL(serverUrl + path).openConnection();
+            http.setRequestMethod("PUT");
+            http.setRequestProperty("Authorization", authToken); // Add Authorization header
+            http.setRequestProperty("Content-Type", "application/json");
+            http.setDoOutput(true);
+
+            // Write the request body
+            try (OutputStream reqBody = http.getOutputStream()) {
+                reqBody.write(new Gson().toJson(requestBody).getBytes());
+            }
+
+            // Check the response code and handle errors
+            http.connect();
+            if (http.getResponseCode() >= 300) {
+                throw new ResponseException(http.getResponseCode(), "Failed to join game");
+            }
+        } catch (IOException e) {
+            throw new ResponseException(500, "Error communicating with the server: " + e.getMessage());
+        }
     }
 
 

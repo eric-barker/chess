@@ -47,6 +47,11 @@ public class ChessPiece {
                 '}';
     }
 
+    public ChessGame.TeamColor getPieceColor() {
+        return pieceColor;
+    }
+
+
     /**
      * The various different chess piece options
      */
