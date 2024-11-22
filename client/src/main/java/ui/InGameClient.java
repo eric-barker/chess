@@ -1,6 +1,8 @@
 
 package ui;
 
+import chess.ChessBoard;
+
 public class InGameClient {
     private final String serverUrl;
     private final Repl repl;
@@ -37,9 +39,23 @@ public class InGameClient {
     }
 
     private String renderBoard() {
-        // Stub for rendering the board
-        return "Rendering the chessboard (stub).";
+        ChessBoard board = new ChessBoard();
+        board.resetBoard();
+
+        if (board == null) {
+            return "No active game board found.";
+        }
+
+        // Render the board from both perspectives
+        System.out.println("White's Perspective:");
+        ChessBoardRenderer.renderChessBoard(board, true);
+
+        System.out.println("\nBlack's Perspective:");
+        ChessBoardRenderer.renderChessBoard(board, false);
+
+        return "Chessboard rendered successfully.";
     }
+
 
     private String makeMove() {
         // Stupb for making moves

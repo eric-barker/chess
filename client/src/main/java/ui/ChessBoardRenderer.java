@@ -1,3 +1,5 @@
+package ui;
+
 import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
@@ -45,7 +47,7 @@ public class ChessBoardRenderer {
                 int actualCol = whitePerspective ? col : 7 - col;
 
                 String squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
-                ChessPosition position = new ChessPosition(actualRow - 1, actualCol);
+                ChessPosition position = new ChessPosition(actualRow - 1 + 1, actualCol + 1);
                 ChessPiece piece = board.getPiece(position);
 
                 String pieceSymbol = " ";
@@ -64,7 +66,7 @@ public class ChessBoardRenderer {
     }
 
     private static void printColumnLabels(boolean whitePerspective) {
-        System.out.print("  "); // Indentation for row numbers
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR + "   "); // Indentation for row numbers
         for (int col = 0; col < 8; col++) {
             char label = (char) ('a' + (whitePerspective ? col : 7 - col));
             System.out.print(" " + label + " ");

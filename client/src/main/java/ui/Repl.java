@@ -3,6 +3,7 @@ package ui;
 
 import exception.ResponseException;
 import model.Auth;
+import server.ServerFacade;
 
 import java.util.Scanner;
 
@@ -14,6 +15,7 @@ public class Repl {
     private Auth auth = null;
     private String username = null;
     private String authToken = null;
+    private final String serverUrl;
 
 
     public Repl(String serverUrl) {
@@ -21,6 +23,7 @@ public class Repl {
         this.postLoginClient = new PostLoginClient(serverUrl, this);
         this.inGameClient = new InGameClient(serverUrl, this);
         this.state = UserState.LOGGEDOUT; // Initial state is logged out
+        this.serverUrl = serverUrl;
     }
 
     public void run() {
@@ -58,8 +61,9 @@ public class Repl {
                 } catch (Exception e) {
                     throw new ResponseException(500, e.getMessage());
                 }
-
             }
+            gracefulClose();
+
         } catch (ResponseException e) {
             System.out.println(e.getMessage());
         }
@@ -91,5 +95,16 @@ public class Repl {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    private void gracefulClose() {
+        ServerFacade serverFacade = new ServerFacade(serverUrl);
+        try {
+            serverFacade.logout(authToken);
+            authToken = null;
+            username = null;
+        } catch (ResponseException e) {
+            System.err.println("Graceful Close Error: " + e.getMessage());
+        }
     }
 }

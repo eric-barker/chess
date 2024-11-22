@@ -232,5 +232,53 @@ public class ServerFacadeTests {
                 "Expected ResponseException when listing games with an invalid auth token");
     }
 
+    @Test
+    @DisplayName("Join Game - Positive Case")
+    public void testJoinGamePositive() {
+        try {
+            // Register a user to obtain a valid auth token
+            User user = new User("join_game_user", "password123", "joingame@email.com");
+            Auth auth = facade.register(user);
+            assertNotNull(auth.authToken(), "Auth token should not be null");
+
+            // Create a game to join
+            String gameName = "game_to_join";
+            int gameID = facade.createGame(gameName, auth.authToken());
+            assertTrue(gameID > 0, "Game ID should be a valid positive number");
+
+            // Join the game as white
+            facade.joinGame(gameID, "white", auth.authToken());
+
+            // If no exception is thrown, the join was successful
+            System.out.println("Successfully joined game: " + gameName + " as white.");
+        } catch (Exception e) {
+            fail("Unexpected exception during joinGame: " + e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Join Game - Negative Case")
+    public void testJoinGameNegative() {
+        // Use an invalid game ID and/or invalid auth token
+        int invalidGameID = -1;
+        String invalidAuthToken = "invalid_auth_token";
+
+        // Attempt to join the game with invalid game ID
+        assertThrows(ResponseException.class, () -> facade.joinGame(invalidGameID, "white", invalidAuthToken),
+                "Expected ResponseException when joining a game with an invalid game ID or auth token");
+
+        // Register a user to test joining a game with an invalid game ID
+        try {
+            User user = new User("join_game_invalid", "password123", "invalidgame@email.com");
+            Auth auth = facade.register(user);
+            assertNotNull(auth.authToken(), "Auth token should not be null");
+
+            // Attempt to join a game that does not exist
+            assertThrows(ResponseException.class, () -> facade.joinGame(invalidGameID, "white", auth.authToken()),
+                    "Expected ResponseException when joining a game with a non-existent game ID");
+        } catch (Exception e) {
+            fail("Unexpected exception during testJoinGameNegative: " + e.getMessage());
+        }
+    }
 
 }
