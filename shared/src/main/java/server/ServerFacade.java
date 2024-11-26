@@ -18,12 +18,12 @@ import java.util.logging.Logger;
 public class ServerFacade {
 
     private final String serverUrl;
-    private static final Logger logger = LoggerManager.getLogger(ServerFacade.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(ServerFacade.class.getName());
 
 
     static {
         // Set the logger level to ALL to capture all log messages
-        logger.setLevel(Level.ALL);
+        LOGGER.setLevel(Level.ALL);
     }
 
     public ServerFacade(String url) {
@@ -204,35 +204,35 @@ public class ServerFacade {
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
             String fullPath = serverUrl + path;
-            logger.info("Constructing URL with serverUrl: " + serverUrl + " and path: " + path);
-            logger.info("Full URL: " + fullPath);
+            LOGGER.info("Constructing URL with serverUrl: " + serverUrl + " and path: " + path);
+            LOGGER.info("Full URL: " + fullPath);
 
             URL url = (new URI(fullPath)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(request != null);
 
-            logger.info("[HTTP] Making " + method + " request to: " + url);
+            LOGGER.info("[HTTP] Making " + method + " request to: " + url);
             if (request != null) {
 
                 var body = writeBody(request, http);
-//                logger.info("[HTTP] Request body: " + body);
+//                LOGGER.info("[HTTP] Request body: " + body);
             }
 
             http.connect();
-            logger.info("[HTTP] Response Code: " + http.getResponseCode());
-            logger.info("[HTTP] Response Body: " + http.getContentLength());
+            LOGGER.info("[HTTP] Response Code: " + http.getResponseCode());
+            LOGGER.info("[HTTP] Response Body: " + http.getContentLength());
             throwIfNotSuccessful(http);
             T response = readBody(http, responseClass);
 
-            logger.info("[HTTP] Response body: " + new Gson().toJson(response));
+            LOGGER.info("[HTTP] Response body: " + new Gson().toJson(response));
             if (response != null) {
-                logger.info("[HTTP] Response body: " + new Gson().toJson(response));
+                LOGGER.info("[HTTP] Response body: " + new Gson().toJson(response));
             }
             return response;
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "[HTTP] Request failed: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "[HTTP] Request failed: " + e.getMessage(), e);
             throw new ResponseException(500, e.getMessage());
         }
     }
@@ -258,7 +258,7 @@ public class ServerFacade {
                     String errorMessage = new BufferedReader(new InputStreamReader(errorStream))
                             .lines()
                             .reduce("", String::concat);
-                    logger.warning("[HTTP] Error response: " + errorMessage);
+                    LOGGER.warning("[HTTP] Error response: " + errorMessage);
                 }
             }
             throw new ResponseException(status, "[HTTP] HTTP error: " + status);
