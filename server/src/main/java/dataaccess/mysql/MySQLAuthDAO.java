@@ -44,6 +44,7 @@ public class MySQLAuthDAO implements AuthDAO {
         }
     }
 
+
     @Override
     public Auth getAuth(String authToken) throws DataAccessException {
         LOGGER.log(Level.INFO, "Fetching auth token: {0}", authToken);

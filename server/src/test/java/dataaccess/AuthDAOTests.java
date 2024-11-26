@@ -47,7 +47,7 @@ public class AuthDAOTests {
 
     @Test
     public void testAddAndGetAuth() throws DataAccessException {
-        authDAO.addAuth("authToken1", "user1");
+        authDAO.addAuth("user1", "authToken1");
         Auth auth = authDAO.getAuth("authToken1");
         assertNotNull(auth, "Expected non-null Auth object after adding.");
         assertEquals("user1", auth.username(), "The username should be user1.");
@@ -55,7 +55,7 @@ public class AuthDAOTests {
 
     @Test
     public void testUpdateAuth() throws DataAccessException {
-        authDAO.addAuth("authToken1", "user1");
+        authDAO.addAuth("user1", "authToken1");
         authDAO.updateAuth("authToken1", "newAuthToken");
 
         Auth updatedAuth = authDAO.getAuth("newAuthToken");
