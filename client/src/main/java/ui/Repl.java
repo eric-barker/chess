@@ -3,6 +3,7 @@ package ui;
 
 import exception.ResponseException;
 import model.Auth;
+import model.Game;
 import server.ServerFacade;
 
 import java.util.Scanner;
@@ -16,6 +17,8 @@ public class Repl {
     private String username = null;
     private String authToken = null;
     private final String serverUrl;
+    private boolean isObserver = false;
+    private Game game;
 
 
     public Repl(String serverUrl) {
@@ -47,7 +50,7 @@ public class Repl {
                         case LOGGEDIN:
                             result = postLoginClient.eval(input);
                             break;
-                        case INGAME:
+                        case INGAME, OBSERVER:
                             result = inGameClient.eval(input);
                             break;
                         default:
@@ -95,6 +98,22 @@ public class Repl {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setIsObserver(boolean isObserver) {
+        this.isObserver = isObserver;
+    }
+
+    public boolean getIsObserver() {
+        return this.isObserver;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Game getGame() {
+        return this.game;
     }
 
     private void gracefulClose() {

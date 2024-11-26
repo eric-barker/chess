@@ -185,6 +185,14 @@ public class ServerFacade {
         }
     }
 
+    public void observeGame() {
+        // Check for a valid game.
+
+        // Render the game board.
+
+        // Not needed in server facade
+    }
+
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {

@@ -281,4 +281,53 @@ public class ServerFacadeTests {
         }
     }
 
+//    @Test
+//    @DisplayName("Observe Game - Positive Case")
+//    public void testObserveGamePositive() {
+//        try {
+//            // Register a user to obtain a valid auth token
+//            User user = new User("observe_game_user", "password123", "observegame@email.com");
+//            Auth auth = facade.register(user);
+//            assertNotNull(auth.authToken(), "Auth token should not be null");
+//
+//            // Create a game to observe
+//            String gameName = "game_to_observe";
+//            int gameID = facade.createGame(gameName, auth.authToken());
+//            assertTrue(gameID > 0, "Game ID should be a valid positive number");
+//
+//            // Observe the game
+//            facade.observeGame(gameID, auth.authToken());
+//
+//            // If no exception is thrown, the observation was successful
+//            System.out.println("Successfully observing game: " + gameName);
+//        } catch (Exception e) {
+//            fail("Unexpected exception during observeGame: " + e.getMessage());
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("Observe Game - Negative Case")
+//    public void testObserveGameNegative() {
+//        // Use an invalid game ID and/or invalid auth token
+//        int invalidGameID = -1;
+//        String invalidAuthToken = "invalid_auth_token";
+//
+//        // Attempt to observe the game with invalid game ID
+//        assertThrows(ResponseException.class, () -> facade.observeGame(invalidGameID, invalidAuthToken),
+//                "Expected ResponseException when observing a game with an invalid game ID or auth token");
+//
+//        // Register a user to test observing a game with an invalid game ID
+//        try {
+//            User user = new User("observe_game_invalid", "password123", "observeinvalidgame@email.com");
+//            Auth auth = facade.register(user);
+//            assertNotNull(auth.authToken(), "Auth token should not be null");
+//
+//            // Attempt to observe a game that does not exist
+//            assertThrows(ResponseException.class, () -> facade.observeGame(invalidGameID, auth.authToken()),
+//                    "Expected ResponseException when observing a game with a non-existent game ID");
+//        } catch (Exception e) {
+//            fail("Unexpected exception during testObserveGameNegative: " + e.getMessage());
+//        }
+//    }
+
 }

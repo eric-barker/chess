@@ -3,6 +3,7 @@ package ui;
 public enum UserState {
     LOGGEDOUT,
     LOGGEDIN,
-    INGAME
+    INGAME,
+    OBSERVER
 }
 

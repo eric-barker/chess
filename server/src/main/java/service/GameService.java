@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
@@ -27,7 +28,7 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
 
-        Game newGame = new Game(0, null, null, gameName, null);  // ID doesn't matter for now.
+        Game newGame = new Game(0, null, null, gameName, new ChessGame());
         newGame = gameDAO.createGame(newGame);  // Use the returned game with the correct ID
 
         return newGame;  // Return the game with the correct gameID

@@ -2,6 +2,7 @@
 package ui;
 
 import exception.ResponseException;
+import model.Game;
 import server.ServerFacade;
 
 import java.util.Scanner;
@@ -112,8 +113,11 @@ public class PostLoginClient {
 
             // Print the game names to the console
             System.out.println("Games available:");
+            int counter = 1;
             for (var game : listOfGames) {
-                System.out.println("- " + game.gameName());
+                System.out.println(counter + " - " + game.gameName() + ", White User: "
+                        + game.whiteUsername() + ", Black User: " + game.blackUsername());
+                counter++;
             }
 
             return "Games listed successfully.";
@@ -182,7 +186,52 @@ public class PostLoginClient {
 
 
     private String observeGame() {
-        // Stub for observing a game
-        return "Observing game (stub).";
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the name of the game you want to observe: ");
+
+        Game myGame = null;
+        boolean gameExists = false;
+        String gameName = "";
+        int gameID = 0;
+
+        while (!gameExists) {
+            gameName = scanner.nextLine();
+
+            // Validate that the game exists in the database
+            try {
+                var listOfGames = serverFacade.listGames(repl.getAuthToken());
+                for (var game : listOfGames) {
+                    if (game.gameName().equalsIgnoreCase(gameName)) {
+                        gameExists = true;
+                        gameID = game.gameID();
+                        myGame = game;
+                        break;
+                    }
+                }
+
+                if (!gameExists) {
+                    System.out.println("Game not found. Please try again or type 'exit' to cancel.");
+                    if (gameName.equalsIgnoreCase("exit")) {
+                        return "Join game cancelled.";
+                    }
+                }
+            } catch (ResponseException e) {
+                return "Error retrieving game list: " + e.getMessage();
+            }
+        }
+
+        // Attempt observe the game
+        try {
+            String authToken = repl.getAuthToken();
+
+            repl.changeState(UserState.OBSERVER);
+            repl.setIsObserver(true);
+
+
+            return "Successfully observing game '" + myGame.gameName() + "', Game ID: " + myGame.gameID();
+
+        } catch (Exception e) {
+            return "Failed to join the game: " + e.getMessage();
+        }
     }
 }
