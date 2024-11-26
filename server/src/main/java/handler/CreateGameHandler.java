@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 public class CreateGameHandler {
 
-    private static final Logger logger = LoggerManager.getLogger(CreateGameHandler.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(CreateGameHandler.class.getName());
     private final GameService gameService;
     private final UserService userService;
     private final Gson gson = new Gson();
@@ -37,7 +37,7 @@ public class CreateGameHandler {
 
             // Deserialize the request body to get the game name
             CreateGameRequest createGameRequest = gson.fromJson(req.body(), CreateGameRequest.class);
-            logger.info("Game Name: " + createGameRequest);
+            LOGGER.info("Game Name: " + createGameRequest);
 
             // Validate gameName
             if (createGameRequest.gameName() == null || createGameRequest.gameName().isEmpty()) {
@@ -52,15 +52,15 @@ public class CreateGameHandler {
             return gson.toJson(new CreateGameResult(createdGame.gameID()));
 
         } catch (ResponseException e) {
-            logger.warning("ResponseException: " + e.getMessage());
+            LOGGER.warning("ResponseException: " + e.getMessage());
             res.status(e.statusCode());  // Use the status code from the exception
             return gson.toJson(new ErrorMessage(e.getMessage()));
         } catch (DataAccessException e) {
-            logger.severe("DataAccessException: " + e.getMessage());
+            LOGGER.severe("DataAccessException: " + e.getMessage());
             res.status(510);
             return gson.toJson(new ErrorMessage("Error: Data Access Error: " + e.getMessage()));
         } catch (Exception e) {
-            logger.severe("Unhandled exception: " + e.getMessage());
+            LOGGER.severe("Unhandled exception: " + e.getMessage());
             res.status(503);  // Internal Server Error
             return gson.toJson(new ErrorMessage("Error: Internal Server Error: " + e.getMessage()));
         }

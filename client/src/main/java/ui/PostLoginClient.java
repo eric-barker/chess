@@ -10,7 +10,7 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 
 public class PostLoginClient {
-    private static final Logger logger = LoggerManager.getLogger(PostLoginClient.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(PostLoginClient.class.getName());
     private final String serverUrl;
     private final Repl repl;
     private final ServerFacade serverFacade;
@@ -118,7 +118,7 @@ public class PostLoginClient {
             System.out.println("Games available:");
             int counter = 1;
             for (var game : listOfGames) {
-                logger.info("Game: " + game);
+                LOGGER.info("Game: " + game);
                 System.out.println(counter + " - " + game.gameName() + ", White User: "
                         + game.whiteUsername() + ", Black User: " + game.blackUsername());
                 counter++;
@@ -205,14 +205,14 @@ public class PostLoginClient {
                 var listOfGames = serverFacade.listGames(repl.getAuthToken());
                 var counter = 1;
                 for (var game : listOfGames) {
-                    logger.info("Game " + counter + " from games list: " + game);
+                    LOGGER.info("Game " + counter + " from games list: " + game);
                     if (game.gameName().equalsIgnoreCase(gameName)) {
                         gameExists = true;
                         gameID = game.gameID();
                         repl.setGame(game);
                         var myGame = repl.getGame();
 
-                        logger.info("myGame: " + myGame);
+                        LOGGER.info("myGame: " + myGame);
                         break;
                     }
                     counter++;

@@ -16,20 +16,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MySQLUserDAO implements UserDAO {
-    private static final Logger logger = LoggerManager.getLogger(MySQLUserDAO.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(MySQLUserDAO.class.getName());
 
     static {
-        logger.setLevel(Level.INFO);
+        LOGGER.setLevel(Level.INFO);
     }
 
     public MySQLUserDAO() throws DataAccessException {
-        logger.info("Initializing MySQLUserDAO and configuring database...");
+        LOGGER.info("Initializing MySQLUserDAO and configuring database...");
         configureDatabase();
     }
 
     @Override
     public User addUser(User user) throws DataAccessException {
-        logger.log(Level.INFO, "Adding user: {0}", user.username());
+        LOGGER.log(Level.INFO, "Adding user: {0}", user.username());
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         String insertStatement = "INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)";
 
@@ -43,21 +43,21 @@ public class MySQLUserDAO implements UserDAO {
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    logger.log(Level.INFO, "User added successfully: {0}", user.username());
+                    LOGGER.log(Level.INFO, "User added successfully: {0}", user.username());
                     return new User(user.username(), hashedPassword, user.email());
                 } else {
-                    logger.warning("Failed to retrieve generated ID for new user.");
+                    LOGGER.warning("Failed to retrieve generated ID for new user.");
                     throw new DataAccessException("Failed to retrieve generated ID for new user.");
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Unable to add user: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to add user: {0}", e.getMessage());
             throw new DataAccessException("Unable to add user: " + e.getMessage());
         }
     }
 
     public Collection<User> listUsers() throws DataAccessException {
-        logger.info("Listing all users...");
+        LOGGER.info("Listing all users...");
         String selectStatement = "SELECT username, password_hash, email FROM users";
         Collection<User> users = new ArrayList<>();
 
@@ -70,11 +70,11 @@ public class MySQLUserDAO implements UserDAO {
                 String passwordHash = rs.getString("password_hash");
                 String email = rs.getString("email");
                 users.add(new User(username, passwordHash, email));
-                logger.log(Level.FINE, "User retrieved: {0}", username);
+                LOGGER.log(Level.FINE, "User retrieved: {0}", username);
             }
-            logger.info("All users listed successfully.");
+            LOGGER.info("All users listed successfully.");
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Unable to list users: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to list users: {0}", e.getMessage());
             throw new DataAccessException("Unable to list users: " + e.getMessage());
         }
         return users;
@@ -82,7 +82,7 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public User getUser(String username) throws DataAccessException {
-        logger.log(Level.INFO, "Retrieving user: {0}", username);
+        LOGGER.log(Level.INFO, "Retrieving user: {0}", username);
         String selectStatement = "SELECT username, password_hash, email FROM users WHERE username = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -94,13 +94,13 @@ public class MySQLUserDAO implements UserDAO {
                 if (rs.next()) {
                     String passwordHash = rs.getString("password_hash");
                     String email = rs.getString("email");
-                    logger.log(Level.INFO, "User found: {0}", username);
+                    LOGGER.log(Level.INFO, "User found: {0}", username);
                     return new User(username, passwordHash, email);
                 }
             }
-            logger.log(Level.WARNING, "User not found: {0}", username);
+            LOGGER.log(Level.WARNING, "User not found: {0}", username);
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Unable to retrieve user: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to retrieve user: {0}", e.getMessage());
             throw new DataAccessException("Unable to retrieve user: " + e.getMessage());
         }
         return null;
@@ -108,7 +108,7 @@ public class MySQLUserDAO implements UserDAO {
 
     @Override
     public void deleteUser(String username) throws DataAccessException {
-        logger.log(Level.INFO, "Deleting user: {0}", username);
+        LOGGER.log(Level.INFO, "Deleting user: {0}", username);
         String deleteStatement = "DELETE FROM users WHERE username = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -117,35 +117,35 @@ public class MySQLUserDAO implements UserDAO {
             ps.setString(1, username);
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {
-                logger.log(Level.INFO, "User deleted: {0}", username);
+                LOGGER.log(Level.INFO, "User deleted: {0}", username);
             } else {
-                logger.log(Level.WARNING, "No user found to delete: {0}", username);
+                LOGGER.log(Level.WARNING, "No user found to delete: {0}", username);
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Unable to delete user: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to delete user: {0}", e.getMessage());
             throw new DataAccessException("Unable to delete user: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteAllUsers() throws DataAccessException {
-        logger.info("Deleting all users...");
+        LOGGER.info("Deleting all users...");
         String truncateStatement = "TRUNCATE TABLE users";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(truncateStatement)) {
 
             ps.executeUpdate();
-            logger.info("All users deleted successfully.");
+            LOGGER.info("All users deleted successfully.");
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Unable to delete all users: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to delete all users: {0}", e.getMessage());
             throw new DataAccessException("Unable to delete all users: " + e.getMessage());
         }
     }
 
     @Override
     public void update(User user) throws DataAccessException {
-        logger.log(Level.INFO, "Updating user: {0}", user.username());
+        LOGGER.log(Level.INFO, "Updating user: {0}", user.username());
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         String updateStatement = "UPDATE users SET password_hash = ?, email = ? WHERE username = ?";
 
@@ -156,20 +156,20 @@ public class MySQLUserDAO implements UserDAO {
             ps.setString(2, user.email());
             ps.setString(3, user.username());
             ps.executeUpdate();
-            logger.log(Level.INFO, "User updated successfully: {0}", user.username());
+            LOGGER.log(Level.INFO, "User updated successfully: {0}", user.username());
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Unable to update user: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to update user: {0}", e.getMessage());
             throw new DataAccessException("Unable to update user: " + e.getMessage());
         }
     }
 
     private void configureDatabase() throws DataAccessException {
-        logger.info("Configuring database for users...");
+        LOGGER.info("Configuring database for users...");
         try {
             DatabaseManager.createDatabase();
-            logger.info("Database created or already exists.");
+            LOGGER.info("Database created or already exists.");
         } catch (DataAccessException e) {
-            logger.log(Level.SEVERE, "Failed to create database: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to create database: {0}", e.getMessage());
             throw new DataAccessException("Failed to create database: " + e.getMessage());
         }
 
@@ -186,40 +186,40 @@ public class MySQLUserDAO implements UserDAO {
 
             try (PreparedStatement preparedStatement = conn.prepareStatement(createTable)) {
                 preparedStatement.executeUpdate();
-                logger.info("Users table created or already exists.");
+                LOGGER.info("Users table created or already exists.");
             }
         } catch (SQLException ex) {
-            logger.log(Level.SEVERE, "Unable to configure database: {0}", ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Unable to configure database: {0}", ex.getMessage());
             throw new DataAccessException("Unable to configure database: " + ex.getMessage());
         }
     }
 
     @Override
     public boolean verifyUserPassword(String username, String providedClearTextPassword) throws DataAccessException {
-        logger.log(Level.INFO, "Verifying password for user: {0}", username);
+        LOGGER.log(Level.INFO, "Verifying password for user: {0}", username);
         String sql = "SELECT password_hash FROM users WHERE username = ?";
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, username);
-            logger.log(Level.FINE, "Executing query to fetch password hash for user: {0}", username);
+            LOGGER.log(Level.FINE, "Executing query to fetch password hash for user: {0}", username);
 
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 String storedHash = rs.getString("password_hash");
-                logger.log(Level.FINE, "Retrieved password hash for user {0}: {1}", new Object[]{username, storedHash});
-                logger.log(Level.FINE, "Provided password: {0}", providedClearTextPassword);
+                LOGGER.log(Level.FINE, "Retrieved password hash for user {0}: {1}", new Object[]{username, storedHash});
+                LOGGER.log(Level.FINE, "Provided password: {0}", providedClearTextPassword);
 
                 boolean matches = BCrypt.checkpw(providedClearTextPassword, storedHash);
 
-                logger.log(Level.INFO, "Password verification result for user {0}: {1}", new Object[]{username, matches});
+                LOGGER.log(Level.INFO, "Password verification result for user {0}: {1}", new Object[]{username, matches});
                 return matches;
             }
-            logger.log(Level.WARNING, "User not found for password verification: {0}", username);
+            LOGGER.log(Level.WARNING, "User not found for password verification: {0}", username);
             return false;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Failed to verify user password: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Failed to verify user password: {0}", e.getMessage());
             throw new DataAccessException("Failed to verify user password: " + e.getMessage());
         }
     }

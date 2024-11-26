@@ -21,10 +21,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Server {
-    private static final Logger logger = LoggerManager.getLogger(Server.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(Server.class.getName());
 
     static {
-        logger.setLevel(Level.ALL);
+        LOGGER.setLevel(Level.ALL);
     }
 
     private final UserDAO userDAO;
@@ -109,9 +109,9 @@ public class Server {
     }
 
     private void logResponse(spark.Request req, spark.Response res) {
-        logger.info("Response Status: " + res.status());
-        logger.info("Response Type: " + res.type());
-        logger.info("Response Body: " + res.body());
+        LOGGER.info("Response Status: " + res.status());
+        LOGGER.info("Response Type: " + res.type());
+        LOGGER.info("Response Body: " + res.body());
     }
 
 

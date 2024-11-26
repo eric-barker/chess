@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class ListGamesHandler {
 
-    private static final Logger logger = LoggerManager.getLogger(ListGamesHandler.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(ListGamesHandler.class.getName());
     private final GameService gameService;
     private final Gson gson = new Gson();
 
@@ -40,7 +40,7 @@ public class ListGamesHandler {
             res.status(200);  // Success
             var json = gson.toJson(response);
 
-            logger.info("json response: " + json);
+            LOGGER.info("json response: " + json);
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
             return json;

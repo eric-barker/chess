@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class GameService {
 
-    private static final Logger logger = LoggerManager.getLogger(GameService.class.getName());
+    private static final Logger LOGGER = LoggerManager.getLogger(GameService.class.getName());
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
 
@@ -32,7 +32,7 @@ public class GameService {
             throw new ResponseException(400, "Error: bad request");
         }
         ChessGame myGame = new ChessGame();
-        logger.info("myGameData for " + gameName + ":" + myGame);
+        LOGGER.info("myGameData for " + gameName + ":" + myGame);
 
         Game newGame = new Game(0, null, null, gameName, myGame);
         newGame = gameDAO.createGame(newGame);  // Use the returned game with the correct ID
