@@ -106,12 +106,6 @@ public class Server {
     }
 
     private void logRequest(spark.Request req, spark.Response res) {
-
-//        // Log the details
-//        logger.info("Request Method: " + req.requestMethod());
-//        logger.info("Request URL: " + req.url());
-//        logger.info("Request Headers: " + req.headers());
-
     }
 
     private void logResponse(spark.Request req, spark.Response res) {

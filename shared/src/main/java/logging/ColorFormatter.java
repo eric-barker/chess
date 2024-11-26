@@ -39,11 +39,11 @@ public class ColorFormatter extends Formatter {
         // Format the log message
         return String.format(
                 "%s[%s]%s%s(%s)%s %s- %s - %s%s[%s] %s%s- %s%s%n",
-                COLOR_FILE, fileName, RESET, // File (Blue)
-                COLOR_METHOD, methodName, RESET, // Method (Red)
-                COLOR_TIMESTAMP, shortTimestamp, RESET, // Timestamp (Green)
-                COLOR_LEVEL, record.getLevel(), RESET, // Log Level (Purple)
-                COLOR_MESSAGE, resolvedMessage, RESET // Message (White)
+                COLOR_FILE, fileName, RESET,
+                COLOR_METHOD, methodName, RESET,
+                COLOR_TIMESTAMP, shortTimestamp, RESET,
+                COLOR_LEVEL, record.getLevel(), RESET,
+                COLOR_MESSAGE, resolvedMessage, RESET
         );
     }
 }
