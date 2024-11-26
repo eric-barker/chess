@@ -30,7 +30,6 @@ public class MySQLGameDAO implements GameDAO {
         String statement = "INSERT INTO games (white_username, black_username, game_name, game_data) VALUES (?, ?, ?, ?)";
         String gameDataJson = gson.toJson(game.game());
         logger.info("Serialized game data: " + gameDataJson);
-
         int gameID = executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), gameDataJson);
         logger.info("Game created with ID: " + gameID);
 

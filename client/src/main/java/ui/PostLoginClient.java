@@ -2,12 +2,15 @@
 package ui;
 
 import exception.ResponseException;
+import logging.LoggerManager;
 import model.Game;
 import server.ServerFacade;
 
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class PostLoginClient {
+    private static final Logger logger = LoggerManager.getLogger(PostLoginClient.class.getName());
     private final String serverUrl;
     private final Repl repl;
     private final ServerFacade serverFacade;
@@ -115,6 +118,7 @@ public class PostLoginClient {
             System.out.println("Games available:");
             int counter = 1;
             for (var game : listOfGames) {
+                logger.info("Game: " + game);
                 System.out.println(counter + " - " + game.gameName() + ", White User: "
                         + game.whiteUsername() + ", Black User: " + game.blackUsername());
                 counter++;
@@ -189,7 +193,6 @@ public class PostLoginClient {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the name of the game you want to observe: ");
 
-        Game myGame = null;
         boolean gameExists = false;
         String gameName = "";
         int gameID = 0;
@@ -200,13 +203,19 @@ public class PostLoginClient {
             // Validate that the game exists in the database
             try {
                 var listOfGames = serverFacade.listGames(repl.getAuthToken());
+                var counter = 1;
                 for (var game : listOfGames) {
+                    logger.info("Game " + counter + " from games list: " + game);
                     if (game.gameName().equalsIgnoreCase(gameName)) {
                         gameExists = true;
                         gameID = game.gameID();
-                        myGame = game;
+                        repl.setGame(game);
+                        var myGame = repl.getGame();
+
+                        logger.info("myGame: " + myGame);
                         break;
                     }
+                    counter++;
                 }
 
                 if (!gameExists) {
@@ -228,7 +237,7 @@ public class PostLoginClient {
             repl.setIsObserver(true);
 
 
-            return "Successfully observing game '" + myGame.gameName() + "', Game ID: " + myGame.gameID();
+            return "Successfully observing game '" + repl.getGame().gameName() + "', Game ID: " + repl.getGame().gameID();
 
         } catch (Exception e) {
             return "Failed to join the game: " + e.getMessage();

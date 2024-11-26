@@ -3,9 +3,13 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import logging.LoggerManager;
 import model.Game;
 
+import java.util.logging.Logger;
+
 public class InGameClient {
+    private static final Logger logger = LoggerManager.getLogger(InGameClient.class.getName());
     private final String serverUrl;
     private final Repl repl;
     private Game game;
@@ -57,9 +61,13 @@ public class InGameClient {
     }
 
     private String renderBoard() {
+        game = repl.getGame();
+        ChessGame myGame = game.game();
+        logger.info("ChessGame: " + myGame);
 
-        ChessBoard board = game.game().getBoard();
-//        board.resetBoard();
+        ChessBoard board = myGame.getBoard();
+        logger.info("ChessBoard: " + board);
+
 
         if (board == null) {
             return "No active game board found.";

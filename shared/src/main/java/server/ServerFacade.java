@@ -116,7 +116,8 @@ public class ServerFacade {
 
                 // Map GameEntry[] to Game[] for client-side use
                 return Arrays.stream(response.getGames())
-                        .map(entry -> new Game(entry.getGameID(), null, null, entry.getGameName(), null))
+                        .map(entry -> new Game(entry.getGameID(), entry.getWhiteUsername(), entry.getBlackUsername(),
+                                entry.getGameName(), entry.getGame()))
                         .toArray(Game[]::new);
             } else {
                 throw new ResponseException(http.getResponseCode(), "Failed to list games");
@@ -138,6 +139,9 @@ public class ServerFacade {
     private static class GameEntry {
         private int gameID;
         private String gameName;
+        private String whiteUsername;
+        private String blackUsername;
+        private ChessGame game;
 
         // Add getters for deserialization
         public int getGameID() {
@@ -146,6 +150,18 @@ public class ServerFacade {
 
         public String getGameName() {
             return gameName;
+        }
+
+        public String getWhiteUsername() {
+            return whiteUsername;
+        }
+
+        public String getBlackUsername() {
+            return blackUsername;
+        }
+
+        public ChessGame getGame() {
+            return game;
         }
     }
 

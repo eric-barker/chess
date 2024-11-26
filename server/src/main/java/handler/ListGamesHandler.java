@@ -1,17 +1,21 @@
 package handler;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import exception.ResponseException;
+import logging.LoggerManager;
 import model.Game;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 public class ListGamesHandler {
 
+    private static final Logger logger = LoggerManager.getLogger(ListGamesHandler.class.getName());
     private final GameService gameService;
     private final Gson gson = new Gson();
 
@@ -35,6 +39,8 @@ public class ListGamesHandler {
             ListGamesResponse response = new ListGamesResponse(games);
             res.status(200);  // Success
             var json = gson.toJson(response);
+
+            logger.info("json response: " + json);
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
             return json;
@@ -47,32 +53,40 @@ public class ListGamesHandler {
         }
     }
 
-    // Helper class to format the response
-    private static class ListGamesResponse {
-        private final GameEntry[] games;
-
-        public ListGamesResponse(Collection<Game> games) {
-            this.games = games.stream()
-                    .map(game -> new GameEntry(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()))
-                    .toArray(GameEntry[]::new);
-        }
-    }
-
     // Helper class to format each game in the list
     private static class GameEntry {
         private final int gameID;
         private final String whiteUsername;
         private final String blackUsername;
         private final String gameName;
+        private final ChessGame game;
 
-        public GameEntry(int gameID, String whiteUsername, String blackUsername, String gameName) {
+        public GameEntry(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
             this.gameID = gameID;
             this.whiteUsername = whiteUsername;
             this.blackUsername = blackUsername;
-
             this.gameName = gameName;
+            this.game = game;
         }
     }
+
+    // Helper class to format the response
+    private static class ListGamesResponse {
+        private final GameEntry[] games;
+
+        public ListGamesResponse(Collection<Game> games) {
+            this.games = games.stream()
+                    .map(game -> new GameEntry(
+                            game.gameID(),
+                            game.whiteUsername(),
+                            game.blackUsername(),
+                            game.gameName(),
+                            game.game()
+                    ))
+                    .toArray(GameEntry[]::new);
+        }
+    }
+
 
     // Helper class for error response
     private static class ErrorResponse {

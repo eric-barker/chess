@@ -4,14 +4,18 @@ import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
+import dataaccess.mysql.MySQLGameDAO;
+import logging.LoggerManager;
 import model.Game;
 import model.Auth;
 import exception.ResponseException;
 
 import java.util.Collection;
+import java.util.logging.Logger;
 
 public class GameService {
 
+    private static final Logger logger = LoggerManager.getLogger(GameService.class.getName());
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
 
@@ -27,8 +31,10 @@ public class GameService {
         if (gameName == null || gameName.isEmpty()) {
             throw new ResponseException(400, "Error: bad request");
         }
+        ChessGame myGame = new ChessGame();
+        logger.info("myGameData for " + gameName + ":" + myGame);
 
-        Game newGame = new Game(0, null, null, gameName, new ChessGame());
+        Game newGame = new Game(0, null, null, gameName, myGame);
         newGame = gameDAO.createGame(newGame);  // Use the returned game with the correct ID
 
         return newGame;  // Return the game with the correct gameID
