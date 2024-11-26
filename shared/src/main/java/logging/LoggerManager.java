@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoggerManager {
-    private static final Logger globalLogger = Logger.getLogger(LoggerManager.class.getName());
+    private static final Logger GLOBAL_LOGGER = Logger.getLogger(LoggerManager.class.getName());
 
     static {
         configureLogger();
@@ -21,15 +21,15 @@ public class LoggerManager {
             Level level = logLevel != null ? Level.parse(logLevel) : Level.INFO;
 
             // Set global logging level
-            globalLogger.setLevel(level);
+            GLOBAL_LOGGER.setLevel(level);
 
             // Configure console handler
             ConsoleHandler consoleHandler = new ConsoleHandler();
             consoleHandler.setLevel(Level.ALL);
             consoleHandler.setFormatter(new ColorFormatter());
-            globalLogger.addHandler(consoleHandler);
+            GLOBAL_LOGGER.addHandler(consoleHandler);
 
-            globalLogger.setUseParentHandlers(false);
+            GLOBAL_LOGGER.setUseParentHandlers(false);
         } catch (Exception e) {
             System.err.println("Failed to configure logger: " + e.getMessage());
         }
@@ -37,11 +37,11 @@ public class LoggerManager {
 
     public static Logger getLogger(String name) {
         Logger logger = Logger.getLogger(name);
-        logger.setParent(globalLogger);
+        logger.setParent(GLOBAL_LOGGER);
         return logger;
     }
 
     public static void setLogLevel(Level level) {
-        globalLogger.setLevel(level);
+        GLOBAL_LOGGER.setLevel(level);
     }
 }
