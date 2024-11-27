@@ -32,7 +32,7 @@ public class RegisterUserHandler {
             // Respond with a success message and the auth token
             String json = gson.toJson(new Auth(newUser.username(), auth.authToken()));
 
-            res.status(202);  // Success
+            res.status(200);  // Success
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
 

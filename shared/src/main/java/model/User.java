@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Objects;
 
-public record User(@SerializedName("user_name") String username, String password, String email) {
+public record User(@SerializedName("username") String username, String password, String email) {
 
     @Override
     public boolean equals(Object o) {

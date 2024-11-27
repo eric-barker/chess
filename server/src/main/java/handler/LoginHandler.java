@@ -54,7 +54,7 @@ public class LoginHandler {
             String json = gson.toJson(auth);
             LOGGER.log(Level.FINE, "Serialized Auth response: {0}", json);
 
-            res.status(203);
+            res.status(200);
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
             return json;
