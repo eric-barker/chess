@@ -48,8 +48,30 @@ public class ServerFacade {
 
     public void logout(String authToken) throws ResponseException {
         var path = "/session"; // The endpoint for LogoutHandler
-        this.makeRequest("DELETE", path, authToken, null);
+
+        if (authToken == null || authToken.isEmpty()) {
+            throw new IllegalArgumentException("Auth token cannot be null or empty.");
+        }
+
+        try {
+            // Construct the full URL and open a connection
+            HttpURLConnection http = (HttpURLConnection) new URL(serverUrl + path).openConnection();
+            http.setRequestMethod("DELETE");
+            http.setRequestProperty("Authorization", authToken); // Set the Authorization header
+
+            // Connect to the server
+            http.connect();
+
+            // Check the response status
+            if (http.getResponseCode() >= 300) {
+                throw new ResponseException(http.getResponseCode(), "Failed to logout");
+            }
+
+        } catch (IOException e) {
+            throw new ResponseException(500, "Error communicating with the server: " + e.getMessage());
+        }
     }
+
 
     public int createGame(String gameName, String authToken) throws ResponseException {
         if (gameName == null || gameName.isEmpty()) {
