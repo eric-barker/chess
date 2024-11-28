@@ -100,7 +100,8 @@ public class PostLoginClient {
             return "Game created successfully.";
 
         } catch (ResponseException e) {
-            return "Game creation failed: " + e.getMessage();
+            LOGGER.warning("Game creation failed: " + e.getMessage());
+            return "Game creation failed!";
         }
     }
 
@@ -126,7 +127,8 @@ public class PostLoginClient {
 
             return "Games listed successfully.";
         } catch (ResponseException e) {
-            return "List games failed: " + e.getMessage();
+            LOGGER.warning("List games failed: " + e.getMessage());
+            return "List games failed!";
         }
     }
 
@@ -149,6 +151,9 @@ public class PostLoginClient {
                     if (game.gameName().equalsIgnoreCase(gameName)) {
                         gameExists = true;
                         gameID = game.gameID();
+                        repl.setGame(game);
+                        var myGame = repl.getGame();
+                        LOGGER.info("myGame: " + myGame);
                         break;
                     }
                 }
@@ -160,7 +165,8 @@ public class PostLoginClient {
                     }
                 }
             } catch (ResponseException e) {
-                return "Error retrieving game list: " + e.getMessage();
+                LOGGER.warning("Error retrieving game list: " + e.getMessage());
+                return "Error retrieving game list!";
             }
         }
 
@@ -184,7 +190,8 @@ public class PostLoginClient {
             repl.changeState(UserState.INGAME);
             return "Successfully joined the game '" + gameName + "' as " + playerColor + ".";
         } catch (ResponseException e) {
-            return "Failed to join the game: " + e.getMessage();
+            LOGGER.warning("Failed to join the game: " + e.getMessage());
+            return "Failed to join the game!";
         }
     }
 
@@ -225,7 +232,8 @@ public class PostLoginClient {
                     }
                 }
             } catch (ResponseException e) {
-                return "Error retrieving game list: " + e.getMessage();
+                LOGGER.warning("Error retrieving game list: " + e.getMessage());
+                return "Error observing game!";
             }
         }
 
@@ -240,7 +248,8 @@ public class PostLoginClient {
             return "Successfully observing game '" + repl.getGame().gameName() + "', Game ID: " + repl.getGame().gameID();
 
         } catch (Exception e) {
-            return "Failed to join the game: " + e.getMessage();
+            LOGGER.warning("Failed to observe the game: " + e.getMessage());
+            return "Failed to observe the game!";
         }
     }
 }

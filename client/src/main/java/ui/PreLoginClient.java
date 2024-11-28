@@ -1,11 +1,14 @@
 package ui;
 
+import logging.LoggerManager;
 import model.User;
 import server.ServerFacade;
 
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class PreLoginClient {
+    private static final Logger LOGGER = LoggerManager.getLogger(PreLoginClient.class.getName());
     private final String serverUrl;
     private final Repl repl;
     private final ServerFacade serverFacade;
@@ -59,7 +62,8 @@ public class PreLoginClient {
             repl.setAuthToken(auth.authToken());
             return "Login successful. Welcome, " + auth.username() + "!";
         } catch (Exception e) {
-            return "Login failed: " + e.getMessage();
+            LOGGER.warning("Login failed: " + e.getMessage());
+            return "Login failed!";
         }
     }
 
@@ -82,7 +86,8 @@ public class PreLoginClient {
             repl.setAuthToken(auth.authToken());
             return "Registration successful. Welcome, " + auth.username() + "!";
         } catch (Exception e) {
-            return "Registration failed: " + e.getMessage();
+            LOGGER.warning("Registration failed: " + e.getMessage());
+            return "Registration failed!";
         }
     }
 }
