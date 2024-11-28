@@ -61,12 +61,19 @@ public class LoginHandler {
 
         } catch (ResponseException e) {
             LOGGER.log(Level.WARNING, "Login failed: {0}", e.getMessage());
-            res.status(500);
-            return gson.toJson(e.getMessage());
+            res.status(e.statusCode());
+            return gson.toJson(new LoginHandler.ErrorMessage(e.getMessage()));
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unexpected error during login: {0}", e.getMessage());
             res.status(509);
             return gson.toJson("Error: Internal Server Error: " + e.getMessage());
         }
     }
+
+    record ErrorMessage(String message) {
+    }
+
+    record AuthResponse(String username, String authToken) {
+    }
+
 }

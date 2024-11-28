@@ -74,7 +74,7 @@ public class InGameClient {
         }
 
         // Render the board from both perspectives
-        System.out.println("White's Perspective:");
+        System.out.println(EscapeSequences.RESET_TEXT_COLOR + "White's Perspective:");
         ChessBoardRenderer.renderChessBoard(board, true);
 
         System.out.println("\nBlack's Perspective:");

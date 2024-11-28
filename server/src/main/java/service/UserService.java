@@ -62,7 +62,7 @@ public class UserService {
         User user = userDAO.getUser(username);
         if (user == null || !userDAO.verifyUserPassword(username, password)) {
             LOGGER.log(Level.WARNING, "Invalid login attempt for username: {0}", username);
-            throw new ResponseException(401, "Invalid credentials");
+            throw new ResponseException(401, "Error: Invalid credentials");
         }
 
         String authToken = UUID.randomUUID().toString(); // Generate new auth token

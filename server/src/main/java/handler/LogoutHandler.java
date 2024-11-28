@@ -18,7 +18,7 @@ public class LogoutHandler {
     public Object handle(Request req, Response res) {
         try {
             // Deserialize authToken from request body
-            String authToken = new Gson().fromJson(req.body(), String.class);
+            String authToken = req.headers("authorization");
 
             if (authToken == null || authToken.isEmpty()) {
                 res.status(401);  // Unauthorized

@@ -1,8 +1,12 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.memory.MemoryUserDAO;
 import dataaccess.memory.MemoryGameDAO;
 import dataaccess.memory.MemoryAuthDAO;
+import dataaccess.mysql.MySQLAuthDAO;
+import dataaccess.mysql.MySQLGameDAO;
+import dataaccess.mysql.MySQLUserDAO;
 import model.User;
 import model.Game;
 import model.Auth;
@@ -14,18 +18,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearServiceTest {
 
-    private MemoryUserDAO userDAO;
-    private MemoryGameDAO gameDAO;
-    private MemoryAuthDAO authDAO;
+    private MySQLUserDAO userDAO;
+    private MySQLGameDAO gameDAO;
+    private MySQLAuthDAO authDAO;
     private ClearService clearService;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws DataAccessException {
         // Initialize DAOs and ClearService before each test
-        userDAO = new MemoryUserDAO();
-        gameDAO = new MemoryGameDAO();
-        authDAO = new MemoryAuthDAO();
+        userDAO = new MySQLUserDAO();
+        gameDAO = new MySQLGameDAO();
+        authDAO = new MySQLAuthDAO();
         clearService = new ClearService(userDAO, gameDAO, authDAO);
+        clearService.clear();
     }
 
     @Test
@@ -52,8 +57,10 @@ public class ClearServiceTest {
         // Verify that data has been inserted
         assertEquals(2, userDAO.listUsers().size(), "Users should be added.");
         assertEquals(2, gameDAO.listGames().size(), "Games should be added.");
-        assertNotNull(authDAO.getAuth("authToken1"), "Auth token 1 should exist.");
-        assertNotNull(authDAO.getAuth("authToken2"), "Auth token 2 should exist.");
+        Auth myAuth1 = authDAO.getAuth("authToken1");
+        Auth myAuth2 = authDAO.getAuth("authToken2");
+        assertNotNull(myAuth1, "Auth token 1 should exist.");
+        assertNotNull(myAuth2, "Auth token 2 should exist.");
 
         // Call the clear service
         clearService.clear();

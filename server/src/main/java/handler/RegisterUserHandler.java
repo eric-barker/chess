@@ -36,7 +36,8 @@ public class RegisterUserHandler {
             res.type("application/json");
             res.header("Content-Length", String.valueOf(json.length()));
 
-            return json;
+            return gson.toJson(new TestAuthResult(newUser.username(), auth.authToken()));
+
         } catch (ResponseException e) {
             // Handle known errors from ResponseException
             if (e.getMessage().contains("already taken")) {

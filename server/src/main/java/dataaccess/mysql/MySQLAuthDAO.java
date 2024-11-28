@@ -28,6 +28,14 @@ public class MySQLAuthDAO implements AuthDAO {
 
     @Override
     public void addAuth(String username, String authToken) throws DataAccessException {
+        insertAuth(username, authToken);
+    }
+
+    public void addAuth(String authToken, String username, boolean flag) throws DataAccessException {
+        insertAuth(username, authToken);
+    }
+
+    private void insertAuth(String username, String authToken) throws DataAccessException {
         LOGGER.log(Level.INFO, "Adding auth token for username: {0}", username);
         String insertStatement = "INSERT INTO auth (username, auth_token) VALUES (?, ?)";
 
@@ -43,7 +51,6 @@ public class MySQLAuthDAO implements AuthDAO {
             throw new DataAccessException("Failed to add auth token: " + e.getMessage());
         }
     }
-
 
     @Override
     public Auth getAuth(String authToken) throws DataAccessException {
