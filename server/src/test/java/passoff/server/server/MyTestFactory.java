@@ -1,8 +1,8 @@
-package server;
+package passoff.server.server;
 
 import com.google.gson.GsonBuilder;
 
-public class TestFactory {
+public class MyTestFactory {
 
     public static Long getMessageTime() {
         /*
