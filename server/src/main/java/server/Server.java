@@ -14,6 +14,7 @@ import handler.*;
 import logging.LoggerManager;
 import model.User;
 
+import server.websocket.WebSocketHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -46,6 +47,7 @@ public class Server {
     private final CreateGameHandler createGameHandler;
     private final ListGamesHandler listGamesHandler;
     private final JoinGameHandler joinGameHandler;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         try {
@@ -68,6 +70,7 @@ public class Server {
         this.createGameHandler = new CreateGameHandler(gameService, userService);
         this.listGamesHandler = new ListGamesHandler(gameService);
         this.joinGameHandler = new JoinGameHandler(gameService, userService);
+        this.webSocketHandler = new WebSocketHandler();
 
 
     }
@@ -90,6 +93,10 @@ public class Server {
         Spark.post("/game", createGameHandler::handle);
         Spark.get("/game", listGamesHandler::handle);
         Spark.put("/game", joinGameHandler::handle);
+
+        // Add the websocket endpoint here.
+        Spark.webSocket("/ws", webSocketHandler);
+
 
         // After filter to log the response
         Spark.after(this::logResponse);

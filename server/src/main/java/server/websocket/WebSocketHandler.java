@@ -4,7 +4,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import websocket.commands.UserGameCommand;
 import com.google.gson.Gson;
-import dataaccess.DataAccess;
+//import dataaccess.DataAccess;
 import exception.ResponseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -14,7 +14,8 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 import java.util.Timer;
 
-@websocket
+
+@WebSocket
 public class WebSocketHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
@@ -23,6 +24,7 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) {
         try {
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+
 
             // Check AuthToken
             String username = getUsername(command.getAuthToken());
@@ -58,5 +60,6 @@ public class WebSocketHandler {
     private void resign(String visitorName, Session session) {
         System.out.println("Resign stub function");
     }
+
 
 }
