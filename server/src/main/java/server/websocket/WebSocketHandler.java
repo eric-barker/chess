@@ -29,13 +29,14 @@ public class WebSocketHandler {
             // Check AuthToken
             String username = getUsername(command.getAuthToken());
 
+            // Where am I saving my session?  Is this for the WEbSocket Handler?
             saveSession(command.getGameID(), session);
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, (ConnectCommand) command);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) command);
-                case LEAVE -> leave(session, username, (LeaveGameCommand) command);
-                case RESIGN -> resign(session, username, (ResignCommand) command);
+                case CONNECT -> connect(session, username, command);
+                case MAKE_MOVE -> makeMove(session, username, command);
+                case LEAVE -> leave(session, username, command);
+                case RESIGN -> resign(session, username, command);
             }
         } catch (ResponseException e) {
             sendMessage(session.getRemote(), new ErrorMessage("Error: unauthorized"));
@@ -45,19 +46,19 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String visitorName, Session session) {
+    private void connect(Session session, String username, UserGameCommand command) {
         System.out.println("Connect stub function");
     }
 
-    private void makeMove(String visitorName, Session session) {
+    private void makeMove(Session session, String username, UserGameCommand command) {
         System.out.println("MakeMove stub function");
     }
 
-    private void leave(String visitorName, Session session) {
+    private void leave(Session session, String username, UserGameCommand command) {
         System.out.println("Leave stub function");
     }
 
-    private void resign(String visitorName, Session session) {
+    private void resign(Session session, String username, UserGameCommand command) {
         System.out.println("Resign stub function");
     }
 
