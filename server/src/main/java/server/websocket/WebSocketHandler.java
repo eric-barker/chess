@@ -78,14 +78,15 @@ public class WebSocketHandler {
             Game gameData = gameDAO.getGame(gameID);
             ChessGame game = gameData.game();
             LOGGER.info("chess game: " + game);
-            ConnectServerMessage message = new ConnectServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            ConnectServerMessage loadGameMessage = new ConnectServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
 
-            connections.broadcast(username, message);
+            connections.broadcast(gameID, username, loadGameMessage);
+
+            ConnectServerMessage notificationMessage = new ConnectServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, game);
+
+            connections.broadcast(gameID, username, notificationMessage);
         } catch (DataAccessException e) {
             LOGGER.info("DataAccessException Error: " + e.getMessage());
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            LOGGER.info("IOException Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
