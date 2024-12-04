@@ -4,6 +4,7 @@ import logging.LoggerManager;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class Connection {
@@ -23,5 +24,18 @@ public class Connection {
 
         session.getRemote().sendString(msg);
         LOGGER.info("msg: " + msg);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Connection that = (Connection) o;
+        return Objects.equals(gameID, that.gameID) && Objects.equals(visitorName, that.visitorName) && Objects.equals(session, that.session);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameID, visitorName, session);
     }
 }

@@ -5,7 +5,6 @@ import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
-import handler.LoginHandler;
 import logging.LoggerManager;
 import model.Auth;
 import model.Game;
@@ -14,15 +13,11 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import websocket.commands.UserGameCommand;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
-import exception.ResponseException;
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.messages.ConnectServerMessage;
+import websocket.messages.Connect;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
-import java.io.IOException;
-import java.util.Timer;
 import java.util.logging.Logger;
 
 
@@ -74,23 +69,21 @@ public class WebSocketHandler {
         Integer gameID = command.getGameID();
         LOGGER.info("gameID: " + gameID);
         try {
+
             // Why does this have an off by one error?
             Game gameData = gameDAO.getGame(gameID);
             ChessGame game = gameData.game();
             LOGGER.info("chess game: " + game);
-            ConnectServerMessage loadGameMessage = new ConnectServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            Connect loadGameMessage = new Connect(ServerMessage.ServerMessageType.LOAD_GAME, game);
+            connections.broadcast(gameID, username, loadGameMessage, ConnectionManager.BroadcastType.JUST_ME);
 
-            connections.broadcast(gameID, username, loadGameMessage);
-
-            ConnectServerMessage notificationMessage = new ConnectServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, game);
-
-            connections.broadcast(gameID, username, notificationMessage);
+            String notification = username + " has joined the lobby";
+            Notification notificationMessage = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, notification);
+            connections.broadcast(gameID, username, notificationMessage, ConnectionManager.BroadcastType.EVERYONE_BUT_ME);
         } catch (DataAccessException e) {
             LOGGER.info("DataAccessException Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
-
-        System.out.println("Connect stub function");
     }
 
     private void makeMove(Session session, String username, UserGameCommand command) {
