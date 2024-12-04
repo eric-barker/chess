@@ -15,10 +15,15 @@ import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.messages.Connect;
+import websocket.messages.ErrorMessage;
 import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
+import websocket.messages.ServerMessage.ServerMessageType;
 
 import java.util.logging.Logger;
+
+import static websocket.messages.ServerMessage.ServerMessageType.*;
+import static server.websocket.ConnectionManager.BroadcastType.*;
 
 
 @WebSocket
@@ -68,23 +73,38 @@ public class WebSocketHandler {
         LOGGER.info("command: " + command);
         Integer gameID = command.getGameID();
         LOGGER.info("gameID: " + gameID);
-        try {
 
-            // Why does this have an off by one error?
+        try {
+            // Fetch the game from the database
             Game gameData = gameDAO.getGame(gameID);
+
+            // Handle invalid gameID
+            if (gameData == null) {
+                LOGGER.warning("Invalid gameID: " + gameID);
+                String error = "Error: invalid gameID: " + gameID;
+                ErrorMessage errorMessage = new ErrorMessage(ERROR, error);
+                connections.broadcast(gameID, username, errorMessage, JUST_ME);
+                return; // Exit method to prevent further processing
+            }
+
+            // Process valid game data
             ChessGame game = gameData.game();
             LOGGER.info("chess game: " + game);
-            Connect loadGameMessage = new Connect(ServerMessage.ServerMessageType.LOAD_GAME, game);
-            connections.broadcast(gameID, username, loadGameMessage, ConnectionManager.BroadcastType.JUST_ME);
 
+            // Send LOAD_GAME message to the connecting user
+            Connect loadGameMessage = new Connect(LOAD_GAME, game);
+            connections.broadcast(gameID, username, loadGameMessage, JUST_ME);
+
+            // Notify other users in the game
             String notification = username + " has joined the lobby";
-            Notification notificationMessage = new Notification(ServerMessage.ServerMessageType.NOTIFICATION, notification);
-            connections.broadcast(gameID, username, notificationMessage, ConnectionManager.BroadcastType.EVERYONE_BUT_ME);
+            Notification notificationMessage = new Notification(NOTIFICATION, notification);
+            connections.broadcast(gameID, username, notificationMessage, EVERYONE_BUT_ME);
         } catch (DataAccessException e) {
-            LOGGER.info("DataAccessException Error: " + e.getMessage());
+            LOGGER.severe("DataAccessException: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
+
 
     private void makeMove(Session session, String username, UserGameCommand command) {
         System.out.println("MakeMove stub function");

@@ -81,8 +81,7 @@ public class GameService {
             }
             game = new Game(game.gameID(), game.whiteUsername(), username, game.gameName(), game.game());
         }
-
-        System.out.println("Updating game: " + game);
+        
         gameDAO.updateGame(game);
     }
 
