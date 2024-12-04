@@ -2,7 +2,6 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.messages.ConnectServerMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -22,21 +21,29 @@ public class ConnectionManager {
         connections.remove(visitorName);
     }
 
-    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (!c.visitorName.equals(excludeVisitorName)) {
-                    c.send(new Gson().toJson(notification, ConnectServerMessage.class));
-                }
-            } else {
-                removeList.add(c);
-            }
-        }
+    public <T> void broadcast(Integer gameID, String excludeVisitorName, T message) {
+        try {
+            // Serialize the message using Gson
+            String serializedMessage = new Gson().toJson(message);
 
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.visitorName);
+            // Stream connections and send the message to relevant sessions
+            connections.values().stream()
+                    .filter(c -> c.session.isOpen() &&
+                            c.gameID.equals(gameID) &&
+                            !c.visitorName.equals(excludeVisitorName))
+                    .forEach(c -> {
+                        try {
+                            c.send(serializedMessage);
+                        } catch (IOException e) {
+                            System.err.println("Failed to send message to " + c.visitorName + ": " + e.getMessage());
+                        }
+                    });
+
+            // Clean up closed connections
+            connections.entrySet().removeIf(entry -> !entry.getValue().session.isOpen());
+        } catch (Exception e) {
+            System.err.println("Error during broadcast: " + e.getMessage());
         }
     }
+
 }
