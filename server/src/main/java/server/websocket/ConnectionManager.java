@@ -49,7 +49,7 @@ public class ConnectionManager {
             LOGGER.info("Excluded current user: " + myName + ", remaining connections: " + targetConnections.size());
 
             // Just the current user
-            var myConnection = gameConnections.stream()
+            var myConnection = connections.values().stream()
                     .filter(c -> c.visitorName.equals(myName)).toList();
             LOGGER.info("My Connection: " + myConnection + " for " + myName);
 

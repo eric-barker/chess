@@ -50,7 +50,17 @@ public class WebSocketHandler {
 
             // Check AuthToken... use DAO?
             String authToken = command.getAuthToken();
+            Integer gameID = command.getGameID();
             Auth myAuth = authDAO.getAuth(authToken);
+            if (myAuth == null) {
+                LOGGER.warning("Auth is null");
+                String error = "Error: Auth is null.";
+                ErrorMessage errorMessage = new ErrorMessage(ERROR, error);
+                String myErrorMessage = new Gson().toJson(errorMessage);
+                session.getRemote().sendString(myErrorMessage);
+                return; // Exit method to prevent further processing
+            }
+
             String username = myAuth.username();
 
             // Where am I saving my session?  Is this for the WEbSocket Handler?
