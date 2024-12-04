@@ -25,7 +25,7 @@ public class LoggerManager {
 
             // Configure console handler
             ConsoleHandler consoleHandler = new ConsoleHandler();
-            consoleHandler.setLevel(Level.OFF);
+            consoleHandler.setLevel(Level.ALL);
             consoleHandler.setFormatter(new ColorFormatter());
             GLOBAL_LOGGER.addHandler(consoleHandler);
 

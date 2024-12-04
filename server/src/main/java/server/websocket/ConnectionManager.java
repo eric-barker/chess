@@ -6,12 +6,13 @@ import websocket.messages.ServerMessage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String visitorName, Session session) {
-        var connection = new Connection(visitorName, session);
+    public void add(Integer gameID, String visitorName, Session session) {
+        var connection = new Connection(gameID, visitorName, session);
         connections.put(visitorName, connection);
     }
 

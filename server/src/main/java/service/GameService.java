@@ -67,7 +67,7 @@ public class GameService {
             throw new ResponseException(507, "Error: Game not found");
         }
 
-        System.out.println("Joining game with ID: " + gameID + " - Current state: " + game);
+        LOGGER.info("Joining game with ID: " + gameID + " - Current state: " + game);
 
         // Assign player to the correct color
         if (playerColor.equalsIgnoreCase("WHITE")) {

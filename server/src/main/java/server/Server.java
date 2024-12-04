@@ -70,7 +70,7 @@ public class Server {
         this.createGameHandler = new CreateGameHandler(gameService, userService);
         this.listGamesHandler = new ListGamesHandler(gameService);
         this.joinGameHandler = new JoinGameHandler(gameService, userService);
-        this.webSocketHandler = new WebSocketHandler();
+        this.webSocketHandler = new WebSocketHandler(authDAO, userDAO, gameDAO);
 
 
     }
@@ -81,9 +81,13 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
+        // Add the websocket endpoint here.
+        Spark.webSocket("/ws", webSocketHandler);
+
         Spark.before(this::logRequest);
 
         // Register your endpoints and handle exceptions here.
+
 
         // Endpoints
         Spark.post("/user", (req, res) -> registerHandler.handle(req, res));
@@ -93,9 +97,6 @@ public class Server {
         Spark.post("/game", createGameHandler::handle);
         Spark.get("/game", listGamesHandler::handle);
         Spark.put("/game", joinGameHandler::handle);
-
-        // Add the websocket endpoint here.
-        Spark.webSocket("/ws", webSocketHandler);
 
 
         // After filter to log the response
