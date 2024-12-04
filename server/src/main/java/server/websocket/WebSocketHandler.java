@@ -18,6 +18,7 @@ import exception.ResponseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import websocket.messages.ConnectServerMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -73,11 +74,18 @@ public class WebSocketHandler {
         Integer gameID = command.getGameID();
         LOGGER.info("gameID: " + gameID);
         try {
-            Game game = gameDAO.getGame(gameID);
-            ChessGame chessGame = game.game();
-            LOGGER.info("chessGame: " + chessGame);
+            // Why does this have an off by one error?
+            Game gameData = gameDAO.getGame(gameID);
+            ChessGame game = gameData.game();
+            LOGGER.info("chess game: " + game);
+            ConnectServerMessage message = new ConnectServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+
+            connections.broadcast(username, message);
         } catch (DataAccessException e) {
-            LOGGER.info("Error: " + e.getMessage());
+            LOGGER.info("DataAccessException Error: " + e.getMessage());
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            LOGGER.info("IOException Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
