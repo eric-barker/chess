@@ -5,12 +5,15 @@ import exception.ResponseException;
 import model.Auth;
 import model.Game;
 import server.ServerFacade;
-import webSocket.UserGameCommandHandler;
+import webSocket.WebSocketListener;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.GameLoad;
+import websocket.messages.Notification;
 
 import java.util.Scanner;
 
-public class Repl implements UserGameCommandHandler {
+public class Repl implements WebSocketListener {
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final InGameClient inGameClient;
@@ -76,6 +79,24 @@ public class Repl implements UserGameCommandHandler {
         System.out.println();
     }
 
+    @Override
+    public void onGameLoad(GameLoad gameLoadMessage) {
+        String message = "The state of the game has changed! <Placeholder>";
+        printNotification(message);
+    }
+
+    @Override
+    public void onNotification(Notification notificationMessage) {
+        String message = notificationMessage.getMessage();
+        printNotification(message);
+    }
+
+    @Override
+    public void onError(ErrorMessage errorMessage) {
+        String message = errorMessage.getMessage();
+        printNotification(message);
+    }
+
     public void changeState(UserState newState) {
         this.state = newState;
     }
@@ -85,9 +106,8 @@ public class Repl implements UserGameCommandHandler {
                 EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_YELLOW);
     }
 
-    @Override
-    public void notify(UserGameCommand notification) {
-
+    private void printNotification(String message) {
+        System.out.print("/n" + EscapeSequences.RESET_TEXT_COLOR + "--- " + EscapeSequences.SET_TEXT_COLOR_YELLOW + message);
     }
 
     public String getAuthToken() {
@@ -132,4 +152,5 @@ public class Repl implements UserGameCommandHandler {
             System.err.println("Graceful Close Error: " + e.getMessage());
         }
     }
+
 }

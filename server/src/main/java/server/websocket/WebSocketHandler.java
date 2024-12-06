@@ -14,11 +14,9 @@ import websocket.commands.UserGameCommand;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.messages.Connect;
+import websocket.messages.GameLoad;
 import websocket.messages.ErrorMessage;
 import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
-import websocket.messages.ServerMessage.ServerMessageType;
 
 import java.util.logging.Logger;
 
@@ -102,7 +100,7 @@ public class WebSocketHandler {
             LOGGER.info("chess game: " + game);
 
             // Send LOAD_GAME message to the connecting user
-            Connect loadGameMessage = new Connect(LOAD_GAME, game);
+            GameLoad loadGameMessage = new GameLoad(LOAD_GAME, game);
             connections.broadcast(gameID, username, loadGameMessage, JUST_ME);
 
             // Notify other users in the game
