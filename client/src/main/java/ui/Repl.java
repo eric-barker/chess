@@ -5,10 +5,12 @@ import exception.ResponseException;
 import model.Auth;
 import model.Game;
 import server.ServerFacade;
+import webSocket.UserGameCommandHandler;
+import websocket.commands.UserGameCommand;
 
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements UserGameCommandHandler {
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final InGameClient inGameClient;
@@ -83,6 +85,10 @@ public class Repl {
                 EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_YELLOW);
     }
 
+    @Override
+    public void notify(UserGameCommand notification) {
+
+    }
 
     public String getAuthToken() {
         return authToken;
