@@ -119,7 +119,40 @@ public class WebSocketHandler {
     }
 
     private void leave(Session session, String username, UserGameCommand command) {
-        System.out.println("Leave stub function");
+        try {
+            LOGGER.info(username + " attempting to leave game...");
+
+            // Remove player from their role.
+            Game game = gameDAO.getGame(command.getGameID());
+            Game newGame;
+
+            LOGGER.info(game.whiteUsername() + " is the whiteUsername");
+            LOGGER.info(game.blackUsername() + " is the blackUsername");
+            if (game.whiteUsername().equals(username)) {
+                LOGGER.info("Removing whiteUsername...");
+                newGame = new Game(command.getGameID(), null, game.blackUsername(), game.gameName(), game.game());
+            } else {
+                LOGGER.info("Removing blackUsername...");
+                newGame = new Game(command.getGameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            }
+
+            LOGGER.info("Updating " + game.gameName() + ": \n" + game.toString() + "\n to: \n" + newGame.toString());
+            gameDAO.updateGame(newGame);
+
+            // remove the root client
+            LOGGER.info("Closing session...");
+            session.close();
+            LOGGER.info("Removing connection...");
+            connections.remove(username);
+
+            // inform the other clients on the game.
+            Notification message = new Notification(NOTIFICATION, username + " has left the game");
+            connections.broadcast(command.getGameID(), username, message, EVERYONE_BUT_ME);
+            System.out.println("Leave stub function");
+
+        } catch (Exception e) {
+            LOGGER.warning("Error leaving game: " + e.getMessage());
+        }
     }
 
     private void resign(Session session, String username, UserGameCommand command) {
