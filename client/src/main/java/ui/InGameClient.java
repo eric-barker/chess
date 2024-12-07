@@ -90,8 +90,14 @@ public class InGameClient {
     }
 
     private String exitGame() {
-        repl.changeState(UserState.LOGGEDIN);
-        return "Exiting Game";
+        try {
+            repl.getWebSocketHandler().disconnect();
+            repl.changeState(UserState.LOGGEDIN);
+            return "Exiting Game";
+        } catch (Exception e) {
+            LOGGER.warning("Error exiting game: " + e.getMessage());
+            return "Error exiting game: " + e.getMessage();
+        }
     }
 
 

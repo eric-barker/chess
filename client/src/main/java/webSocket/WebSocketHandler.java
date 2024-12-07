@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import logging.LoggerManager;
 import ui.PostLoginClient;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.GameLoad;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -36,25 +39,24 @@ public class WebSocketHandler {
         session.addMessageHandler((MessageHandler.Whole<String>) this::handleMessage);
 
         UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
-
         session.getBasicRemote().sendText(gson.toJson(connectCommand));
-
     }
 
     private void handleMessage(String message) {
         ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
-        switch (serverMessage.serverMessageType) {
-            case LOAD_GAME -> listener.onGameLoad(serverMessage);
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME -> listener.onGameLoad(gson.fromJson(message, GameLoad.class));
             case NOTIFICATION -> listener.onNotification(
-                    gson.fromJson(message, NotificationMessage.class));
-            case ERROR -> listener.onError(serverMessage.errorMessage);
+                    gson.fromJson(message, Notification.class));
+            case ERROR -> listener.onError(gson.fromJson(message, ErrorMessage.class));
         }
     }
 
     public void disconnect() throws Exception {
         if (session != null && session.isOpen()) {
             session.close();
+            LOGGER.info("WebSocket Connection disconnected");
         }
     }
 }

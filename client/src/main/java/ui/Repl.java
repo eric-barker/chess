@@ -1,10 +1,13 @@
 package ui;
 
 
+import chess.ChessGame;
 import exception.ResponseException;
+import logging.LoggerManager;
 import model.Auth;
 import model.Game;
 import server.ServerFacade;
+import webSocket.WebSocketHandler;
 import webSocket.WebSocketListener;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -12,8 +15,12 @@ import websocket.messages.GameLoad;
 import websocket.messages.Notification;
 
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public class Repl implements WebSocketListener {
+
+    private static final Logger LOGGER = LoggerManager.getLogger(Repl.class.getName());
+    private WebSocketHandler webSocketHandler;
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final InGameClient inGameClient;
@@ -32,6 +39,7 @@ public class Repl implements WebSocketListener {
         this.inGameClient = new InGameClient(serverUrl, this);
         this.state = UserState.LOGGEDOUT; // Initial state is logged out
         this.serverUrl = serverUrl;
+        this.webSocketHandler = new WebSocketHandler(serverUrl, this);
     }
 
     public void run() {
@@ -81,8 +89,10 @@ public class Repl implements WebSocketListener {
 
     @Override
     public void onGameLoad(GameLoad gameLoadMessage) {
-        String message = "The state of the game has changed! <Placeholder>";
-        printNotification(message);
+        ChessGame chessGame = game.game();
+//        game. = gameLoadMessage.getGame(); // Update the game state in Repl
+        System.out.println("Game state updated!");
+//        inGameClient.renderBoard(); // Call InGameClient to redraw the chessboard
     }
 
     @Override
@@ -142,14 +152,21 @@ public class Repl implements WebSocketListener {
         return this.game;
     }
 
+    public WebSocketHandler getWebSocketHandler() {
+        return this.webSocketHandler;
+    }
+
     private void gracefulClose() {
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         try {
             serverFacade.logout(authToken);
+            webSocketHandler.disconnect();
             authToken = null;
             username = null;
         } catch (ResponseException e) {
-            System.err.println("Graceful Close Error: " + e.getMessage());
+            LOGGER.warning("Error gracefully closing: " + e.getMessage());
+        } catch (Exception e) {
+            LOGGER.warning("Error gracefully closing: " + e.getMessage());
         }
     }
 

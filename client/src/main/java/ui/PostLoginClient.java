@@ -57,10 +57,16 @@ public class PostLoginClient {
         repl.changeState(UserState.LOGGEDOUT);
 
         try {
+            LOGGER.info("Attempting to logout...");
             String authToken = repl.getAuthToken();
             serverFacade.logout(authToken);
+            LOGGER.info("Logged out");
         } catch (ResponseException e) {
-            throw new RuntimeException(e);
+            LOGGER.warning("Error logging out: " + e.getMessage());
+            return "Error logging out";
+        } catch (Exception e) {
+            LOGGER.warning("Error logging out: " + e.getMessage());
+            return "Error logging out!";
         }
 
         return "You have been logged out.";
@@ -187,9 +193,15 @@ public class PostLoginClient {
         try {
             String authToken = repl.getAuthToken();
             serverFacade.joinGame(gameID, playerColor, authToken);
+
+            repl.getWebSocketHandler().connect(authToken, gameID);
+
             repl.changeState(UserState.INGAME);
             return "Successfully joined the game '" + gameName + "' as " + playerColor + ".";
         } catch (ResponseException e) {
+            LOGGER.warning("Failed to join the game: " + e.getMessage());
+            return "Failed to join the game!";
+        } catch (Exception e) {
             LOGGER.warning("Failed to join the game: " + e.getMessage());
             return "Failed to join the game!";
         }
@@ -240,6 +252,8 @@ public class PostLoginClient {
         // Attempt observe the game
         try {
             String authToken = repl.getAuthToken();
+
+            repl.getWebSocketHandler().connect(authToken, gameID);
 
             repl.changeState(UserState.OBSERVER);
             repl.setIsObserver(true);
