@@ -7,7 +7,7 @@ import logging.LoggerManager;
 import model.Auth;
 import model.Game;
 import server.ServerFacade;
-import webSocket.WebSocketHandler;
+import webSocket.WebSocketFacade;
 import webSocket.WebSocketListener;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class Repl implements WebSocketListener {
 
     private static final Logger LOGGER = LoggerManager.getLogger(Repl.class.getName());
-    private WebSocketHandler webSocketHandler;
+    private WebSocketFacade webSocketFacade;
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final InGameClient inGameClient;
@@ -38,7 +38,7 @@ public class Repl implements WebSocketListener {
         this.inGameClient = new InGameClient(serverUrl, this);
         this.state = UserState.LOGGEDOUT; // Initial state is logged out
         this.serverUrl = serverUrl;
-        this.webSocketHandler = new WebSocketHandler(serverUrl, this);
+        this.webSocketFacade = new WebSocketFacade(serverUrl, this);
     }
 
     public void run() {
@@ -90,13 +90,16 @@ public class Repl implements WebSocketListener {
     public void onGameLoad(LoadGameMessage loadGameMessageMessage) {
         ChessGame chessGame = game.game();
 //        game. = gameLoadMessage.getGame(); // Update the game state in Repl
-        System.out.println("Game state updated!");
+        printNotification("Game state updated!");
 //        inGameClient.renderBoard(); // Call InGameClient to redraw the chessboard
     }
 
     @Override
     public void onNotification(NotificationMessage notificationMessage) {
         String message = notificationMessage.getMessage();
+        if (message.contains("left the game")) {
+            LOGGER.info("Notification received: " + message);
+        }
         printNotification(message);
     }
 
@@ -151,15 +154,15 @@ public class Repl implements WebSocketListener {
         return this.game;
     }
 
-    public WebSocketHandler getWebSocketHandler() {
-        return this.webSocketHandler;
+    public WebSocketFacade getWebSocketHandler() {
+        return this.webSocketFacade;
     }
 
     private void gracefulClose() {
         ServerFacade serverFacade = new ServerFacade(serverUrl);
         try {
             serverFacade.logout(authToken);
-            webSocketHandler.disconnect();
+            webSocketFacade.disconnect();
             authToken = null;
             username = null;
         } catch (ResponseException e) {

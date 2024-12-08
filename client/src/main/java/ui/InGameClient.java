@@ -29,8 +29,8 @@ public class InGameClient {
                     return getObserverHelpText();
                 case "renderboard":
                     return renderBoard();
-                case "exitgame":
-                    return exitGame();
+                case "leave":
+                    return leave();
                 default:
                     return "Unknown command. Type 'help' for a list of commands.";
             }
@@ -39,7 +39,7 @@ public class InGameClient {
                 case "help" -> getHelpText();
                 case "renderboard" -> renderBoard();
                 case "makemove" -> makeMove();
-                case "exitgame" -> exitGame();
+                case "leave" -> leave();
                 default -> "Unknown command. Type 'help' for a list of commands.";
             };
         }
@@ -50,14 +50,14 @@ public class InGameClient {
                 "help         - Show this help text.\n" +
                 "renderboard  - Display the chessboard.\n" +
                 "makemove     - Make a move.\n" +
-                "exitgame     - Exit the game.\n";
+                "leave     - Exit the game.\n";
     }
 
     private String getObserverHelpText() {
         return "Available commands:\n" +
                 "help         - Show this help text.\n" +
                 "renderboard  - Display the chessboard.\n" +
-                "exitgame     - Exit the game.\n";
+                "leave     - Exit the game.\n";
     }
 
     private String renderBoard() {
@@ -89,14 +89,17 @@ public class InGameClient {
         return "Making a move";
     }
 
-    private String exitGame() {
+    private String leave() {
         try {
+            repl.getWebSocketHandler().leaveGame(repl.getAuthToken(), repl.getGame().gameID());
             repl.getWebSocketHandler().disconnect();
             repl.changeState(UserState.LOGGEDIN);
-            return "Exiting Game";
+            repl.setIsObserver(false);
+            LOGGER.info("Successfully left the game.");
+            return "Leaving Game";
         } catch (Exception e) {
-            LOGGER.warning("Error exiting game: " + e.getMessage());
-            return "Error exiting game: " + e.getMessage();
+            LOGGER.warning("Error leaving game: " + e.getMessage());
+            return "Error leaving game: " + e.getMessage();
         }
     }
 

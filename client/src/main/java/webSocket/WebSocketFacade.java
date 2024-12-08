@@ -2,6 +2,7 @@ package webSocket;
 
 import com.google.gson.Gson;
 import logging.LoggerManager;
+import websocket.commands.LeaveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -12,14 +13,14 @@ import javax.websocket.*;
 import java.net.URI;
 import java.util.logging.Logger;
 
-public class WebSocketHandler {
-    private static final Logger LOGGER = LoggerManager.getLogger(WebSocketHandler.class.getName());
+public class WebSocketFacade {
+    private static final Logger LOGGER = LoggerManager.getLogger(WebSocketFacade.class.getName());
     private Session session;
     private final String serverUrl;
     private final WebSocketListener listener; // Delegate message processing
     private final Gson gson = new Gson();
 
-    public WebSocketHandler(String serverUrl, WebSocketListener listener) {
+    public WebSocketFacade(String serverUrl, WebSocketListener listener) {
         this.serverUrl = serverUrl.replace("http", "ws") + "/ws";
         this.listener = listener;
     }
@@ -56,6 +57,16 @@ public class WebSocketHandler {
         if (session != null && session.isOpen()) {
             session.close();
             LOGGER.info("WebSocket Connection disconnected");
+        }
+    }
+
+    public void leaveGame(String authToken, int gameID) throws Exception {
+        if (session != null && session.isOpen()) {
+            LeaveCommand leaveCommand = new LeaveCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            session.getBasicRemote().sendText(gson.toJson(leaveCommand));
+            LOGGER.info("sent LEAVE command to server.");
+        } else {
+            LOGGER.warning("WebSocket session is not open. unable to send LEAVE command.");
         }
     }
 }
