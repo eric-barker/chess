@@ -2,11 +2,10 @@ package webSocket;
 
 import com.google.gson.Gson;
 import logging.LoggerManager;
-import ui.PostLoginClient;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
-import websocket.messages.GameLoad;
-import websocket.messages.Notification;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -46,9 +45,9 @@ public class WebSocketHandler {
         ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
         switch (serverMessage.getServerMessageType()) {
-            case LOAD_GAME -> listener.onGameLoad(gson.fromJson(message, GameLoad.class));
+            case LOAD_GAME -> listener.onGameLoad(gson.fromJson(message, LoadGameMessage.class));
             case NOTIFICATION -> listener.onNotification(
-                    gson.fromJson(message, Notification.class));
+                    gson.fromJson(message, NotificationMessage.class));
             case ERROR -> listener.onError(gson.fromJson(message, ErrorMessage.class));
         }
     }

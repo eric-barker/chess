@@ -9,10 +9,9 @@ import model.Game;
 import server.ServerFacade;
 import webSocket.WebSocketHandler;
 import webSocket.WebSocketListener;
-import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
-import websocket.messages.GameLoad;
-import websocket.messages.Notification;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -88,7 +87,7 @@ public class Repl implements WebSocketListener {
     }
 
     @Override
-    public void onGameLoad(GameLoad gameLoadMessage) {
+    public void onGameLoad(LoadGameMessage loadGameMessageMessage) {
         ChessGame chessGame = game.game();
 //        game. = gameLoadMessage.getGame(); // Update the game state in Repl
         System.out.println("Game state updated!");
@@ -96,7 +95,7 @@ public class Repl implements WebSocketListener {
     }
 
     @Override
-    public void onNotification(Notification notificationMessage) {
+    public void onNotification(NotificationMessage notificationMessage) {
         String message = notificationMessage.getMessage();
         printNotification(message);
     }

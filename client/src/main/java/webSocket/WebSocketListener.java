@@ -1,15 +1,14 @@
 package webSocket;
 
 
-import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
-import websocket.messages.GameLoad;
-import websocket.messages.Notification;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 public interface WebSocketListener {
-    void onGameLoad(GameLoad gameLoadMessage);
+    void onGameLoad(LoadGameMessage loadGameMessageMessage);
 
-    void onNotification(Notification notificationMessage);
+    void onNotification(NotificationMessage notificationMessage);
 
     void onError(ErrorMessage errorMessage);
 }

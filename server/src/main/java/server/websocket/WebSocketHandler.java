@@ -10,13 +10,13 @@ import model.Auth;
 import model.Game;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import com.google.gson.Gson;
 //import dataaccess.DataAccess;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.messages.GameLoad;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.ErrorMessage;
-import websocket.messages.Notification;
+import websocket.messages.NotificationMessage;
 
 import java.util.logging.Logger;
 
@@ -43,7 +43,27 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) {
         try {
+
             UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+
+            MakeMoveCommand makeMoveCommand = null;
+            ConnectCommand connectCommand = null;
+            LeaveCommand leaveCommand = null;
+            ResignCommand resignCommand = null;
+            switch (command.getCommandType()) {
+                case CONNECT:
+                    connectCommand = new Gson().fromJson(message, ConnectCommand.class);
+                    break;
+                case MAKE_MOVE:
+                    makeMoveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+                    break;
+                case LEAVE:
+                    leaveCommand = new Gson().fromJson(message, LeaveCommand.class);
+                    break;
+                case RESIGN:
+                    resignCommand = new Gson().fromJson(message, ResignCommand.class);
+                    break;
+            }
 
 
             // Check AuthToken... use DAO?
@@ -65,10 +85,10 @@ public class WebSocketHandler {
             connections.add(command.getGameID(), username, session);
 
             switch (command.getCommandType()) {
-                case CONNECT -> connect(session, username, command);
-                case MAKE_MOVE -> makeMove(session, username, command);
-                case LEAVE -> leave(session, username, command);
-                case RESIGN -> resign(session, username, command);
+                case CONNECT -> connect(session, username, connectCommand);
+                case MAKE_MOVE -> makeMove(session, username, makeMoveCommand);
+                case LEAVE -> leave(session, username, leaveCommand);
+                case RESIGN -> resign(session, username, resignCommand);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -100,12 +120,12 @@ public class WebSocketHandler {
             LOGGER.info("chess game: " + game);
 
             // Send LOAD_GAME message to the connecting user
-            GameLoad loadGameMessage = new GameLoad(LOAD_GAME, game);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, game);
             connections.broadcast(gameID, username, loadGameMessage, JUST_ME);
 
             // Notify other users in the game
             String notification = username + " has joined the lobby";
-            Notification notificationMessage = new Notification(NOTIFICATION, notification);
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, notification);
             connections.broadcast(gameID, username, notificationMessage, EVERYONE_BUT_ME);
         } catch (DataAccessException e) {
             LOGGER.severe("DataAccessException: " + e.getMessage());
@@ -114,8 +134,51 @@ public class WebSocketHandler {
     }
 
 
-    private void makeMove(Session session, String username, UserGameCommand command) {
-        System.out.println("MakeMove stub function");
+    private void makeMove(Session session, String username, MakeMoveCommand command) {
+        try {
+            //      Server verifies the validity of the move.
+
+            Game game = gameDAO.getGame(command.getGameID());
+            ChessGame chessGame = game.game();
+            chessGame.makeMove(command.getMove());
+
+            // Game is updated to represent the move. Game is updated in the database.
+            Game updatedGame = new Game(game.gameID(),
+                    game.whiteUsername(),
+                    game.blackUsername(),
+                    game.gameName(),
+                    chessGame);
+            gameDAO.updateGame(updatedGame);
+
+            // Server sends a LOAD_GAME message to all clients in the game (including the root client) with an updated game.
+            LoadGameMessage loadGameMessage = new LoadGameMessage(LOAD_GAME, chessGame);
+            connections.broadcast(command.getGameID(), username, loadGameMessage, EVERYONE);
+
+            // Server sends a Notification message to all other clients in that game informing them what move was made.
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION,
+                    "Player " + username + " has made a move");
+            NotificationMessage notificationMessageStatus = null;
+            connections.broadcast(command.getGameID(), username, notificationMessage, EVERYONE_BUT_ME);
+
+            // If the move results in check, checkmate or stalemate the server sends a Notification message to all clients.
+            if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION, chessGame.getTeamTurn().toString() + " is in check mate, " + username + " wins.");
+                connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
+            } else if (chessGame.isInCheck(chessGame.getTeamTurn())) {
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION, chessGame.getTeamTurn().toString() + " is in check");
+                connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
+            } else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION, "Stalemate, game over.");
+                connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
+            }
+
+
+        } catch (Exception e) {
+            LOGGER.warning("Error making move: " + e.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Error making move: " + e.getMessage());
+            connections.broadcast(command.getGameID(), username, errorMessage, JUST_ME);
+        }
+
     }
 
     private void leave(Session session, String username, UserGameCommand command) {
@@ -146,10 +209,8 @@ public class WebSocketHandler {
             connections.remove(username);
 
             // inform the other clients on the game.
-            Notification message = new Notification(NOTIFICATION, username + " has left the game");
+            NotificationMessage message = new NotificationMessage(NOTIFICATION, username + " has left the game");
             connections.broadcast(command.getGameID(), username, message, EVERYONE_BUT_ME);
-            System.out.println("Leave stub function");
-
         } catch (Exception e) {
             LOGGER.warning("Error leaving game: " + e.getMessage());
         }
