@@ -3,6 +3,7 @@ package webSocket;
 import com.google.gson.Gson;
 import logging.LoggerManager;
 import websocket.commands.LeaveCommand;
+import websocket.commands.ResignCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -67,6 +68,16 @@ public class WebSocketFacade {
             LOGGER.info("sent LEAVE command to server.");
         } else {
             LOGGER.warning("WebSocket session is not open. unable to send LEAVE command.");
+        }
+    }
+
+    public void resignGame(String authToken, int gameID) throws Exception {
+        if (session != null && session.isOpen()) {
+            ResignCommand resignCommand = new ResignCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            session.getBasicRemote().sendText(gson.toJson(resignCommand));
+            LOGGER.info("Sent RESIGN command to server.");
+        } else {
+            LOGGER.warning("WebSocket session is not open. Unable to send RESIGN command.");
         }
     }
 }

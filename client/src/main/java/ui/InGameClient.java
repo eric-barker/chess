@@ -39,6 +39,7 @@ public class InGameClient {
                 case "help" -> getHelpText();
                 case "renderboard" -> renderBoard();
                 case "makemove" -> makeMove();
+                case "resign" -> resignGame();
                 case "leave" -> leave();
                 default -> "Unknown command. Type 'help' for a list of commands.";
             };
@@ -50,6 +51,7 @@ public class InGameClient {
                 "help         - Show this help text.\n" +
                 "renderboard  - Display the chessboard.\n" +
                 "makemove     - Make a move.\n" +
+                "resign       - Resign from game.\n" +
                 "leave     - Exit the game.\n";
     }
 
@@ -85,7 +87,7 @@ public class InGameClient {
 
 
     private String makeMove() {
-        // Stupb for making moves
+        // Stub for making moves
         return "Making a move";
     }
 
@@ -100,6 +102,17 @@ public class InGameClient {
         } catch (Exception e) {
             LOGGER.warning("Error leaving game: " + e.getMessage());
             return "Error leaving game: " + e.getMessage();
+        }
+    }
+
+    private String resignGame() {
+        try {
+            repl.getWebSocketHandler().resignGame(repl.getAuthToken(), repl.getGame().gameID());
+            LOGGER.info("Successfully resigned from the game.");
+            return "You have resigned from the game.";
+        } catch (Exception e) {
+            LOGGER.warning("Error resigning from game: " + e.getMessage());
+            return "Error resigning from game: " + e.getMessage();
         }
     }
 
