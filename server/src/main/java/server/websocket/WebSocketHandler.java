@@ -1,6 +1,7 @@
 package server.websocket;
 
 import chess.ChessGame;
+import chess.ChessPiece;
 import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
@@ -136,10 +137,31 @@ public class WebSocketHandler {
 
     private void makeMove(Session session, String username, MakeMoveCommand command) {
         try {
-            //      Server verifies the validity of the move.
-
             Game game = gameDAO.getGame(command.getGameID());
             ChessGame chessGame = game.game();
+
+            if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+                throw new Exception(username + " is not playing this game and cannot make a move");
+            }
+
+            ChessPiece myPiece = chessGame.getBoard().getPiece(command.getMove().getStartPosition());
+            ChessGame.TeamColor pieceColor = myPiece.getTeamColor();
+            String pieceColorString = (pieceColor == ChessGame.TeamColor.WHITE) ? "white" : "black";
+            String myTeam;
+
+            if (username.equals(game.blackUsername())) {
+                myTeam = "black";
+            } else if (username.equals(game.whiteUsername())) {
+                myTeam = "white";
+            } else {
+                myTeam = "error";
+            }
+            // Is the piece my piece?
+            if (pieceColorString != myTeam) {
+                throw new Exception("Error: you cannot move your opponent's pieces");
+            }
+
+            //      Server verifies the validity of the move.
             chessGame.makeMove(command.getMove());
 
             // Game is updated to represent the move. Game is updated in the database.
@@ -191,7 +213,7 @@ public class WebSocketHandler {
 
             LOGGER.info(game.whiteUsername() + " is the whiteUsername");
             LOGGER.info(game.blackUsername() + " is the blackUsername");
-            if (game.whiteUsername().equals(username)) {
+            if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
                 LOGGER.info("Removing whiteUsername...");
                 newGame = new Game(command.getGameID(), null, game.blackUsername(), game.gameName(), game.game());
             } else {
@@ -217,7 +239,25 @@ public class WebSocketHandler {
     }
 
     private void resign(Session session, String username, UserGameCommand command) {
-        System.out.println("Resign stub function");
+        try {
+            Game game = gameDAO.getGame(command.getGameID());
+
+            if (!username.equals(game.whiteUsername()) && !username.equals(game.blackUsername())) {
+                throw new Exception(username + " is not playing this game and cannot resign");
+            }
+
+            game.game().setGameIsOver();
+            gameDAO.updateGame(game);
+
+            NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION,
+                    "Player " + username + " has resigned, the game is over");
+            connections.broadcast(command.getGameID(), username, notificationMessage, EVERYONE);
+        } catch (Exception e) {
+            LOGGER.warning("Error resigning: " + e.getMessage());
+            ErrorMessage errorMessage = new ErrorMessage(ERROR, "Error resigning: " + e.getMessage());
+            connections.broadcast(command.getGameID(), username, errorMessage, JUST_ME);
+        }
+
     }
 
 

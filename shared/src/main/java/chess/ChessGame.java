@@ -16,6 +16,7 @@ public class ChessGame {
     private String invalidMoveException;
     private ChessPosition whiteKingPosition;
     private ChessPosition blackKingPosition;
+    private boolean gameIsOver = false;
 
     public ChessGame() {
         this.gameBoard = new ChessBoard();
@@ -48,6 +49,17 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return gameBoard;
+    }
+
+    public Boolean getGameIsOver() {
+        return gameIsOver;
+    }
+
+    public void setGameIsOver() throws Exception {
+        if (this.gameIsOver == true) {
+            throw new Exception("You cannot resign, the game is already over");
+        }
+        this.gameIsOver = !gameIsOver;
     }
 
     @Override
@@ -151,6 +163,10 @@ public class ChessGame {
         ChessPosition startPosition = move.getStartPosition();
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece myPiece = gameBoard.getPiece(startPosition);
+
+        if (gameIsOver) {
+            throw new InvalidMoveException("The game is over: No new moves can be made.");
+        }
 
         // Is the start square empty?
         if (myPiece == null) {
