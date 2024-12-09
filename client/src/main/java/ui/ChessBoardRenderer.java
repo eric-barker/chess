@@ -1,9 +1,11 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +51,53 @@ public class ChessBoardRenderer {
                 String squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
                 ChessPosition position = new ChessPosition(actualRow - 1 + 1, actualCol + 1);
                 ChessPiece piece = board.getPiece(position);
+
+                String pieceSymbol = " ";
+                if (piece != null) {
+                    String key = piece.getPieceColor() + "_" + piece.getPieceType();
+                    pieceSymbol = PIECE_SYMBOLS.getOrDefault(key, "?");
+                }
+
+                System.out.print(squareColor + " " + pieceSymbol + " " + RESET_COLOR);
+            }
+            System.out.println(" " + actualRow); // Row number on the right side
+        }
+
+        // Print column letters (bottom)
+        printColumnLabels(whitePerspective);
+    }
+
+    public static void renderLegalMoves(ChessBoard board, ChessPosition evalPosition, Collection<ChessMove> legalMoves, boolean whitePerspective) {
+        // Extract the valid end positions from the legal moves
+        Collection<ChessPosition> legalPositions = legalMoves.stream()
+                .map(ChessMove::getEndPosition)
+                .toList();
+
+        // Print column letters (top)
+        printColumnLabels(whitePerspective);
+
+        // Traverse the board row by row
+        for (int row = 0; row < 8; row++) {
+            int actualRow = whitePerspective ? 8 - row : row + 1;
+            System.out.print(actualRow + " "); // Row number on the left side
+
+            for (int col = 0; col < 8; col++) {
+                int actualCol = whitePerspective ? col : 7 - col;
+
+                ChessPosition currentPosition = new ChessPosition(actualRow, actualCol + 1);
+                ChessPiece piece = board.getPiece(currentPosition);
+
+                String squareColor;
+                if (currentPosition.equals(evalPosition)) {
+                    squareColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+                } else if (legalPositions.contains(currentPosition)) {
+                    squareColor = ((row + actualCol) % 2 == 0) ?
+                            EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
+                } else {
+                    squareColor = ((row + actualCol) % 2 == 0) ?
+                            EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_BLACK;
+                }
+
 
                 String pieceSymbol = " ";
                 if (piece != null) {
