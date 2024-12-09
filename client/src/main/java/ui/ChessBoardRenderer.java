@@ -60,7 +60,7 @@ public class ChessBoardRenderer {
                 ChessPosition position = new ChessPosition(actualRow, actualCol + 1);
                 ChessPiece piece = board.getPiece(position);
 
-                String pieceSymbol = EscapeSequences.EMPTY;
+                String pieceSymbol = (squareColor == LIGHT_SQUARE) ? EscapeSequences.PAWN_LIGHT_BEIGE : EscapeSequences.PAWN_WOOD;
                 if (piece != null) {
                     String key = piece.getPieceColor() + "_" + piece.getPieceType();
                     pieceSymbol = PIECE_SYMBOLS.getOrDefault(key, "?");
@@ -111,7 +111,14 @@ public class ChessBoardRenderer {
                     squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
                 }
 
-                String pieceSymbol = EscapeSequences.EMPTY;
+                String pieceSymbol = switch (squareColor) {
+                    case EscapeSequences.SET_BG_COLOR_YELLOW -> EscapeSequences.PAWN_YELLOW;
+                    case EscapeSequences.SET_BG_COLOR_GREEN -> EscapeSequences.PAWN_GREEN_LIGHT;
+                    case EscapeSequences.SET_BG_COLOR_DARK_GREEN -> EscapeSequences.PAWN_GREEN_DARK;
+                    case EscapeSequences.SET_BG_COLOR_LIGHT_BEIGE -> EscapeSequences.PAWN_LIGHT_BEIGE;
+                    case EscapeSequences.SET_BG_COLOR_WOOD -> EscapeSequences.PAWN_WOOD;
+                    default -> EscapeSequences.SET_BG_COLOR_BLUE + "   ";
+                };
                 if (piece != null) {
                     String key = piece.getPieceColor() + "_" + piece.getPieceType();
                     pieceSymbol = PIECE_SYMBOLS.getOrDefault(key, "?");

@@ -43,6 +43,7 @@ public class EscapeSequences {
     public static final String SET_TEXT_COLOR_WHITE = SET_TEXT_COLOR + "15m";
     public static final String RESET_TEXT_COLOR = UNICODE_ESCAPE + "[39m";
 
+
     public static final String SET_BG_COLOR_BLACK = SET_BG_COLOR + "0m";
     public static final String SET_BG_COLOR_LIGHT_GREY = SET_BG_COLOR + "242m";
     public static final String SET_BG_COLOR_DARK_GREY = SET_BG_COLOR + "235m";
@@ -54,6 +55,17 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_MAGENTA = SET_BG_COLOR + "5m";
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
+
+
+    public static final String PAWN_LIGHT_BEIGE = SET_BG_COLOR_LIGHT_BEIGE +
+            SET_TEXT_COLOR + "230m" + " ♙ " + RESET_TEXT_COLOR;
+    public static final String PAWN_WOOD = SET_BG_COLOR_WOOD + SET_TEXT_COLOR + "130m" + " ♙ " + RESET_TEXT_COLOR;
+    public static final String PAWN_YELLOW = SET_BG_COLOR_YELLOW + SET_TEXT_COLOR +
+            "226m" + " ♙ " + RESET_TEXT_COLOR;
+    public static final String PAWN_GREEN_DARK = SET_BG_COLOR_DARK_GREEN + SET_TEXT_COLOR +
+            "22m" + " ♙ " + RESET_TEXT_COLOR;
+    public static final String PAWN_GREEN_LIGHT = SET_BG_COLOR_GREEN + SET_TEXT_COLOR +
+            "46m" + " ♙ " + RESET_TEXT_COLOR;
 
     public static final String WHITE_KING = " ♔ ";
     public static final String WHITE_QUEEN = " ♕ ";
