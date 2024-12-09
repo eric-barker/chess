@@ -1,4 +1,4 @@
-package webSocket;
+package websocket;
 
 import chess.ChessMove;
 import com.google.gson.Gson;
@@ -74,12 +74,6 @@ public class WebSocketFacade {
             }
             default -> LOGGER.warning("Unhandled message type: " + serverMessage.getServerMessageType());
         }
-    }
-
-    @OnClose
-    public void onClose(Session session, CloseReason reason) {
-        LOGGER.info("WebSocket connection closed: " + reason);
-        this.session = null;
     }
 
     @OnError

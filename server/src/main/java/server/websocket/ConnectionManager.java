@@ -5,6 +5,7 @@ import logging.LoggerManager;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -55,46 +56,13 @@ public class ConnectionManager {
 
             switch (broadcastType) {
                 case EVERYONE:
-                    for (Connection c : gameConnections) {
-                        if (c.session.isOpen()) {
-                            try {
-                                c.send(serializedMessage);
-                                LOGGER.info("Message sent to " + c.visitorName);
-                            } catch (IOException e) {
-                                LOGGER.severe("Failed to send message to " + c.visitorName + ": " + e.getMessage());
-                            }
-                        } else {
-                            LOGGER.warning("Session for " + c.visitorName + " is closed and will be cleaned up");
-                        }
-                    }
+                    sendMessageToConnections(serializedMessage, gameConnections, myName);
                     break;
                 case JUST_ME:
-                    for (Connection c : myConnection) {
-                        if (c.session.isOpen()) {
-                            try {
-                                c.send(serializedMessage);
-                                LOGGER.info("Message sent to " + c.visitorName);
-                            } catch (IOException e) {
-                                LOGGER.severe("Failed to send message to " + c.visitorName + ": " + e.getMessage());
-                            }
-                        } else {
-                            LOGGER.warning("Session for " + c.visitorName + " is closed and will be cleaned up");
-                        }
-                    }
+                    sendMessageToConnections(serializedMessage, myConnection, myName);
                     break;
                 case EVERYONE_BUT_ME:
-                    for (Connection c : targetConnections) {
-                        if (c.session.isOpen()) {
-                            try {
-                                c.send(serializedMessage);
-                                LOGGER.info("Message sent to " + c.visitorName);
-                            } catch (IOException e) {
-                                LOGGER.severe("Failed to send message to " + c.visitorName + ": " + e.getMessage());
-                            }
-                        } else {
-                            LOGGER.warning("Session for " + c.visitorName + " is closed and will be cleaned up");
-                        }
-                    }
+                    sendMessageToConnections(serializedMessage, targetConnections, myName);
                     break;
                 default:
                     LOGGER.warning("Error: unknown broadcast type");
@@ -106,6 +74,21 @@ public class ConnectionManager {
             LOGGER.info("Cleaned up closed connections");
         } catch (Exception e) {
             LOGGER.severe("Error during broadcast: " + e.getMessage());
+        }
+    }
+
+    private void sendMessageToConnections(String serializedMessage, List<Connection> connections, String myName) {
+        for (Connection c : connections) {
+            if (c.session.isOpen()) {
+                try {
+                    c.send(serializedMessage);
+                    LOGGER.info("Message sent to " + c.visitorName);
+                } catch (IOException e) {
+                    LOGGER.severe("Failed to send message to " + c.visitorName + ": " + e.getMessage());
+                }
+            } else {
+                LOGGER.warning("Session for " + c.visitorName + " is closed and will be cleaned up");
+            }
         }
     }
 

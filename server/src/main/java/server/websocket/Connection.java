@@ -27,8 +27,12 @@ public class Connection {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Connection that = (Connection) o;
         return Objects.equals(gameID, that.gameID) && Objects.equals(visitorName, that.visitorName) && Objects.equals(session, that.session);
     }

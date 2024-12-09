@@ -197,10 +197,13 @@ public class WebSocketHandler {
                 targetUser = game.whiteUsername();
             }
             if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
-                notificationMessageStatus = new NotificationMessage(NOTIFICATION, targetUser + " (" + chessGame.getTeamTurn().toString() + ")" + " is in check mate, " + username + " wins.");
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION,
+                        targetUser + " (" + chessGame.getTeamTurn().toString() + ")"
+                                + " is in check mate, " + username + " wins.");
                 connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
             } else if (chessGame.isInCheck(chessGame.getTeamTurn())) {
-                notificationMessageStatus = new NotificationMessage(NOTIFICATION, targetUser + " (" + chessGame.getTeamTurn().toString() + ")" + " is in check");
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION,
+                        targetUser + " (" + chessGame.getTeamTurn().toString() + ")" + " is in check");
                 connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
             } else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
                 notificationMessageStatus = new NotificationMessage(NOTIFICATION, "Stalemate, game over.");
