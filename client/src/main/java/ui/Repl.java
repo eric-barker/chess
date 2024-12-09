@@ -20,6 +20,7 @@ public class Repl implements WebSocketListener {
 
     private static final Logger LOGGER = LoggerManager.getLogger(Repl.class.getName());
     private WebSocketFacade webSocketFacade;
+    private ChessBoardRenderer boardRenderer;
     private final PreLoginClient preLoginClient;
     private final PostLoginClient postLoginClient;
     private final InGameClient inGameClient;
@@ -39,6 +40,7 @@ public class Repl implements WebSocketListener {
         this.state = UserState.LOGGEDOUT; // Initial state is logged out
         this.serverUrl = serverUrl;
         this.webSocketFacade = new WebSocketFacade(serverUrl, this);
+        this.boardRenderer = new ChessBoardRenderer();
     }
 
     public void run() {
@@ -99,6 +101,10 @@ public class Repl implements WebSocketListener {
         this.game = new Game(gameID, whiteUsername, blackUsername, gameName, newGame);
         printNotification("Game state updated!");
         // Call InGameClient to redraw the chessboard?
+
+
+        Boolean isWhite = username.equals(whiteUsername);
+        ChessBoardRenderer.renderChessBoard(newGame.getBoard(), isWhite);
         printPrompt();
     }
 

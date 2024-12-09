@@ -45,6 +45,7 @@ public class ChessBoardRenderer {
         ChessPiece[][] squares = board.getSquares(); // Assuming this retrieves the board state as a 2D array of ChessPieces.
 
         // Print column letters (top)
+        System.out.println("\n");
         printColumnLabels(whitePerspective);
 
         // Traverse the board row by row
