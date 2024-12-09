@@ -66,7 +66,7 @@ public class ChessBoardRenderer {
     }
 
     private static void printColumnLabels(boolean whitePerspective) {
-        System.out.print(EscapeSequences.RESET_TEXT_COLOR + "   "); // Indentation for row numbers
+        System.out.print(EscapeSequences.RESET_TEXT_COLOR + "  "); // Indentation for row numbers
         for (int col = 0; col < 8; col++) {
             char label = (char) ('a' + (whitePerspective ? col : 7 - col));
             System.out.print(" " + label + " ");

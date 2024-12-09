@@ -48,17 +48,19 @@ public class InGameClient {
 
     private String getHelpText() {
         return "Available commands:\n" +
-                "help         - Show this help text.\n" +
-                "renderboard  - Display the chessboard.\n" +
-                "makemove     - Make a move.\n" +
-                "resign       - Resign from game.\n" +
-                "leave     - Exit the game.\n";
+                "help                   - Show this help text.\n" +
+                "renderboard            - Display the chessboard.\n" +
+                "makemove               - Make a move.\n" +
+                "highlight legal moves  - highlight legal moves" +
+                "resign                 - Resign from game.\n" +
+                "leave                  - Exit the game.\n";
     }
 
     private String getObserverHelpText() {
         return "Available commands:\n" +
                 "help         - Show this help text.\n" +
                 "renderboard  - Display the chessboard.\n" +
+                "highlight legal moves  - highlight legal moves" +
                 "leave     - Exit the game.\n";
     }
 
@@ -75,12 +77,13 @@ public class InGameClient {
             return "No active game board found.";
         }
 
-        // Render the board from both perspectives
-        System.out.println(EscapeSequences.RESET_TEXT_COLOR + "White's Perspective:");
-        ChessBoardRenderer.renderChessBoard(board, true);
-
-        System.out.println("\nBlack's Perspective:");
-        ChessBoardRenderer.renderChessBoard(board, false);
+        if (repl.getUsername() == repl.getGame().blackUsername()) {
+            LOGGER.info("Rendering board from black's perspective");
+            ChessBoardRenderer.renderChessBoard(board, false);
+        } else {
+            LOGGER.info("Rendering board from white's perspective");
+            ChessBoardRenderer.renderChessBoard(board, true);
+        }
 
         return "Chessboard rendered successfully.";
     }
