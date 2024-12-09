@@ -91,7 +91,12 @@ public class Repl implements WebSocketListener {
         // Update the game state in Repl
 
         ChessGame newGame = loadGameMessage.getGame();
-        this.game = new Game(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
+        String whiteUsername = game.whiteUsername();
+        String blackUsername = game.blackUsername();
+        String gameName = game.gameName();
+        Integer gameID = game.gameID();
+
+        this.game = new Game(gameID, whiteUsername, blackUsername, gameName, newGame);
         printNotification("Game state updated!");
         // Call InGameClient to redraw the chessboard?
         printPrompt();

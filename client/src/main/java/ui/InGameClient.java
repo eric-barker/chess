@@ -5,6 +5,7 @@ import chess.*;
 import logging.LoggerManager;
 import model.Game;
 
+import java.util.Collection;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
@@ -12,12 +13,11 @@ public class InGameClient {
     private static final Logger LOGGER = LoggerManager.getLogger(InGameClient.class.getName());
     private final String serverUrl;
     private final Repl repl;
-    private Game game;
+
 
     public InGameClient(String serverUrl, Repl repl) {
         this.serverUrl = serverUrl;
         this.repl = repl;
-        this.game = repl.getGame();
     }
 
     public String eval(String input) {
@@ -29,6 +29,8 @@ public class InGameClient {
                     return getObserverHelpText();
                 case "renderboard":
                     return renderBoard();
+                case "legalmoves":
+                    return renderLegalMoves();
                 case "leave":
                     return leave();
                 default:
@@ -38,6 +40,7 @@ public class InGameClient {
             return switch (command) {
                 case "help" -> getHelpText();
                 case "renderboard" -> renderBoard();
+                case "legalmoves" -> renderLegalMoves();
                 case "makemove" -> makeMove();
                 case "resign" -> resignGame();
                 case "leave" -> leave();
@@ -48,24 +51,24 @@ public class InGameClient {
 
     private String getHelpText() {
         return "Available commands:\n" +
-                "help                   - Show this help text.\n" +
-                "renderboard            - Display the chessboard.\n" +
-                "makemove               - Make a move.\n" +
-                "highlight legal moves  - highlight legal moves" +
-                "resign                 - Resign from game.\n" +
-                "leave                  - Exit the game.\n";
+                "help         - Show this help text.\n" +
+                "renderboard  - Display the chessboard.\n" +
+                "makemove     - Make a move.\n" +
+                "legalmoves   - highlight legal moves" +
+                "resign       - Resign from game.\n" +
+                "leave        - Exit the game.\n";
     }
 
     private String getObserverHelpText() {
         return "Available commands:\n" +
                 "help         - Show this help text.\n" +
                 "renderboard  - Display the chessboard.\n" +
-                "highlight legal moves  - highlight legal moves" +
-                "leave     - Exit the game.\n";
+                "legalmoves   - highlight legal moves" +
+                "leave        - Exit the game.\n";
     }
 
     private String renderBoard() {
-        game = repl.getGame();
+        Game game = repl.getGame();
         ChessGame myGame = game.game();
         LOGGER.info("ChessGame: " + myGame);
 
@@ -77,7 +80,10 @@ public class InGameClient {
             return "No active game board found.";
         }
 
-        if (repl.getUsername() == repl.getGame().blackUsername()) {
+        LOGGER.info("Repl Username: " + repl.getUsername());
+        LOGGER.info("Repl getGame().whiteUsername() " + repl.getGame().whiteUsername());
+        LOGGER.info("Repl getGame().blackUsername() " + repl.getGame().blackUsername());
+        if (repl.getUsername().equals(repl.getGame().blackUsername())) {
             LOGGER.info("Rendering board from black's perspective");
             ChessBoardRenderer.renderChessBoard(board, false);
         } else {
@@ -86,6 +92,42 @@ public class InGameClient {
         }
 
         return "Chessboard rendered successfully.";
+    }
+
+    private String renderLegalMoves() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter your square in the format '[col][row]' (e.g., 'e2'): ");
+        String input = scanner.nextLine().trim();
+
+        if (input.length() != 2) {
+            return "Invalid move format. Please use the format '[col][row]' (e.g., 'e2').";
+        }
+
+        try {
+            ChessPosition evalPosition = parseChessNotation(input);
+
+            Game game = repl.getGame();
+            ChessGame myGame = game.game();
+            Collection<ChessMove> legalMoves = myGame.validMoves(evalPosition);
+            ChessBoard board = myGame.getBoard();
+
+            if (board == null) {
+                return "No active game board found.";
+            }
+
+            if (repl.getUsername().equals(repl.getGame().blackUsername())) {
+                LOGGER.info("Rendering legal moves from black's perspective");
+                ChessBoardRenderer.renderLegalMoves(board, evalPosition, legalMoves, false);
+            } else {
+                LOGGER.info("Rendering legal moves from white's perspective");
+                ChessBoardRenderer.renderLegalMoves(board, evalPosition, legalMoves, true);
+            }
+
+            return "Legal moves for position " + evalPosition.toString() + "rendered successfully.";
+        } catch (IllegalArgumentException e) {
+            LOGGER.warning("Invalid chess notation: " + e.getMessage());
+            return "Invalid chess notation. Please use the format '[col][row]' (e.g., 'e2').";
+        }
     }
 
     private String leave() {

@@ -176,7 +176,8 @@ public class PostLoginClient {
             }
         }
 
-
+        LOGGER.info("whiteUsername(): " + repl.getGame().whiteUsername());
+        LOGGER.info("blackUsername(): " + repl.getGame().blackUsername());
         // List available colors
         String options = "";
         if (repl.getGame().whiteUsername() == null) {
@@ -207,7 +208,21 @@ public class PostLoginClient {
             serverFacade.joinGame(gameID, playerColor, authToken);
 
             repl.getWebSocketHandler().connect(authToken, gameID);
-
+            if (playerColor.contains("black")) {
+                Game newGame = new Game(repl.getGame().gameID(),
+                        repl.getGame().whiteUsername(),
+                        repl.getUsername(),
+                        repl.getGame().gameName(),
+                        repl.getGame().game());
+                repl.setGame(newGame);
+            } else if (playerColor.contains("white")) {
+                Game newGame = new Game(repl.getGame().gameID(),
+                        repl.getUsername(),
+                        repl.getGame().blackUsername(),
+                        repl.getGame().gameName(),
+                        repl.getGame().game());
+                repl.setGame(newGame);
+            }
             repl.changeState(UserState.INGAME);
             return "Successfully joined the game '" + gameName + "' as " + playerColor + ".";
         } catch (ResponseException e) {

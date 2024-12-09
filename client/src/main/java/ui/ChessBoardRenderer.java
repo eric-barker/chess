@@ -4,15 +4,20 @@ import chess.ChessBoard;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import logging.LoggerManager;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ChessBoardRenderer {
-    private static final String LIGHT_SQUARE = "\u001B[47m"; // White background
-    private static final String DARK_SQUARE = "\u001B[40m";  // Black background
-    private static final String RESET_COLOR = "\u001B[0m";
+
+    private static final Logger LOGGER = LoggerManager.getLogger(ChessBoardRenderer.class.getName());
+    private static final String LIGHT_SQUARE = EscapeSequences.SET_BG_COLOR_WHITE; // White background   "\u001B[47m"
+    private static final String DARK_SQUARE = EscapeSequences.SET_BG_COLOR_BLACK;  // Black background "\u001B[40m"
+    private static final String TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_MIDTONE_GREY;
+    private static final String RESET_COLOR = "\u001B[0m";  //  RESET color"\u001B[0m
 
     // Mapping ChessPiece to symbols
     private static final Map<String, String> PIECE_SYMBOLS = new HashMap<>();
@@ -35,6 +40,7 @@ public class ChessBoardRenderer {
     }
 
     public static void renderChessBoard(ChessBoard board, boolean whitePerspective) {
+        LOGGER.info("White perspective: " + whitePerspective);
         ChessPiece[][] squares = board.getSquares(); // Assuming this retrieves the board state as a 2D array of ChessPieces.
 
         // Print column letters (top)
@@ -49,7 +55,7 @@ public class ChessBoardRenderer {
                 int actualCol = whitePerspective ? col : 7 - col;
 
                 String squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
-                ChessPosition position = new ChessPosition(actualRow - 1 + 1, actualCol + 1);
+                ChessPosition position = new ChessPosition(actualRow, actualCol + 1);
                 ChessPiece piece = board.getPiece(position);
 
                 String pieceSymbol = " ";
@@ -67,7 +73,11 @@ public class ChessBoardRenderer {
         printColumnLabels(whitePerspective);
     }
 
-    public static void renderLegalMoves(ChessBoard board, ChessPosition evalPosition, Collection<ChessMove> legalMoves, boolean whitePerspective) {
+    public static void renderLegalMoves(ChessBoard board,
+                                        ChessPosition evalPosition,
+                                        Collection<ChessMove> legalMoves,
+                                        boolean whitePerspective) {
+
         // Extract the valid end positions from the legal moves
         Collection<ChessPosition> legalPositions = legalMoves.stream()
                 .map(ChessMove::getEndPosition)
