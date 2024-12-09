@@ -1,8 +1,10 @@
 package webSocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import logging.LoggerManager;
 import websocket.commands.LeaveCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.ResignCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -14,6 +16,7 @@ import javax.websocket.*;
 import java.net.URI;
 import java.util.logging.Logger;
 
+@ClientEndpoint
 public class WebSocketFacade {
     private static final Logger LOGGER = LoggerManager.getLogger(WebSocketFacade.class.getName());
     private Session session;
@@ -30,28 +33,58 @@ public class WebSocketFacade {
         URI uri = new URI(serverUrl);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
 
-        this.session = container.connectToServer(new Endpoint() {
-            @Override
-            public void onOpen(Session session, EndpointConfig endpointConfig) {
-                LOGGER.info("WebSocket connection established!");
-            }
-        }, uri);
+        container.connectToServer(this, uri); // Directly connect this client endpoint
 
-        session.addMessageHandler((MessageHandler.Whole<String>) this::handleMessage);
+        // Wait for session to initialize
+        if (session == null || !session.isOpen()) {
+            throw new IllegalStateException("Failed to open WebSocket session.");
+        }
 
+        // Send the CONNECT message
         UserGameCommand connectCommand = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
         session.getBasicRemote().sendText(gson.toJson(connectCommand));
+        LOGGER.info("Sent CONNECT command: " + gson.toJson(connectCommand));
     }
 
-    private void handleMessage(String message) {
+    @OnOpen
+    public void onOpen(Session session, EndpointConfig config) {
+        this.session = session;
+        LOGGER.info("WebSocket connection established!");
+        session.addMessageHandler(String.class, this::handleMessage);
+    }
+
+    @OnMessage
+    public void handleMessage(String message) {
+        LOGGER.info("Received WebSocket message: " + message);
+
         ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
 
         switch (serverMessage.getServerMessageType()) {
-            case LOAD_GAME -> listener.onGameLoad(gson.fromJson(message, LoadGameMessage.class));
-            case NOTIFICATION -> listener.onNotification(
-                    gson.fromJson(message, NotificationMessage.class));
-            case ERROR -> listener.onError(gson.fromJson(message, ErrorMessage.class));
+            case LOAD_GAME -> {
+                LOGGER.info("Routing to onGameLoad");
+                listener.onGameLoad(gson.fromJson(message, LoadGameMessage.class));
+            }
+            case NOTIFICATION -> {
+                LOGGER.info("Routing to onNotification");
+                listener.onNotification(gson.fromJson(message, NotificationMessage.class));
+            }
+            case ERROR -> {
+                LOGGER.warning("Routing to onError");
+                listener.onError(gson.fromJson(message, ErrorMessage.class));
+            }
+            default -> LOGGER.warning("Unhandled message type: " + serverMessage.getServerMessageType());
         }
+    }
+
+    @OnClose
+    public void onClose(Session session, CloseReason reason) {
+        LOGGER.info("WebSocket connection closed: " + reason);
+        this.session = null;
+    }
+
+    @OnError
+    public void onError(Session session, Throwable throwable) {
+        LOGGER.severe("WebSocket error: " + throwable.getMessage());
     }
 
     public void disconnect() throws Exception {
@@ -65,9 +98,9 @@ public class WebSocketFacade {
         if (session != null && session.isOpen()) {
             LeaveCommand leaveCommand = new LeaveCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
             session.getBasicRemote().sendText(gson.toJson(leaveCommand));
-            LOGGER.info("sent LEAVE command to server.");
+            LOGGER.info("Sent LEAVE command to server.");
         } else {
-            LOGGER.warning("WebSocket session is not open. unable to send LEAVE command.");
+            LOGGER.warning("WebSocket session is not open. Unable to send LEAVE command.");
         }
     }
 
@@ -78,6 +111,16 @@ public class WebSocketFacade {
             LOGGER.info("Sent RESIGN command to server.");
         } else {
             LOGGER.warning("WebSocket session is not open. Unable to send RESIGN command.");
+        }
+    }
+
+    public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
+        if (session != null && session.isOpen()) {
+            MakeMoveCommand makeMoveCommand = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+            session.getBasicRemote().sendText(gson.toJson(makeMoveCommand));
+            LOGGER.info("Sent MAKE_MOVE command to server: " + move);
+        } else {
+            LOGGER.warning("WebSocket session is not open. Unable to send MAKE_MOVE command.");
         }
     }
 }

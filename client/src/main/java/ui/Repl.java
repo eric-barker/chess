@@ -87,26 +87,30 @@ public class Repl implements WebSocketListener {
     }
 
     @Override
-    public void onGameLoad(LoadGameMessage loadGameMessageMessage) {
-        ChessGame chessGame = game.game();
-//        game. = gameLoadMessage.getGame(); // Update the game state in Repl
+    public void onGameLoad(LoadGameMessage loadGameMessage) {
+        // Update the game state in Repl
+
+        ChessGame newGame = loadGameMessage.getGame();
+        this.game = new Game(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), newGame);
         printNotification("Game state updated!");
-//        inGameClient.renderBoard(); // Call InGameClient to redraw the chessboard
+        // Call InGameClient to redraw the chessboard?
+        printPrompt();
     }
 
     @Override
     public void onNotification(NotificationMessage notificationMessage) {
         String message = notificationMessage.getMessage();
-        if (message.contains("left the game")) {
-            LOGGER.info("Notification received: " + message);
-        }
+        LOGGER.info("Notification received: " + message);
         printNotification(message);
+        printPrompt();
     }
 
     @Override
     public void onError(ErrorMessage errorMessage) {
         String message = errorMessage.getMessage();
+        LOGGER.warning("Error received: " + message);
         printNotification(message);
+        printPrompt();
     }
 
     public void changeState(UserState newState) {
@@ -119,8 +123,10 @@ public class Repl implements WebSocketListener {
     }
 
     private void printNotification(String message) {
-        System.out.print("/n" + EscapeSequences.RESET_TEXT_COLOR + "--- " + EscapeSequences.SET_TEXT_COLOR_YELLOW + message);
+        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "--- " +
+                EscapeSequences.SET_TEXT_COLOR_YELLOW + message + EscapeSequences.RESET_TEXT_COLOR);
     }
+
 
     public String getAuthToken() {
         return authToken;
