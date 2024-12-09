@@ -123,7 +123,7 @@ public class InGameClient {
                 ChessBoardRenderer.renderLegalMoves(board, evalPosition, legalMoves, true);
             }
 
-            return "Legal moves for position " + evalPosition.toString() + "rendered successfully.";
+            return "Legal moves for position " + evalPosition.toString() + " rendered successfully.";
         } catch (IllegalArgumentException e) {
             LOGGER.warning("Invalid chess notation: " + e.getMessage());
             return "Invalid chess notation. Please use the format '[col][row]' (e.g., 'e2').";

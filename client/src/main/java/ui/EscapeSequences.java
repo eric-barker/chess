@@ -24,9 +24,16 @@ public class EscapeSequences {
     private static final String SET_TEXT_COLOR = UNICODE_ESCAPE + "[38;5;";
     private static final String SET_BG_COLOR = UNICODE_ESCAPE + "[48;5;";
 
+
+    public static final String SET_BG_COLOR_LIGHT_BEIGE = SET_BG_COLOR + "230m"; // Light beige for light squares
+    public static final String SET_BG_COLOR_WOOD = SET_BG_COLOR + "130m";        // Wood tone for dark squares
+    public static final String SET_TEXT_COLOR_BLACK_MINE = SET_TEXT_COLOR + "16m";   // Black text for pieces
+    public static final String SET_TEXT_COLOR_WHITE_MINE = SET_TEXT_COLOR + "231m";  // White text for pieces
+
+
     public static final String SET_TEXT_COLOR_BLACK = SET_TEXT_COLOR + "0m";
     public static final String SET_TEXT_COLOR_LIGHT_GREY = SET_TEXT_COLOR + "242m";
-    public static final String SET_TEXT_COLOR_MIDTONE_GREY = "[90m";
+    public static final String SET_TEXT_COLOR_MIDTONE_GREY = SET_TEXT_COLOR + "[90m";
     public static final String SET_TEXT_COLOR_DARK_GREY = SET_TEXT_COLOR + "235m";
     public static final String SET_TEXT_COLOR_RED = SET_TEXT_COLOR + "160m";
     public static final String SET_TEXT_COLOR_GREEN = SET_TEXT_COLOR + "46m";

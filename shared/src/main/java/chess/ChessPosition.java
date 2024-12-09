@@ -15,10 +15,8 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "ChessPosition{" +
-                "row=" + row +
-                ", col=" + col +
-                '}';
+        char columnLetter = (char) ('a' + (col - 1)); // Convert column number (1–8) to letter ('a'–'h')
+        return "" + columnLetter + row; // Column letter followed by row number
     }
 
     public ChessPosition(int row, int col) {

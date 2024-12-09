@@ -125,7 +125,14 @@ public class WebSocketHandler {
             connections.broadcast(gameID, username, loadGameMessage, JUST_ME);
 
             // Notify other users in the game
-            String notification = username + " has joined the lobby";
+            String notification;
+            if (username.equals(gameData.whiteUsername())) {
+                notification = username + " has joined the lobby as WHITE.";
+            } else if (username.equals(gameData.blackUsername())) {
+                notification = username + " has joined the lobby as BLACK.";
+            } else {
+                notification = username + " has joined the lobby as OBSERVER.";
+            }
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION, notification);
             connections.broadcast(gameID, username, notificationMessage, EVERYONE_BUT_ME);
         } catch (DataAccessException e) {
@@ -178,16 +185,22 @@ public class WebSocketHandler {
 
             // Server sends a Notification message to all other clients in that game informing them what move was made.
             NotificationMessage notificationMessage = new NotificationMessage(NOTIFICATION,
-                    "Player " + username + " has made a move");
+                    "Player " + username + " has made move: " + command.getMove().toString());
             NotificationMessage notificationMessageStatus = null;
             connections.broadcast(command.getGameID(), username, notificationMessage, EVERYONE_BUT_ME);
 
             // If the move results in check, checkmate or stalemate the server sends a Notification message to all clients.
+            String targetUser = "";
+            if (chessGame.getTeamTurn().toString().contains("BLACK")) {
+                targetUser = game.blackUsername();
+            } else if (chessGame.getTeamTurn().toString().contains("WHITE")) {
+                targetUser = game.whiteUsername();
+            }
             if (chessGame.isInCheckmate(chessGame.getTeamTurn())) {
-                notificationMessageStatus = new NotificationMessage(NOTIFICATION, chessGame.getTeamTurn().toString() + " is in check mate, " + username + " wins.");
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION, targetUser + " (" + chessGame.getTeamTurn().toString() + ")" + " is in check mate, " + username + " wins.");
                 connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
             } else if (chessGame.isInCheck(chessGame.getTeamTurn())) {
-                notificationMessageStatus = new NotificationMessage(NOTIFICATION, chessGame.getTeamTurn().toString() + " is in check");
+                notificationMessageStatus = new NotificationMessage(NOTIFICATION, targetUser + " (" + chessGame.getTeamTurn().toString() + ")" + " is in check");
                 connections.broadcast(command.getGameID(), username, notificationMessageStatus, EVERYONE);
             } else if (chessGame.isInStalemate(chessGame.getTeamTurn())) {
                 notificationMessageStatus = new NotificationMessage(NOTIFICATION, "Stalemate, game over.");

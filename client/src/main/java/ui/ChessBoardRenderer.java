@@ -14,29 +14,30 @@ import java.util.logging.Logger;
 public class ChessBoardRenderer {
 
     private static final Logger LOGGER = LoggerManager.getLogger(ChessBoardRenderer.class.getName());
-    private static final String LIGHT_SQUARE = EscapeSequences.SET_BG_COLOR_WHITE; // White background   "\u001B[47m"
-    private static final String DARK_SQUARE = EscapeSequences.SET_BG_COLOR_BLACK;  // Black background "\u001B[40m"
-    private static final String TEXT_COLOR = EscapeSequences.SET_TEXT_COLOR_MIDTONE_GREY;
-    private static final String RESET_COLOR = "\u001B[0m";  //  RESET color"\u001B[0m
+    private static final String LIGHT_SQUARE = EscapeSequences.SET_BG_COLOR_LIGHT_BEIGE; // Light beige for light squares
+    private static final String DARK_SQUARE = EscapeSequences.SET_BG_COLOR_WOOD;        // Wood tone for dark squares
+    private static final String TEXT_COLOR_BLACK = EscapeSequences.SET_TEXT_COLOR_BLACK_MINE;   // Black text for pieces
+    private static final String TEXT_COLOR_WHITE = EscapeSequences.SET_TEXT_COLOR_WHITE_MINE;   // White text for pieces
+    private static final String RESET_COLOR = "\u001B[0m"; // Reset all colors
 
     // Mapping ChessPiece to symbols
     private static final Map<String, String> PIECE_SYMBOLS = new HashMap<>();
 
     static {
         // Map pieces to terminal symbols (can be updated as needed)
-        PIECE_SYMBOLS.put("WHITE_PAWN", "P");
-        PIECE_SYMBOLS.put("WHITE_ROOK", "R");
-        PIECE_SYMBOLS.put("WHITE_KNIGHT", "N");
-        PIECE_SYMBOLS.put("WHITE_BISHOP", "B");
-        PIECE_SYMBOLS.put("WHITE_QUEEN", "Q");
-        PIECE_SYMBOLS.put("WHITE_KING", "K");
+        PIECE_SYMBOLS.put("WHITE_PAWN", EscapeSequences.WHITE_PAWN);
+        PIECE_SYMBOLS.put("WHITE_ROOK", EscapeSequences.WHITE_ROOK);
+        PIECE_SYMBOLS.put("WHITE_KNIGHT", EscapeSequences.WHITE_KNIGHT);
+        PIECE_SYMBOLS.put("WHITE_BISHOP", EscapeSequences.WHITE_BISHOP);
+        PIECE_SYMBOLS.put("WHITE_QUEEN", EscapeSequences.WHITE_QUEEN);
+        PIECE_SYMBOLS.put("WHITE_KING", EscapeSequences.WHITE_KING);
 
-        PIECE_SYMBOLS.put("BLACK_PAWN", "p");
-        PIECE_SYMBOLS.put("BLACK_ROOK", "r");
-        PIECE_SYMBOLS.put("BLACK_KNIGHT", "n");
-        PIECE_SYMBOLS.put("BLACK_BISHOP", "b");
-        PIECE_SYMBOLS.put("BLACK_QUEEN", "q");
-        PIECE_SYMBOLS.put("BLACK_KING", "k");
+        PIECE_SYMBOLS.put("BLACK_PAWN", EscapeSequences.BLACK_PAWN);
+        PIECE_SYMBOLS.put("BLACK_ROOK", EscapeSequences.BLACK_ROOK);
+        PIECE_SYMBOLS.put("BLACK_KNIGHT", EscapeSequences.BLACK_KNIGHT);
+        PIECE_SYMBOLS.put("BLACK_BISHOP", EscapeSequences.BLACK_BISHOP);
+        PIECE_SYMBOLS.put("BLACK_QUEEN", EscapeSequences.BLACK_QUEEN);
+        PIECE_SYMBOLS.put("BLACK_KING", EscapeSequences.BLACK_KING);
     }
 
     public static void renderChessBoard(ChessBoard board, boolean whitePerspective) {
@@ -58,13 +59,15 @@ public class ChessBoardRenderer {
                 ChessPosition position = new ChessPosition(actualRow, actualCol + 1);
                 ChessPiece piece = board.getPiece(position);
 
-                String pieceSymbol = " ";
+                String pieceSymbol = EscapeSequences.EMPTY;
                 if (piece != null) {
                     String key = piece.getPieceColor() + "_" + piece.getPieceType();
                     pieceSymbol = PIECE_SYMBOLS.getOrDefault(key, "?");
                 }
 
-                System.out.print(squareColor + " " + pieceSymbol + " " + RESET_COLOR);
+                String textColor = piece != null && piece.getPieceColor().equals("WHITE") ? TEXT_COLOR_WHITE : TEXT_COLOR_BLACK;
+
+                System.out.print(squareColor + textColor + pieceSymbol + RESET_COLOR);
             }
             System.out.println(" " + actualRow); // Row number on the right side
         }
@@ -104,18 +107,18 @@ public class ChessBoardRenderer {
                     squareColor = ((row + actualCol) % 2 == 0) ?
                             EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
                 } else {
-                    squareColor = ((row + actualCol) % 2 == 0) ?
-                            EscapeSequences.SET_BG_COLOR_WHITE : EscapeSequences.SET_BG_COLOR_BLACK;
+                    squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
                 }
 
-
-                String pieceSymbol = " ";
+                String pieceSymbol = EscapeSequences.EMPTY;
                 if (piece != null) {
                     String key = piece.getPieceColor() + "_" + piece.getPieceType();
                     pieceSymbol = PIECE_SYMBOLS.getOrDefault(key, "?");
                 }
 
-                System.out.print(squareColor + " " + pieceSymbol + " " + RESET_COLOR);
+                String textColor = piece != null && piece.getPieceColor().equals("WHITE") ? TEXT_COLOR_WHITE : TEXT_COLOR_BLACK;
+
+                System.out.print(squareColor + textColor + pieceSymbol + RESET_COLOR);
             }
             System.out.println(" " + actualRow); // Row number on the right side
         }
@@ -128,7 +131,7 @@ public class ChessBoardRenderer {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR + "  "); // Indentation for row numbers
         for (int col = 0; col < 8; col++) {
             char label = (char) ('a' + (whitePerspective ? col : 7 - col));
-            System.out.print(" " + label + " ");
+            System.out.print(" " + label + "  ");
         }
         System.out.println();
     }
