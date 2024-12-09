@@ -176,8 +176,20 @@ public class PostLoginClient {
             }
         }
 
+
         // List available colors
-        System.out.println("Available colors: white, black");
+        String options = "";
+        if (repl.getGame().whiteUsername() == null) {
+            options += "white";
+        }
+        if (repl.getGame().blackUsername() == null) {
+            if (repl.getGame().whiteUsername() == null) {
+                options += ", black";
+            } else {
+                options += "black";
+            }
+        }
+        System.out.println("Available colors: " + options);
 
         // Ask the user to choose one of the available colors
         String playerColor = "";
