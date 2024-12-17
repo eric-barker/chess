@@ -56,7 +56,11 @@ public class ChessBoardRenderer {
             for (int col = 0; col < 8; col++) {
                 int actualCol = whitePerspective ? col : 7 - col;
 
-                String squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
+                // Adjust background colors based on perspective, black wasn't working before
+                boolean isLightSquare = (actualRow + actualCol) % 2 == 0;
+
+
+                String squareColor = (isLightSquare) ? LIGHT_SQUARE : DARK_SQUARE;
                 ChessPosition position = new ChessPosition(actualRow, actualCol + 1);
                 ChessPiece piece = board.getPiece(position);
 
@@ -101,14 +105,17 @@ public class ChessBoardRenderer {
                 ChessPosition currentPosition = new ChessPosition(actualRow, actualCol + 1);
                 ChessPiece piece = board.getPiece(currentPosition);
 
+                // Adjust background colors based on perspective, black wasn't working before
+                boolean isLightSquare = (actualRow + actualCol) % 2 == 0;
+
                 String squareColor;
                 if (currentPosition.equals(evalPosition)) {
                     squareColor = EscapeSequences.SET_BG_COLOR_YELLOW;
                 } else if (legalPositions.contains(currentPosition)) {
-                    squareColor = ((row + actualCol) % 2 == 0) ?
+                    squareColor = (isLightSquare) ?
                             EscapeSequences.SET_BG_COLOR_GREEN : EscapeSequences.SET_BG_COLOR_DARK_GREEN;
                 } else {
-                    squareColor = ((row + actualCol) % 2 == 0) ? LIGHT_SQUARE : DARK_SQUARE;
+                    squareColor = (isLightSquare) ? LIGHT_SQUARE : DARK_SQUARE;
                 }
 
                 String pieceSymbol = switch (squareColor) {
@@ -138,8 +145,8 @@ public class ChessBoardRenderer {
     private static void printColumnLabels(boolean whitePerspective) {
         System.out.print(EscapeSequences.RESET_TEXT_COLOR + "  "); // Indentation for row numbers
         for (int col = 0; col < 8; col++) {
-            char label = (char) ('a' + (whitePerspective ? col : 7 - col));
-            System.out.print(" " + label + "  ");
+            char label = (char) ('ａ' + (whitePerspective ? col : 7 - col));
+            System.out.print(" " + label + " ");
         }
         System.out.println();
     }

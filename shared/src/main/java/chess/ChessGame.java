@@ -181,23 +181,23 @@ public class ChessGame {
         // Get valid moves for this piece
         Collection<ChessMove> validMoves = this.validMoves(startPosition);
 
-        boolean validMovesExist;
-        if (validMoves == null) {
-            validMovesExist = false;
-        }
+//        boolean validMovesExist;
+//        if (validMoves == null) {
+//            validMovesExist = false;
+//        }
 
         // Check if the move is valid
-        boolean isMoveValid = false;
-        for (ChessMove aMove : validMoves) {
-            if (aMove.getStartPosition().equals(move.getStartPosition()) &&
-                    aMove.getEndPosition().equals(move.getEndPosition())) {
-                isMoveValid = true;
-                break;  // Found a valid move
-            }
-        }
+//        boolean isMoveValid = false;
+//        for (ChessMove aMove : validMoves) {
+//            if (aMove.getStartPosition().equals(move.getStartPosition()) &&
+//                    aMove.getEndPosition().equals(move.getEndPosition())) {
+//                isMoveValid = true;
+//                break;  // Found a valid move
+//            }
+//        }
 
         // If the move is invalid, throw an exception
-        if (!isMoveValid) {
+        if (validMoves == null || !validMoves.contains(move)) {
             throw new InvalidMoveException("Invalid Move: The move is not allowed. ChessMove: " + move.toString());
         }
 

@@ -103,8 +103,8 @@ public class Repl implements WebSocketListener {
         // Call InGameClient to redraw the chessboard?
 
 
-        Boolean isWhite = username.equals(whiteUsername);
-        ChessBoardRenderer.renderChessBoard(newGame.getBoard(), isWhite);
+        Boolean isBlack = username.equals(blackUsername);
+        ChessBoardRenderer.renderChessBoard(newGame.getBoard(), !isBlack);
         printPrompt();
     }
 

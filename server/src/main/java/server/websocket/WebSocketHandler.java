@@ -232,13 +232,17 @@ public class WebSocketHandler {
             if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
                 LOGGER.info("Removing whiteUsername...");
                 newGame = new Game(command.getGameID(), null, game.blackUsername(), game.gameName(), game.game());
-            } else {
+            } else if (game.blackUsername() != null && game.blackUsername().equals(username)) {
                 LOGGER.info("Removing blackUsername...");
                 newGame = new Game(command.getGameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            } else {
+                newGame = null;
             }
 
-            LOGGER.info("Updating " + game.gameName() + ": \n" + game.toString() + "\n to: \n" + newGame.toString());
-            gameDAO.updateGame(newGame);
+            if (newGame != null) {
+                LOGGER.info("Updating " + game.gameName() + ": \n" + game.toString() + "\n to: \n" + newGame.toString());
+                gameDAO.updateGame(newGame);
+            }
 
             // remove the root client
             LOGGER.info("Closing session...");
